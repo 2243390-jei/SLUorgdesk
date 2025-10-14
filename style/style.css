@@ -145,24 +145,20 @@ button[type="submit"]:hover {
   src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
   font-weight: 400;
 }
-/* ----------------------------------------
-   HOME PAGE OVERRIDES & NAVBAR STYLING
----------------------------------------- */
-
 /* ===== HOME BODY ===== */
-/* ===== HOME PAGE BASE STYLES ===== */
 body.home-body {
   margin: 0;
   padding: 0;
   font-family: "Inter", sans-serif;
   background: #ffffff;
   overflow-x: hidden;
-  padding-top: 90px; /* space for fixed navbar */
+  overflow-y: auto;
+  padding-top: 90px; 
   display: block;
   height: auto;
-  justify-content: initial; /* Reset flex properties */
-  align-items: initial; /* Reset flex properties */
-  background-image: none; /* Optional: Remove dotted background */
+  justify-content: initial; 
+  align-items: initial; 
+  background-image: none; 
 }
 
 /* ===== NAVBAR ===== */
@@ -223,8 +219,8 @@ body.home-body {
 /* ===== HERO SECTION ===== */
 .home-body .hero {
   display: block;
-  padding: 40px 80px 0 80px; /* top padding, no bottom padding */
-  min-height: 30vh; /* adjust height as needed */
+  padding: 40px 80px 0 80px; 
+  min-height: 30vh; 
   box-sizing: border-box;
   background: #ffffff;
 }
@@ -232,7 +228,7 @@ body.home-body {
 .home-body .hero-content {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end; /* push image to bottom */
+  align-items: flex-end; 
   max-width: 1200px;
   margin: 0 auto;
   gap: 60px;
@@ -241,14 +237,14 @@ body.home-body {
 
 .home-body .hero-text {
   flex: 1;
-  align-self: flex-start; /* text stays at top */
+  align-self: center; 
 }
 
 .home-body .hero-text h1 {
   font-family: "Bebas Neue", sans-serif;
   font-size: 2.4rem;
   color: #000000;
-  margin: 0 0 10px 0; /* reduce bottom margin */
+  margin: 0 0 10px 0; 
   line-height: 1.2;
 }
 
@@ -256,7 +252,7 @@ body.home-body {
   font-family: "Inter", sans-serif;
   font-size: 1rem;
   color: #000000;
-  margin: 0 0 15px 0; /* reduce bottom margin */
+  margin: 0 0 15px 0; 
   max-width: 500px;
 }
 
@@ -282,7 +278,7 @@ body.home-body {
 
 .home-body .hero-image {
   flex: 1;
-  align-self: flex-end; /* image touches bottom */
+  align-self: flex-end; 
 }
 
 .home-body .hero-image img {
@@ -291,15 +287,15 @@ body.home-body {
   height: auto;
   display: block;
 }
+/*  School Section */
 
-/* ===== SCHOOLS SECTION ===== */
 .home-body .schools-section {
   display: block;
-  margin-top: 0; /* no gap with hero section */
+  margin-top: 0; 
   background-color: #2F3C4C;
   padding: 40px 60px;
   color: #ffffff;
-  min-height: 50vh; /* half screen height */
+  min-height: 50vh; 
 }
 
 .home-body .schools-content {
@@ -315,7 +311,7 @@ body.home-body {
 .home-body .schools-image {
   position: relative;
   display: flex;
-  justify-content: center; /* center image */
+  justify-content: center; 
   align-items: center;
   flex: 1;
 }
@@ -329,7 +325,7 @@ body.home-body {
   opacity: 1;
 }
 
-/* Carousel buttons beside image */
+
 .home-body .carousel-buttons {
   position: absolute;
   top: 50%;
@@ -357,7 +353,7 @@ body.home-body {
   background-color: rgba(255, 255, 255, 1);
 }
 
-/* Move buttons slightly outside the image */
+
 .home-body .carousel-buttons .prev {
   margin-left: -30px;
 }
@@ -369,7 +365,9 @@ body.home-body {
 /* TEXT SECTION */
 .home-body .schools-text {
   flex: 1;
-  padding-left: 20px;
+  text-align: right;
+  align-self: center;
+  padding-left: 30px;
 }
 
 .home-body .schools-text h2 {
