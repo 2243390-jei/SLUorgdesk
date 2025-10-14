@@ -1,4 +1,4 @@
-
+/*Authentication*/
 body {
   margin: 0;
   height: 100vh;
@@ -63,7 +63,6 @@ body::after {
   margin-bottom: 0.8rem;
 }
 
-
 .login-box h2 {
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
@@ -95,7 +94,6 @@ input {
   font-size: 0.9rem;
 }
 
-
 button[type="submit"] {
   background-color: #404040;
   color: #fff;
@@ -111,7 +109,6 @@ button[type="submit"]:hover {
   background-color: #2b2b2b;
 }
 
-
 .forgot {
   font-size: 0.8rem;
   color: #555;
@@ -120,7 +117,6 @@ button[type="submit"]:hover {
   display: block;
   text-decoration: none;
 }
-
 
 .divider {
   text-align: center;
@@ -135,4 +131,256 @@ button[type="submit"]:hover {
   height: auto;
 }
 
+/* Home html */
 
+/* FONTS */
+@font-face {
+  font-family: "Bebas Neue";
+  src: url("../Fonts/BebasNeue-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+/* ----------------------------------------
+   HOME PAGE OVERRIDES & NAVBAR STYLING
+---------------------------------------- */
+
+/* ===== HOME BODY ===== */
+/* ===== HOME PAGE BASE STYLES ===== */
+body.home-body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  background: #ffffff;
+  overflow-x: hidden;
+  padding-top: 90px; /* space for fixed navbar */
+  display: block;
+  height: auto;
+  justify-content: initial; /* Reset flex properties */
+  align-items: initial; /* Reset flex properties */
+  background-image: none; /* Optional: Remove dotted background */
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff; 
+  padding: 10px 30px;
+  box-shadow: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.navbar .logo img {
+  height: 70px;
+  width: auto;
+}
+
+.navbar nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navbar nav ul {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+  margin: 0;
+  padding: 10px 30px;
+  background-color: #1e1362;
+  border-radius: 40px;
+}
+
+.navbar nav a {
+  text-decoration: none;
+  font-family: "Inter", sans-serif;
+  color: #ffffff;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.navbar nav a:hover {
+  color: #ffce00;
+}
+
+.navbar .profile-icon img {
+  height: 40px;
+  cursor: pointer;
+}
+
+/* ===== HERO SECTION ===== */
+.home-body .hero {
+  display: block;
+  padding: 40px 80px 0 80px; /* top padding, no bottom padding */
+  min-height: 30vh; /* adjust height as needed */
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.home-body .hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* push image to bottom */
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.home-body .hero-text {
+  flex: 1;
+  align-self: flex-start; /* text stays at top */
+}
+
+.home-body .hero-text h1 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.4rem;
+  color: #000000;
+  margin: 0 0 10px 0; /* reduce bottom margin */
+  line-height: 1.2;
+}
+
+.home-body .hero-text p {
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  color: #000000;
+  margin: 0 0 15px 0; /* reduce bottom margin */
+  max-width: 500px;
+}
+
+.home-body .submit-btn {
+  display: inline-block;
+  background-color: transparent;
+  color: #000000;
+  padding: 10px 25px;
+  border-radius: 8px;
+  border: 2px solid #000000;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  letter-spacing: 0.5px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.home-body .submit-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.home-body .hero-image {
+  flex: 1;
+  align-self: flex-end; /* image touches bottom */
+}
+
+.home-body .hero-image img {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  display: block;
+}
+
+/* ===== SCHOOLS SECTION ===== */
+.home-body .schools-section {
+  display: block;
+  margin-top: 0; /* no gap with hero section */
+  background-color: #2F3C4C;
+  padding: 40px 60px;
+  color: #ffffff;
+  min-height: 50vh; /* half screen height */
+}
+
+.home-body .schools-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 50px;
+}
+
+/* IMAGE CAROUSEL */
+.home-body .schools-image {
+  position: relative;
+  display: flex;
+  justify-content: center; /* center image */
+  align-items: center;
+  flex: 1;
+}
+
+.home-body .schools-image img {
+  max-width: 450px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Carousel buttons beside image */
+.home-body .carousel-buttons {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.home-body .carousel-buttons button {
+  pointer-events: all;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  font-size: 1.5rem;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.home-body .carousel-buttons button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+/* Move buttons slightly outside the image */
+.home-body .carousel-buttons .prev {
+  margin-left: -30px;
+}
+
+.home-body .carousel-buttons .next {
+  margin-right: -30px;
+}
+
+/* TEXT SECTION */
+.home-body .schools-text {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.home-body .schools-text h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.home-body .schools-text p {
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  color: #ffffff;
+}

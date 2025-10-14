@@ -62,3 +62,42 @@ function handleCredentialResponse(response) {
     alert("Access denied: Please use your SLU email account.");
   }
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const images = [
+    "../Images/Samcis.png",
+    "../Images/BEdS.png",
+    "../Images/Sonahbs.png"
+  ];
+
+  let currentIndex = 0;
+  const schoolImg = document.getElementById("school-img");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  if (schoolImg && prevBtn && nextBtn) {
+    // Set initial image
+    schoolImg.src = images[currentIndex];
+    schoolImg.style.opacity = 1;
+
+    const changeImage = (index) => {
+      schoolImg.style.opacity = 0;
+      setTimeout(() => {
+        schoolImg.src = images[index];
+        schoolImg.style.opacity = 1;
+      }, 200);
+    };
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      changeImage(currentIndex);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % images.length;
+      changeImage(currentIndex);
+    });
+  }
+});
+
+
+
