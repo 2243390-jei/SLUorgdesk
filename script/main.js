@@ -71,42 +71,35 @@ function handleCredentialResponse(response) {
   }
 }
 
-// --- Image Carousel ---
-document.addEventListener("DOMContentLoaded", () => {
-  const images = [
-    "../Images/Samcis.png",
-    "../Images/BEdS.png",
-    "../Images/Sonahbs.png"
-  ];
+document.addEventListener('DOMContentLoaded', () => {
+  const images = document.querySelectorAll('.schools-section .carousel-slide img');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  let current = 0;
 
-  let currentIndex = 0;
-  const schoolImg = document.getElementById("school-img");
-  const prevBtn = document.getElementById("prev-btn");
-  const nextBtn = document.getElementById("next-btn");
+  function updateCarousel() {
+    images.forEach(img => img.classList.remove('active', 'prev', 'next'));
 
-  if (schoolImg && prevBtn && nextBtn) {
-    const updateCarousel = () => {
-      schoolImg.style.opacity = 0;
-      setTimeout(() => {
-        schoolImg.src = images[currentIndex];
-        schoolImg.style.opacity = 1;
-      }, 200);
-    };
+    const total = images.length;
+    const prevIndex = (current - 1 + total) % total;
+    const nextIndex = (current + 1) % total;
 
-    // Set initial image
-    schoolImg.src = images[currentIndex];
-    schoolImg.style.opacity = 1;
-
-    prevBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      updateCarousel();
-    });
-
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      updateCarousel();
-    });
+    images[current].classList.add('active');
+    images[prevIndex].classList.add('prev');
+    images[nextIndex].classList.add('next');
   }
+
+  prevBtn.addEventListener('click', () => {
+    current = (current - 1 + images.length) % images.length;
+    updateCarousel();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    current = (current + 1) % images.length;
+    updateCarousel();
+  });
+
+  updateCarousel();
 });
 
 // --- Navbar profile + organization table ---
