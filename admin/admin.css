@@ -79,6 +79,15 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   color: #ecf0f1;
 }
 
+.circle-btn i { font-size: 18px; }
+
+.circle-btn.active { 
+  background: linear-gradient(135deg, #3498db, #2980b9); 
+  box-shadow: 0 4px 16px rgba(52,152,219,0.4); 
+  transform: translateY(-1px); 
+  color: white; 
+}
+
 /* MAIN AREA */
 .main-area { 
   flex: 1; 
@@ -129,6 +138,27 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 
 .profile-circle:hover {
   transform: translateY(-1px);
+}
+
+.body { 
+  display: flex; 
+  gap: 18px; 
+  align-items: flex-start; 
+  flex: 1;
+}
+
+.org-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.org-table tr:hover {
+  background-color: #f2f2f2;
+}
+.org-table td, .org-table th {
+  padding: 10px;
+  text-align: center;
 }
 
 .footer { 
