@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         switch (user.role) {
           case "student": window.location.href = "student/home.html"; break;
-          case "osas":    window.location.href = "osas/dashboard.html"; break;
+          case "osas":    window.location.href = "osas/calendar.html"; break;
           case "admin":   window.location.href = "admin/dashboard.html"; break;
         }
       } else {
@@ -71,6 +71,7 @@ function handleCredentialResponse(response) {
   }
 }
 
+// --- Image Carousel ---
 document.addEventListener("DOMContentLoaded", () => {
   const images = [
     "../Images/Samcis.png",
@@ -84,31 +85,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next-btn");
 
   if (schoolImg && prevBtn && nextBtn) {
-    // Set initial image
-    schoolImg.src = images[currentIndex];
-    schoolImg.style.opacity = 1;
-
-    const changeImage = (index) => {
+    const updateCarousel = () => {
       schoolImg.style.opacity = 0;
       setTimeout(() => {
-        schoolImg.src = images[index];
+        schoolImg.src = images[currentIndex];
         schoolImg.style.opacity = 1;
       }, 200);
     };
 
+    // Set initial image
+    schoolImg.src = images[currentIndex];
+    schoolImg.style.opacity = 1;
+
     prevBtn.addEventListener("click", () => {
       currentIndex = (currentIndex - 1 + images.length) % images.length;
-      changeImage(currentIndex);
+      updateCarousel();
     });
 
-  nextBtn.addEventListener('click', () => {
-    current = (current + 1) % images.length;
-    updateCarousel();
-  });
-
-  updateCarousel();
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % images.length;
+      updateCarousel();
+    });
+  }
 });
-
 
 // --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
@@ -127,43 +126,77 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Mock organization data ---
-const organizations = [
-  { 
-    name: "ICON", 
-    school: "SAMCIS", 
-    programs: "BSIT, BSCS, BMMA", 
-    image: "/Images/orgs/ICON.jpg" 
-  },
-  { 
-    name: "JPIA", 
-    school: "SAMCIS", 
-    programs: "BSBA, BSAC", 
-    image: "/Images/orgs/JPIA.jpg" 
-  },
-  { 
-    name: "RPG", 
-    school: "SAMCIS", 
-    programs: "SAMCIS", 
-    image: "/Images/orgs/RPG.jpg" 
+  const organizations = [
+    { 
+      name: "ICON", 
+      school: "SAMCIS", 
+      programs: "BSIT, BSCS, BMMA", 
+      image: "/Images/orgs/ICON.jpg" 
+    },
+    { 
+      name: "JPIA", 
+      school: "SAMCIS", 
+      programs: "BSBA, BSAC", 
+      image: "/Images/orgs/JPIA.jpg" 
+    },
+    { 
+      name: "RPG", 
+      school: "SAMCIS", 
+      programs: "SAMCIS", 
+      image: "/Images/orgs/RPG.jpg" 
+    }
+  ];
+
+  const tableBody = document.getElementById("orgTableBody");
+
+  if (tableBody) {
+    tableBody.innerHTML = "";
+
+    organizations.forEach(org => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td><img src="${org.image}" alt="${org.name} logo" class="org-logo"></td>
+        <td>${org.name}</td>
+        <td>${org.school}</td>
+        <td>${org.programs}</td>
+      `;
+
+      tableBody.appendChild(row);
+    });
   }
-];
-
-const tableBody = document.getElementById("orgTableBody");
-
-if (tableBody) {
-  tableBody.innerHTML = "";
-
-  organizations.forEach(org => {
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td><img src="${org.image}" alt="${org.name} logo" class="org-logo"></td>
-      <td>${org.name}</td>
-      <td>${org.school}</td>
-      <td>${org.programs}</td>
-    `;
-
-    tableBody.appendChild(row);
-  });
-}
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  function getActiveSchool() {
+    const activeImg = document.querySelector('.carousel-slide img.active');
+    return activeImg ? activeImg.alt : null;
+  }
+
+  function updateGallery() {
+    const school = getActiveSchool();
+    const allGroups = document.querySelectorAll('.org-group');
+
+    allGroups.forEach(group => {
+      if (group.dataset.school === school) {
+        group.classList.add("active");
+      } else {
+        group.classList.remove("active");
+      }
+    });
+  }
+
+  // Initial load
+  updateGallery();
+
+  // Update when carousel moves
+  prevBtn.addEventListener("click", updateGallery);
+  nextBtn.addEventListener("click", updateGallery);
+});
+
+
+
