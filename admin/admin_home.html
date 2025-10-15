@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Home</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-jQf6B8VQw5s3pQKxZ0vZk4bqf6tF6y5r8i8P6b1GxZ9l1E2YQk3xG3k2y3P1X9c4n6b7R8s9T0wW3e4F5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Left circular sidebar -->
+    <aside class="leftbar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo">AD</div>
+      </div>
+
+      <nav class="left-nav" role="navigation" aria-label="Admin Sidebar">
+        <button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)" onclick="window.location.href='home.html'">
+        <i class="fa-solid fa-chart-column"></i></button>
+        <button class="circle-btn" title="Create Organization Account" aria-label="Create Organization Account" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-user-plus"></i></button>
+      </nav>
+    </aside>
+
+    <!-- Main area -->
+    <main class="main-area" role="main">
+      <!-- Keep your original header with "Hello, Admin" -->
+      <header class="header">
+        <div class="greeting">
+          <h1>Hello, Admin</h1>
+          <div class="muted">Analytics Dashboard</div>
+        </div>
+        <div class="top-actions">
+          <div class="profile-header">
+            <div class="profile-circle">M</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ✅ FULL DASHBOARD HTML (with .dashboard wrapper) -->
+      <div class="dashboard">
+        <!-- Menu (we'll hide it visually since you have leftbar, but keep for structure) -->
+        <div class="menu flex-c">
+          <div class="logo">
+            <div class="icon">
+              <ion-icon name="logo-bitbucket"></ion-icon>
+            </div>
+          </div>
+          <div class="navigation">
+            <div class="icon"><ion-icon name="filter-circle-outline"></ion-icon></div>
+            <div class="icon"><ion-icon name="file-tray-full-outline"></ion-icon></div>
+            <div class="icon"><ion-icon name="mail-unread-outline"></ion-icon></div>
+            <div class="icon"><ion-icon name="pulse-outline"></ion-icon></div>
+            <div class="icon"><ion-icon name="storefront-outline"></ion-icon></div>
+          </div>
+          <div class="settings">
+            <div class="icon"><ion-icon name="settings-outline"></ion-icon></div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="main-content">
+            <!-- Stats -->
+            <div class="stats flex">
+              <div class="stats-box sales">
+                <h2 class="heading">Sales</h2>
+                <canvas id="sales"></canvas>
+              </div>
+              <div class="stats-box earning">
+                <h2 class="heading">Earning</h2>
+                <div class="earning-amount flex-c">
+                  <div class="earning-icon flex">
+                    <ion-icon name="logo-paypal"></ion-icon>
+                  </div>
+                  <p>$9125.33</p>
+                </div>
+                <canvas id="earning"></canvas>
+              </div>
+            </div>
+
+            <!-- Product Stats -->
+            <div class="product-stats flex">
+              <div class="product-sales stats-box">
+                <h2 class="heading">Sales</h2>
+                <canvas id="products"></canvas>
+              </div>
+              <div class="top-selling stats-box">
+                <h2 class="heading">Top Selling Product</h2>
+                <table class="top-selling-products" height="100%" width="100%">
+                  <tr><th>ID</th><th>Product</th><th>Price</th><th>Sold</th></tr>
+                  <tr>
+                    <td>68231</td>
+                    <td>
+                      <div class="product-name flex">
+                        <div class="icon"><ion-icon name="logo-amazon"></ion-icon></div>
+                        <p>Amazon Kindle 4th Gen</p>
+                      </div>
+                    </td>
+                    <td>$1900</td>
+                    <td>351</td>
+                  </tr>
+                  <tr>
+                    <td>68231</td>
+                    <td>
+                      <div class="product-name iphone flex">
+                        <div class="icon"><ion-icon name="logo-apple"></ion-icon></div>
+                        <p>Iphone 11 Pro</p>
+                      </div>
+                    </td>
+                    <td>$1300</td>
+                    <td>121</td>
+                  </tr>
+                  <tr>
+                    <td>68231</td>
+                    <td>
+                      <div class="product-name windows flex">
+                        <div class="icon"><ion-icon name="logo-microsoft"></ion-icon></div>
+                        <p>Windows 11</p>
+                      </div>
+                    </td>
+                    <td>$180</td>
+                    <td>195</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div> <!-- ⚠️ This was missing! Closes .content -->
+      </div> <!-- Closes .dashboard -->
+
+      <footer class="footer muted">© <span id="curYear"></span> Admin Home</footer>
+    </main>
+
+    <script>
+      document.getElementById('curYear').textContent = new Date().getFullYear();
+    </script>
+    <!-- Make sure this points to your actual JS file -->
+    <script src="admin/admin.js"></script>
+  </div>
+</body>
+</html>

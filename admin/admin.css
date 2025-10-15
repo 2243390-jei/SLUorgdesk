@@ -167,3 +167,330 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   text-align: right; 
   border-top: 1px solid #eef2f6;
 }
+
+/* Home */
+
+/* Dashboard integration styles */
+
+/* Hide the dashboard's internal menu (we use .leftbar instead) */
+.dashboard .menu {
+  display: none;
+}
+
+/* Make dashboard content fill available space */
+.dashboard {
+  background: #291623;
+  border-radius: var(--rounded);
+  overflow: hidden;
+  width: 100%;
+  min-height: 700px; /* Adjust as needed */
+  display: flex;
+  margin-top: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard .content {
+  flex: 1;
+  display: flex;
+  padding: 0;
+}
+
+/* Main content area (76%) */
+.main-content {
+  width: 76%;
+  padding: 3rem;
+  background: #291623;
+}
+
+/* Profile sidebar (24%) */
+.profile {
+  background: #2f1a27;
+  padding: 2rem;
+  width: 24%;
+  color: #927685;
+  font-family: "Time New Roman", sans-serif;
+}
+
+/* Flex utilities (from your dashboard CSS) */
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-c {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Typography */
+.heading {
+  font-size: 1.8rem;
+  color: #fcfcfc;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 2rem;
+  font-family: "Time New Roman", sans-serif;
+}
+
+/* Stats section */
+.stats {
+  background: #33202c;
+  margin-top: 4rem;
+  padding: 2rem 1rem;
+  font-size: 1.6rem;
+  justify-content: space-between;
+  display: flex;
+  border-radius: 8px;
+}
+
+.stats-box {
+  min-height: 30rem;
+  padding: 2rem 1rem;
+}
+
+.sales {
+  flex: 0 0 60%;
+}
+
+.earning {
+  background: #3f2532;
+  width: 38%;
+}
+
+.earning-amount {
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.earning-icon {
+  font-size: 4rem;
+  color: #3f2532;
+  background: linear-gradient(to right bottom, #faad72, #f89456);
+  padding: 15px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* Product Stats */
+.product-stats {
+  justify-content: space-between;
+  margin-top: 2rem;
+  display: flex;
+}
+
+.product-stats .stats-box {
+  background: #33202c;
+  border-radius: 8px;
+}
+
+.product-sales {
+  width: 38%;
+}
+
+.top-selling {
+  width: 60%;
+}
+
+.top-selling-products {
+  text-align: left;
+  font-size: 1.8rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.top-selling-products th,
+.top-selling-products td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #44303a;
+}
+
+.top-selling-products th {
+  background: #3f2532;
+  color: #fff;
+}
+
+.product-name {
+  justify-content: flex-start;
+}
+
+.product-name p {
+  margin-left: 10px;
+  color: #e6e3e5;
+}
+
+.product-name .icon {
+  margin: 0;
+  background: #ff8bb4;
+  border-radius: 50%;
+  color: #291623;
+  font-size: 3rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-name.iphone .icon {
+  background: #f89456;
+}
+
+.product-name.windows .icon {
+  background: #dc9afc;
+}
+
+/* Profile section */
+.user {
+  color: #fff;
+  text-align: center;
+  margin: 3rem 0 5rem 0;
+}
+
+.user img {
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user h2 {
+  font-size: 2rem;
+  margin: 8px 0;
+  font-family: "Time New Roman", sans-serif;
+}
+
+.user p {
+  color: #ccc;
+  font-family: "Time New Roman", sans-serif;
+}
+
+.title {
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title .heading {
+  margin-bottom: 0;
+}
+
+.activities {
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.activity {
+  justify-content: flex-start;
+  font-size: 14px;
+  margin: 2rem 0;
+  color: #ddd;
+}
+
+.activity h2 {
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.task p {
+  color: #ddd;
+  margin: 0;
+}
+
+.time {
+  margin-top: 4px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.activity .icon {
+  font-size: 3rem;
+  width: 40px;
+  height: 40px;
+  background: #33202c;
+  margin: 0 10px 5px 0;
+  border-radius: 50%;
+  color: #faad72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upgrade {
+  width: 100%;
+  margin: 5rem auto 0 auto;
+  background: #33202c;
+  padding: 2rem;
+  color: #ccc;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.upgrade .icon {
+  font-size: 8rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  width: 100%;
+  margin: 1.5rem auto 0 auto;
+  background: linear-gradient(to right bottom, #faad72, #f89456);
+  padding: 1.2rem 0;
+  color: #2f1a27;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: center;
+  font-family: "Time New Roman", sans-serif;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .main-content,
+  .profile {
+    width: 100%;
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .profile {
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  /* Optional: hide less critical sections on mobile */
+  .title h2,
+  .upgrade,
+  .btn {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 650px) {
+  .product-stats {
+    flex-direction: column;
+  }
+
+  .product-sales,
+  .top-selling {
+    width: 100% !important;
+    margin-bottom: 1.5rem;
+  }
+}
