@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/OSASorgs.css">
+    <script src="/script/main.js" defer></script>
+    <title>Organizations in SLU</title>
+</head>
+<body>
+  <div class="app">
+    <aside class="leftbar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo">AD</div>
+      </div>
+
+      <nav class="left-nav" role="navigation" aria-label="Sidebar">
+        
+<button class="circle-btn" title="Calendar" aria-label="Calendar">
+    <img src="/Images/calendar.png" alt="Calendar" class="nav-icon">
+  </button>
+
+        <button class="circle-btn active" title="Organizations" aria-label="Organizations">
+    <img src="/Images/grid.png" alt="Organizations" class="nav-icon">
+  </button>
+
+  
+  
+        <button class="circle-btn" title="Email" aria-label="Email"><i class="fa-regular fa-envelope"></i></button>
+        <button class="circle-btn" title="Form List" aria-label="Form List"><i class="fa-solid fa-list-check"></i></button>
+        <button class="circle-btn" title="View All Users" aria-label="View All Users"><i class="fa-solid fa-users"></i></button>
+      </nav>
+    </aside>  
+
+    <main class="main-area" role="main">
+      <header class="header">
+        <div class="greeting">
+          <h1>Hello, OSAS</h1>
+          <div class="muted">Here are all the student organizations inside of Saint Louis University</div>
+        </div>
+
+        <div class="top-actions">
+          <div class="search-wrap">
+            <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization" />
+            <button id="searchClear" title="Clear" aria-label="Clear search">✕</button>
+          </div>
+          <!-- Profile moved to header -->
+          <div class="profile-header">
+            <div class="profile-circle">M</div>
+          </div>
+        </div>
+      </header>
+
+      <table class="org-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Organization</th>
+      <th>School</th>
+      <th>Programs</th>
+    </tr>
+  </thead>
+  <tbody id="orgTableBody"></tbody>
+</table>
+
+
+
+
+</body>
+</html>
