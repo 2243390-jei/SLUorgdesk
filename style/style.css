@@ -292,7 +292,7 @@ body.home-body {
 .home-body .schools-section {
   display: block;
   margin-top: 0;
-  background-color: #2F3C4C;
+  background: linear-gradient(125deg, rgb(14, 4, 101), rgb(50, 94, 208));
   padding: 40px 60px;
   color: #ffffff;
   min-height: 30vh;
