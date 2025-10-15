@@ -64,15 +64,14 @@ function handleCredentialResponse(response) {
     } else if (email.startsWith("admin@")) {
       window.location.href = "admin/dashboard.html";
     } else {
-      // Any other SLU email fallback
       alert("Unrecognized SLU account type.");
     }
   } else {
-    // if hindi slu org acc niya hindi siya makakapasok
     alert("Access denied: Please use your SLU email account.");
   }
 }
 
+// --- Image carousel logic ---
 document.addEventListener("DOMContentLoaded", () => {
   const images = [
     "../Images/Samcis.png",
@@ -110,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
   // --- Navbar profile update (if user is logged in) ---
   const navbarProfilePic = document.getElementById("nav-profile-pic");
@@ -125,4 +125,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Mock organization data ---
+const organizations = [
+  { 
+    name: "ICON", 
+    school: "SAMCIS", 
+    programs: "BSIT, BSCS, BMMA", 
+    image: "/Images/orgs/ICON.jpg" 
+  },
+  { 
+    name: "JPIA", 
+    school: "SAMCIS", 
+    programs: "BSBA, BSAC", 
+    image: "/Images/orgs/JPIA.jpg" 
+  },
+  { 
+    name: "RPG", 
+    school: "SAMCIS", 
+    programs: "SAMCIS", 
+    image: "/Images/orgs/RPG.jpg" 
+  }
+];
+
+const tableBody = document.getElementById("orgTableBody");
+
+if (tableBody) {
+  tableBody.innerHTML = "";
+
+  organizations.forEach(org => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td><img src="${org.image}" alt="${org.name} logo" class="org-logo"></td>
+      <td>${org.name}</td>
+      <td>${org.school}</td>
+      <td>${org.programs}</td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
 });
