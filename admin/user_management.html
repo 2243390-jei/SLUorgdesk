@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-jQf6B8VQw5s3pQKxZ0vZk4bqf6tF6y5r8i8P6b1GxZ9l1E2YQk3xG3k2y3P1X9c4n6b7R8s9T0wW3e4F5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="admin.css">
+    <script src="/script/main.js" defer></script>    
+  </head>
+
+  <body>
+    <div class="app">
+      <aside class="leftbar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="logo">AD</div>
+        </div>
+
+        <nav class="left-nav" role="navigation" aria-label="Sidebar">
+          <a href="../admin/home.html"><button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/here.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
+          <a href="../admin/user_management.html"><button class="circle-btn active" title="User Management" aria-label="User Management"><img src="/Images/here.png" alt="User Management" class="nav-icon"></button></a>    
+        </nav>
+      </aside>
+
+      <!-- Main area -->
+      <main class="main-area" role="main">
+        <header class="header">
+          <div class="greeting">
+            <h1>Hello, Admin</h1>
+            <div class="muted">Here are all the student organizations inside of Saint Louis University</div>
+          </div>
+
+          <div class="top-actions">
+            <div class="profile-header">
+              <div class="profile-circle">A</div>
+            </div>
+          </div>
+        </header>
+
+        <table class="org-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Organization</th>
+              <th>School</th>
+              <th>Programs</th>
+            </tr>
+          </thead>
+          <tbody id="orgTableBody"></tbody>
+        </table>        
+
+        <footer class="footer muted">© <span id="curYear"></span> Admin User Management</footer>
+      </main>
+    </div>
+  </body>
+</html>
