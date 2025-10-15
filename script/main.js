@@ -64,37 +64,42 @@ function handleCredentialResponse(response) {
     } else if (email.startsWith("admin@")) {
       window.location.href = "admin/dashboard.html";
     } else {
-      // Any other SLU email fallback
       alert("Unrecognized SLU account type.");
     }
   } else {
-    // if hindi slu org acc niya hindi siya makakapasok
     alert("Access denied: Please use your SLU email account.");
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const images = document.querySelectorAll('.schools-section .carousel-slide img');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  let current = 0;
+document.addEventListener("DOMContentLoaded", () => {
+  const images = [
+    "../Images/Samcis.png",
+    "../Images/BEdS.png",
+    "../Images/Sonahbs.png"
+  ];
 
-  function updateCarousel() {
-    images.forEach(img => img.classList.remove('active', 'prev', 'next'));
+  let currentIndex = 0;
+  const schoolImg = document.getElementById("school-img");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
 
-    const total = images.length;
-    const prevIndex = (current - 1 + total) % total;
-    const nextIndex = (current + 1) % total;
+  if (schoolImg && prevBtn && nextBtn) {
+    // Set initial image
+    schoolImg.src = images[currentIndex];
+    schoolImg.style.opacity = 1;
 
-    images[current].classList.add('active');
-    images[prevIndex].classList.add('prev');
-    images[nextIndex].classList.add('next');
-  }
+    const changeImage = (index) => {
+      schoolImg.style.opacity = 0;
+      setTimeout(() => {
+        schoolImg.src = images[index];
+        schoolImg.style.opacity = 1;
+      }, 200);
+    };
 
-  prevBtn.addEventListener('click', () => {
-    current = (current - 1 + images.length) % images.length;
-    updateCarousel();
-  });
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      changeImage(currentIndex);
+    });
 
   nextBtn.addEventListener('click', () => {
     current = (current + 1) % images.length;
@@ -105,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
   // --- Navbar profile update (if user is logged in) ---
   const navbarProfilePic = document.getElementById("nav-profile-pic");
@@ -120,4 +126,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Mock organization data ---
+const organizations = [
+  { 
+    name: "ICON", 
+    school: "SAMCIS", 
+    programs: "BSIT, BSCS, BMMA", 
+    image: "/Images/orgs/ICON.jpg" 
+  },
+  { 
+    name: "JPIA", 
+    school: "SAMCIS", 
+    programs: "BSBA, BSAC", 
+    image: "/Images/orgs/JPIA.jpg" 
+  },
+  { 
+    name: "RPG", 
+    school: "SAMCIS", 
+    programs: "SAMCIS", 
+    image: "/Images/orgs/RPG.jpg" 
+  }
+];
+
+const tableBody = document.getElementById("orgTableBody");
+
+if (tableBody) {
+  tableBody.innerHTML = "";
+
+  organizations.forEach(org => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td><img src="${org.image}" alt="${org.name} logo" class="org-logo"></td>
+      <td>${org.name}</td>
+      <td>${org.school}</td>
+      <td>${org.programs}</td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
 });
