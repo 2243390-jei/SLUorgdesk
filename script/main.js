@@ -73,42 +73,37 @@ function handleCredentialResponse(response) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const images = [
-    "../Images/Samcis.png",
-    "../Images/BEdS.png",
-    "../Images/Sonahbs.png"
-  ];
+document.addEventListener('DOMContentLoaded', () => {
+  const images = document.querySelectorAll('.schools-section .carousel-slide img');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  let current = 0;
 
-  let currentIndex = 0;
-  const schoolImg = document.getElementById("school-img");
-  const prevBtn = document.getElementById("prev-btn");
-  const nextBtn = document.getElementById("next-btn");
+  function updateCarousel() {
+    images.forEach(img => img.classList.remove('active', 'prev', 'next'));
 
-  if (schoolImg && prevBtn && nextBtn) {
-    // Set initial image
-    schoolImg.src = images[currentIndex];
-    schoolImg.style.opacity = 1;
+    const total = images.length;
+    const prevIndex = (current - 1 + total) % total;
+    const nextIndex = (current + 1) % total;
 
-    const changeImage = (index) => {
-      schoolImg.style.opacity = 0;
-      setTimeout(() => {
-        schoolImg.src = images[index];
-        schoolImg.style.opacity = 1;
-      }, 200);
-    };
-
-    prevBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      changeImage(currentIndex);
-    });
-
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      changeImage(currentIndex);
-    });
+    images[current].classList.add('active');
+    images[prevIndex].classList.add('prev');
+    images[nextIndex].classList.add('next');
   }
+
+  prevBtn.addEventListener('click', () => {
+    current = (current - 1 + images.length) % images.length;
+    updateCarousel();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    current = (current + 1) % images.length;
+    updateCarousel();
+  });
+
+  updateCarousel();
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- Navbar profile update (if user is logged in) ---
