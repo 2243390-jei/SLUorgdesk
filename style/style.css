@@ -287,15 +287,15 @@ body.home-body {
   height: auto;
   display: block;
 }
-/*  School Section */
 
+/* ===== SCHOOL SECTION ===== */
 .home-body .schools-section {
   display: block;
-  margin-top: 0; 
+  margin-top: 0;
   background-color: #2F3C4C;
   padding: 40px 60px;
   color: #ffffff;
-  min-height: 50vh; 
+  min-height: 50vh;
 }
 
 .home-body .schools-content {
@@ -307,60 +307,93 @@ body.home-body {
   gap: 50px;
 }
 
-/* IMAGE CAROUSEL */
-.home-body .schools-image {
-  position: relative;
+/* === PERSPECTIVE CAROUSEL (3 IMAGES ONLY) === */
+.carousel {
   display: flex;
-  justify-content: center; 
   align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+.carousel-slide {
+  position: relative;
   flex: 1;
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 350px;
 }
 
-.home-body .schools-image img {
-  max-width: 450px;
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  transition: opacity 0.3s ease;
-  opacity: 1;
-}
-
-
-.home-body .carousel-buttons {
+/* Base style for all images */
+.carousel-slide img {
   position: absolute;
+  width: 280px;
+  height: 200px;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: all 0.6s ease;
+  border-radius: 12px;
+  z-index: 1;
+}
+
+/* Center (active) image */
+.carousel-slide img.active {
+  opacity: 1;
+  transform: scale(1) translateZ(80px);
+  z-index: 3;
+}
+
+/* Left (previous) image */
+.carousel-slide img.prev {
+  opacity: 0.8;
+  transform: scale(0.8) translateX(-180px) rotateY(25deg);
+  z-index: 2;
+}
+
+/* Right (next) image */
+.carousel-slide img.next {
+  opacity: 0.8;
+  transform: scale(0.8) translateX(180px) rotateY(-25deg);
+  z-index: 2;
+}
+
+/* Hide all other images (no background stacking) */
+.carousel-slide img:not(.active):not(.prev):not(.next) {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.6) translateZ(-200px);
+}
+
+/* Buttons */
+.carousel-buttons {
+  position: absolute;
+  width: 100%;
   top: 50%;
-  left: 0;
-  right: 0;
+  transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  transform: translateY(-50%);
   pointer-events: none;
+  z-index: 10;
 }
 
-.home-body .carousel-buttons button {
-  pointer-events: all;
-  background-color: rgba(255, 255, 255, 0.7);
+.carousel-buttons button {
+  background: none;
   border: none;
-  font-size: 1.5rem;
-  padding: 8px 12px;
-  border-radius: 50%;
+  color: #ffffff;
+  font-size: 2rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  pointer-events: all;
+  transition: color 0.3s;
+  z-index: 11;
 }
 
-.home-body .carousel-buttons button:hover {
-  background-color: rgba(255, 255, 255, 1);
+.carousel-buttons button:hover {
+  color: #ffcc00;
 }
 
-
-.home-body .carousel-buttons .prev {
-  margin-left: -30px;
-}
-
-.home-body .carousel-buttons .next {
-  margin-right: -30px;
-}
 
 /* TEXT SECTION */
 .home-body .schools-text {
@@ -382,3 +415,4 @@ body.home-body {
   font-size: 1rem;
   color: #ffffff;
 }
+
