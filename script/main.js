@@ -121,3 +121,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  function getActiveSchool() {
+    const activeImg = document.querySelector('.carousel-slide img.active');
+    return activeImg ? activeImg.alt : null;
+  }
+
+  function updateGallery() {
+    const school = getActiveSchool();
+    const allGroups = document.querySelectorAll('.org-group');
+
+    allGroups.forEach(group => {
+      if (group.dataset.school === school) {
+        group.classList.add("active");
+      } else {
+        group.classList.remove("active");
+      }
+    });
+  }
+
+  // Initial load
+  updateGallery();
+
+  // Update when carousel moves
+  prevBtn.addEventListener("click", updateGallery);
+  nextBtn.addEventListener("click", updateGallery);
+});
+
+
+
