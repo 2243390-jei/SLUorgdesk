@@ -71,7 +71,6 @@ function handleCredentialResponse(response) {
   }
 }
 
-// --- Image carousel logic ---
 document.addEventListener("DOMContentLoaded", () => {
   const images = [
     "../Images/Samcis.png",
@@ -102,12 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
       changeImage(currentIndex);
     });
 
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      changeImage(currentIndex);
-    });
-  }
+  nextBtn.addEventListener('click', () => {
+    current = (current + 1) % images.length;
+    updateCarousel();
+  });
+
+  updateCarousel();
 });
+
 
 // --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {

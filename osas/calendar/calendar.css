@@ -431,7 +431,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 
 .event-head { 
   display: flex; 
-  justify-content: space-between; 
+  justify-c ontent: space-between; 
   align-items: flex-start; 
   gap: 8px; 
 }
