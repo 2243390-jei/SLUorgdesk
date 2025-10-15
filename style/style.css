@@ -192,11 +192,11 @@ body.home-body {
 .navbar nav ul {
   display: flex;
   list-style: none;
-  gap: 30px;
+  gap: 65px;
   margin: 0;
-  padding: 10px 30px;
+  padding: 15px 40px;
   background-color: #1e1362;
-  border-radius: 40px;
+  border-radius: 50px;
 }
 
 .navbar nav a {
@@ -242,7 +242,7 @@ body.home-body {
 
 .home-body .hero-text h1 {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 2.4rem;
+  font-size: 3rem;
   color: #000000;
   margin: 0 0 10px 0; 
   line-height: 1.2;
@@ -250,7 +250,7 @@ body.home-body {
 
 .home-body .hero-text p {
   font-family: "Inter", sans-serif;
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #000000;
   margin: 0 0 15px 0; 
   max-width: 500px;
@@ -348,15 +348,15 @@ body.home-body {
 
 /* Left (previous) image */
 .carousel-slide img.prev {
-  opacity: 0.8;
-  transform: scale(0.8) translateX(-180px) rotateY(25deg);
+  opacity: 0.5;
+  transform: scale(0.62) translateX(-205px) rotateY(25deg);
   z-index: 2;
 }
 
 /* Right (next) image */
 .carousel-slide img.next {
-  opacity: 0.8;
-  transform: scale(0.8) translateX(180px) rotateY(-25deg);
+  opacity: 0.5;
+  transform: scale(0.62) translateX(205px) rotateY(-25deg);
   z-index: 2;
 }
 
@@ -370,7 +370,7 @@ body.home-body {
 /* Buttons */
 .carousel-buttons {
   position: absolute;
-  width: 100%;
+  width: 80%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -398,28 +398,29 @@ body.home-body {
 /* TEXT SECTION */
 .home-body .schools-text {
   flex: 1;
-  text-align: right;
+  text-align: left;
   align-self: center;
   padding-left: 30px;
 }
 
 .home-body .schools-text h2 {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 2.2rem;
+  font-size: 3rem;
   margin-bottom: 15px;
   color: #ffffff;
 }
 
 .home-body .schools-text p {
   font-family: "Inter", sans-serif;
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #ffffff;
 }
 
-.organizations-section{
+/* Org Section */
+.organizations-section h2{
   text-align: center;
   font-family: "Bebas Neue", sans-serif;
-  font-size: 37px;
+  font-size: 3rem;
   margin-bottom: 30px;
 }
 
