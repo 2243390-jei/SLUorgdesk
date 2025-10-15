@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Home</title>
 
-  <!-- Font (system fallback) + Font Awesome for nicer icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-jQf6B8VQw5s3pQKxZ0vZk4bqf6tF6y5r8i8P6b1GxZ9l1E2YQk3xG3k2y3P1X9c4n6b7R8s9T0wW3e4F5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="admin.css">
 </head>
@@ -19,13 +22,14 @@
       </div>
 
       <nav class="left-nav" role="navigation" aria-label="Admin Sidebar">
-        <button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)" onclick="window.location.href='home.html'"></button><i class="fa-solid fa-chart-column"></i></button>       
-        <button class="circle-btn" title="Create Organization Account" aria-label="Create Organization Account" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-user-plus"></i></button>        
+        <button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)" onclick="window.location.href='home.html'">
+        <i class="fa-solid fa-chart-column"></i></button>
+        <button class="circle-btn" title="Create Organization Account" aria-label="Create Organization Account" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-user-plus"></i></button>
       </nav>
     </aside>
 
     <!-- Main area -->
-   <main class="main-area" role="main">
+    <main class="main-area" role="main">
       <!-- Keep your original header with "Hello, Admin" -->
       <header class="header">
         <div class="greeting">
@@ -62,8 +66,6 @@
 
         <div class="content">
           <div class="main-content">
-            <!-- ❌ REMOVED: .head with "Good Morning 👋" to avoid duplication -->
-
             <!-- Stats -->
             <div class="stats flex">
               <div class="stats-box sales">
@@ -129,8 +131,8 @@
               </div>
             </div>
           </div>
-
-         
+        </div> <!-- ⚠️ This was missing! Closes .content -->
+      </div> <!-- Closes .dashboard -->
 
       <footer class="footer muted">© <span id="curYear"></span> Admin Home</footer>
     </main>
@@ -138,6 +140,8 @@
     <script>
       document.getElementById('curYear').textContent = new Date().getFullYear();
     </script>
-    <script src="js/script.js"></script>
+    <!-- Make sure this points to your actual JS file -->
+    <script src="admin/admin.js"></script>
+  </div>
 </body>
 </html>
