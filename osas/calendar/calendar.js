@@ -158,8 +158,13 @@ function makeDayCell(dateObj, inactive=false){
       const firstEv = pastEvents[0];
       const card = document.querySelector(`.event-card[data-id="${firstEv.id}"]`);
       if (card) {
-        // scroll the events container to the card
-        card.scrollIntoView({behavior:'smooth', block:'center'});
+        // FIXED SCROLLING: Only scroll if the card is not in view
+        const cardRect = card.getBoundingClientRect();
+        const containerRect = eventsListEl.getBoundingClientRect();
+        
+        if (cardRect.top < containerRect.top || cardRect.bottom > containerRect.bottom) {
+          card.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
         // open detail panel for that event
         openDetailPanel(firstEv);
       }
@@ -224,7 +229,13 @@ function renderPastEvents(filterText = '') {
       const dayEl = document.querySelector(`.day[data-date="${ev.date}"]`);
       if (dayEl) {
         dayEl.classList.add('highlight');
-        dayEl.scrollIntoView({behavior:'smooth', block:'center'});
+        // FIXED SCROLLING: Only scroll if the day is not in view
+        const dayRect = dayEl.getBoundingClientRect();
+        const calendarRect = calendarGrid.getBoundingClientRect();
+        
+        if (dayRect.top < calendarRect.top || dayRect.bottom > calendarRect.bottom) {
+          dayEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
       }
     });
 
@@ -318,4 +329,4 @@ todayBtn.addEventListener('click', () => {
 
 // initial render
 renderCalendar();
-renderPastEvents(); 
+renderPastEvents();
