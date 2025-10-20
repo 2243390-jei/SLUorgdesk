@@ -13,20 +13,20 @@
 
   <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
   <div class="app">
     <!-- Left circular sidebar -->
-    <aside class="leftbar" aria-label="Main navigation">
-      <div class="brand">
-        <div class="logo">AD</div>
-      </div>
+      <aside class="leftbar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="logo">AD</div>
+        </div>
 
-      <nav class="left-nav" role="navigation" aria-label="Admin Sidebar">
-        <button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)" onclick="window.location.href='home.html'">
-        <i class="fa-solid fa-chart-column"></i></button>
-        <button class="circle-btn" title="Create Organization Account" aria-label="Create Organization Account" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-user-plus"></i></button>
-      </nav>
-    </aside>
+        <nav class="left-nav" role="navigation" aria-label="Sidebar">
+          <a href="../admin/dashboard.html"><button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/statistics.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
+          <a href="../admin/usermanagement.html"><button class="circle-btn active" title="User Management" aria-label="User Management"><img src="/Images/user_management.png" alt="User Management" class="nav-icon"></button></a>    
+        </nav>
+      </aside>
 
     <!-- Main area -->
     <main class="main-area" role="main">
@@ -43,96 +43,109 @@
         </div>
       </header>
 
-      <!-- ✅ FULL DASHBOARD HTML (with .dashboard wrapper) -->
-      <div class="dashboard">
-        <!-- Menu (we'll hide it visually since you have leftbar, but keep for structure) -->
-        <div class="menu flex-c">
-          <div class="logo">
-            <div class="icon">
-              <ion-icon name="logo-bitbucket"></ion-icon>
-            </div>
-          </div>
-          <div class="navigation">
-            <div class="icon"><ion-icon name="filter-circle-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="file-tray-full-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="mail-unread-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="pulse-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="storefront-outline"></ion-icon></div>
-          </div>
-          <div class="settings">
-            <div class="icon"><ion-icon name="settings-outline"></ion-icon></div>
-          </div>
+      <!-- Analytics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
+    <div class="stat-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-2xl">👥</div>
+      </div>
+      <div class="metric-value" id="totalUsers">2,847</div>
+      <div class="metric-label">Total Users</div>
+      <div class="metric-change positive">↑ 12.5% from last month</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-2xl">✓</div>
+      </div>
+      <div class="metric-value" id="activeUsers">1,923</div>
+      <div class="metric-label">Active Users</div>
+      <div class="metric-change positive">↑ 8.2% from last month</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-2xl">🏢</div>
+      </div>
+      <div class="metric-value" id="totalOrgs">47</div>
+      <div class="metric-label">Organizations</div>
+      <div class="metric-change positive">↑ 3 new this month</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-2xl">⏸</div>
+      </div>
+      <div class="metric-value" id="inactiveUsers">924</div>
+      <div class="metric-label">Inactive Users</div>
+      <div class="metric-change negative">↓ 4.1% from last month</div>
+    </div>
+  </div>
+
+  <!-- User Management Section -->
+  <div class="table-container">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-bold mb-4">User Management</h2>
+
+      <!-- Filters and Search -->
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="flex-1">
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search users by name or email..."
+          >
         </div>
+        <div class="flex gap-2 flex-wrap">
+          <button class="filter-btn active" data-filter="all">All Users</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="inactive">Inactive</button>
+        </div>
+      </div>
 
-        <div class="content">
-          <div class="main-content">
-            <!-- Stats -->
-            <div class="stats flex">
-              <div class="stats-box sales">
-                <h2 class="heading">Sales</h2>
-                <canvas id="sales"></canvas>
-              </div>
-              <div class="stats-box earning">
-                <h2 class="heading">Earning</h2>
-                <div class="earning-amount flex-c">
-                  <div class="earning-icon flex">
-                    <ion-icon name="logo-paypal"></ion-icon>
-                  </div>
-                  <p>$9125.33</p>
-                </div>
-                <canvas id="earning"></canvas>
-              </div>
-            </div>
+      <!-- Organization Filter -->
+      <div class="flex gap-2 flex-wrap">
+        <span class="text-sm text-gray-500 mr-2">Filter by Organization:</span>
+        <button class="filter-btn active" data-org="all">All</button>
+        <button class="filter-btn" data-org="Acme Corp">Acme Corp</button>
+        <button class="filter-btn" data-org="TechStart Inc">TechStart Inc</button>
+        <button class="filter-btn" data-org="Global Solutions">Global Solutions</button>
+        <button class="filter-btn" data-org="Innovation Labs">Innovation Labs</button>
+      </div>
+    </div>
 
-            <!-- Product Stats -->
-            <div class="product-stats flex">
-              <div class="product-sales stats-box">
-                <h2 class="heading">Sales</h2>
-                <canvas id="products"></canvas>
-              </div>
-              <div class="top-selling stats-box">
-                <h2 class="heading">Top Selling Product</h2>
-                <table class="top-selling-products" height="100%" width="100%">
-                  <tr><th>ID</th><th>Product</th><th>Price</th><th>Sold</th></tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name flex">
-                        <div class="icon"><ion-icon name="logo-amazon"></ion-icon></div>
-                        <p>Amazon Kindle 4th Gen</p>
-                      </div>
-                    </td>
-                    <td>$1900</td>
-                    <td>351</td>
-                  </tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name iphone flex">
-                        <div class="icon"><ion-icon name="logo-apple"></ion-icon></div>
-                        <p>Iphone 11 Pro</p>
-                      </div>
-                    </td>
-                    <td>$1300</td>
-                    <td>121</td>
-                  </tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name windows flex">
-                        <div class="icon"><ion-icon name="logo-microsoft"></ion-icon></div>
-                        <p>Windows 11</p>
-                      </div>
-                    </td>
-                    <td>$180</td>
-                    <td>195</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div> <!-- ⚠️ This was missing! Closes .content -->
-      </div> <!-- Closes .dashboard -->
+    <!-- Users Table -->
+    <div class="overflow-x-auto">
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Organization</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Last Active</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-4 border-t border-gray-200 flex items-center justify-between">
+      <div class="text-sm text-gray-500">
+        Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> users
+      </div>
+      <div class="flex gap-2">
+        <button id="prevBtn" class="filter-btn" disabled>Previous</button>
+        <button id="nextBtn" class="filter-btn">Next</button>
+      </div>
+    </div>
+  </div>
+
 
       <footer class="footer muted">© <span id="curYear"></span> Admin Home</footer>
     </main>
@@ -140,8 +153,9 @@
     <script>
       document.getElementById('curYear').textContent = new Date().getFullYear();
     </script>
-    <!-- Make sure this points to your actual JS file -->
-    <script src="admin/admin.js"></script>
+ 
+    
   </div>
+  <script src="admin.js"></script>
 </body>
 </html>
