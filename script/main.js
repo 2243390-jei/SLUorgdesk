@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         switch (user.role) {
           case "student": window.location.href = "student/home.html"; break;
           case "osas":    window.location.href = "osas/calendar.html"; break;
-          case "admin":   window.location.href = "admin/admin_home.html"; break;
+          case "admin":   window.location.href = "admin/dashboard.html"; break;
         }
       } else {
         alert("Invalid email or password. Please try again.");
