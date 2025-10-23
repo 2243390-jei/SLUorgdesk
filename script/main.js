@@ -114,11 +114,11 @@ document.addEventListener("DOMContentLoaded", () => {
       navbarProfilePic.style.borderRadius = "50%"; // make it round
     } else {
       // If not logged in, redirect back to login page
-      window.location.href = "../index.html";
+      // window.location.href = "../index.html";
     }
   }
 
-  // --- Mock organization data ---
+  // OSAS Table Logic
   const organizations = [
     { 
       name: "ICON", 
