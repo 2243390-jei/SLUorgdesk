@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/analytics.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>OSAS Analytics Dashboard</title>
 </head>
 <body>
@@ -52,23 +51,37 @@
       </header>
 
       <div class="body">
-        <div class="stats-container">
-          <div class="stats-card">
-            <h2>Top Active Organizations</h2>
+        <div class="stats-row">
+          <div class="orgs-section">
+            <div class="section-header">
+              <h2>Top Active Organizations</h2>
+            </div>
             <div class="orgs-list" id="orgsList">
-              <!-- Will be populated by JavaScript -->
+              <!-- Organizations will be populated by JavaScript -->
             </div>
           </div>
-          
-          <div class="stats-card">
-            <h2>Monthly Events</h2>
-            <canvas id="eventsChart"></canvas>
+
+          <div class="charts-section">
+            <div class="chart-card large-chart">
+              <div class="chart-header">
+                <h3>Monthly Events</h3>
+              </div>
+              <div class="chart-container-large">
+                <canvas id="eventsChart"></canvas>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div class="stats-container">
-          <div class="stats-card full-width">
+
+        <div class="sdg-section">
+          <div class="section-header">
             <h2>SDG Submissions</h2>
+            <div class="sdg-stats">
+              <span class="sdg-count">500 Submissions</span>
+              <span class="sdg-goals">22 Goals</span>
+            </div>
+          </div>
+          <div class="chart-container-extra-large">
             <canvas id="sdgChart"></canvas>
           </div>
         </div>
