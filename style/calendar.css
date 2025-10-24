@@ -79,13 +79,16 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   color: #ecf0f1;
 }
 
-.circle-btn i { font-size: 18px; }
-
 .circle-btn.active { 
   background: linear-gradient(135deg, #3498db, #2980b9); 
   box-shadow: 0 4px 16px rgba(52,152,219,0.4); 
   transform: translateY(-1px); 
   color: white; 
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* MAIN AREA */
@@ -270,10 +273,6 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   background: #344a56; 
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(43,61,71,0.3);
-}
-
-.btn-small i {
-  font-size: 12px;
 }
 
 /* CALENDAR GRID - FIXED LAYOUT */

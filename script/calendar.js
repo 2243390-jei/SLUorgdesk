@@ -18,29 +18,75 @@ const detailClose = document.getElementById('detailClose');
 
 document.getElementById('curYear').textContent = new Date().getFullYear();
 
-// Use a fixed "today" for demo (change to new Date() for live)
+// Use October 2025 to match your data
 let viewDate = new Date(2025, 9, 13); // Oct 13, 2025
 const today = new Date(2025, 9, 13);
 
-// ---------------- EXPANDED Demo events ----------------
-const events = [
-  {id: 101, title: "Orientation Meeting", date: "2025-10-02", start:"09:00", end:"10:00", category:"Meeting", description:"Discuss orientation plan with staff."},
-  {id: 102, title: "Team Sync", date: "2025-10-05", start:"11:00", end:"11:30", category:"Standup", description:"Weekly sprint sync and blockers."},
-  {id: 103, title: "Client Debrief", date: "2025-10-10", start:"14:00", end:"15:00", category:"Client", description:"Debrief on recent delivery and feedback."},
-  {id: 104, title: "Security Patch", date: "2025-10-12", start:"22:00", end:"23:30", category:"Maintenance", description:"Apply emergency security patch to servers."},
-  {id: 105, title: "Townhall", date: "2025-10-25", start:"15:00", end:"16:00", category:"All-hands", description:"Monthly company townhall."},
-  {id: 106, title: "Budget Review", date: "2025-10-18", start:"10:00", end:"11:30", category:"Finance", description:"Quarterly budget review meeting."},
-  {id: 107, title: "Product Launch", date: "2025-10-30", start:"13:00", end:"14:30", category:"Marketing", description:"Launch event for new product line."},
-  {id: 108, title: "Training Session", date: "2025-10-08", start:"09:30", end:"12:00", category:"HR", description:"Employee training on new software."},
-  
-  // Previous months events
-  {id: 201, title: "Project Kickoff", date: "2025-08-20", start:"09:30", end:"10:30", category:"Meeting", description:"Kickoff for new client project."},
-  {id: 202, title: "Design Review", date: "2025-07-10", start:"14:00", end:"15:00", category:"Review", description:"UX/UI design review."},
-  {id: 203, title: "Release 1.2", date: "2025-06-02", start:"02:00", end:"03:00", category:"Release", description:"Deployment of release v1.2."},
-  {id: 204, title: "Quarterly Planning", date: "2025-09-15", start:"10:00", end:"12:00", category:"Strategy", description:"Q4 planning session with department heads."},
-  {id: 205, title: "Client Workshop", date: "2025-09-22", start:"13:00", end:"17:00", category:"Client", description:"Full-day workshop with key client."},
-  {id: 206, title: "System Upgrade", date: "2025-08-05", start:"20:00", end:"23:00", category:"Maintenance", description:"Scheduled system maintenance and upgrades."}
-];
+// Base URL (adjust port if needed)
+const API_BASE_URL = "http://localhost:3000/api";
+
+// ---------------- MongoDB Integration ----------------
+async function fetchFormsFromMongoDB() {
+  try {
+    console.log("Fetching forms from MongoDB...");
+    const response = await fetch(`${API_BASE_URL}/forms`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const forms = await response.json();
+    console.log(`✅ Successfully fetched ${forms.length} forms from MongoDB`);
+
+    if (forms.length === 0) {
+      console.warn("⚠️ No forms found in database");
+      return [];
+    }
+
+    // Transform forms to events
+    const transformedForms = forms.map((form) => {
+      let formDate = new Date(form.createdAt || Date.now());
+      if (isNaN(formDate)) formDate = new Date();
+
+      const eventDate = toISO(formDate);
+
+      return {
+        id: form._id?.$oid || form._id || `temp-${Math.random()}`,
+        title: `${form.acronym} - ${form.status || "No Status"}`,
+        date: eventDate,
+        start: "09:00",
+        end: "10:00",
+        category: getCategoryFromOrgType(form.organizationType),
+        description: `${form.completeName} - ${form.school}`,
+        formData: form,
+        status: form.status || "Unknown",
+        school: form.school || "Unknown School",
+        organizationType: form.organizationType || "Unknown Type",
+        acronym: form.acronym || "No Acronym",
+        completeName: form.completeName || "Unknown Name",
+      };
+    });
+
+    return transformedForms;
+  } catch (error) {
+    console.error("❌ Error fetching forms from MongoDB:", error);
+    return [];
+  }
+}
+
+
+// Helper function to categorize organizations
+function getCategoryFromOrgType(orgType) {
+  const categories = {
+    'Co-Curricular': 'Academic',
+    'Extra-Curricular': 'Activities',
+    'Academic': 'Academic',
+    'Cultural': 'Cultural',
+    'Sports': 'Sports',
+    'Religious': 'Religious'
+  };
+  return categories[orgType] || 'General';
+}
 
 // Utility functions
 function toISO(dateObj){
@@ -49,16 +95,18 @@ function toISO(dateObj){
   const d = String(dateObj.getDate()).padStart(2,'0');
   return `${y}-${m}-${d}`;
 }
+
 function fromISO(iso){
   const [y,m,d] = iso.split('-').map(Number);
   return new Date(y, m-1, d);
 }
+
 function clearDayHighlights(){
   document.querySelectorAll('.day.highlight').forEach(el => el.classList.remove('highlight'));
 }
 
 // ---------------- Render calendar ----------------
-function renderCalendar(){
+async function renderCalendar(){
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   monthNameEl.textContent = MONTHS[month];
@@ -76,13 +124,13 @@ function renderCalendar(){
   for (let i = firstDay - 1; i >= 0; i--){
     const dnum = prevMonthDays - i;
     const cellDate = new Date(year, month-1, dnum);
-    const cell = makeDayCell(cellDate, true);
+    const cell = await makeDayCell(cellDate, true);
     calendarGrid.appendChild(cell);
   }
 
   for (let d = 1; d <= daysInMonth; d++){
     const cellDate = new Date(year, month, d);
-    const cell = makeDayCell(cellDate, false);
+    const cell = await makeDayCell(cellDate, false);
     calendarGrid.appendChild(cell);
   }
 
@@ -92,14 +140,14 @@ function renderCalendar(){
     const toAdd = 7 - (filled % 7);
     for (let k = 1; k <= toAdd; k++){
       const cellDate = new Date(year, month+1, k);
-      const cell = makeDayCell(cellDate, true);
+      const cell = await makeDayCell(cellDate, true);
       calendarGrid.appendChild(cell);
     }
   }
 }
 
 // Create a day cell element
-function makeDayCell(dateObj, inactive=false){
+async function makeDayCell(dateObj, inactive=false){
   const iso = toISO(dateObj);
   const el = document.createElement('div');
   el.className = 'day' + (inactive ? ' inactive' : '');
@@ -117,25 +165,26 @@ function makeDayCell(dateObj, inactive=false){
   dateRow.appendChild(dayNum); dateRow.appendChild(todayMark);
   el.appendChild(dateRow);
 
-  const eventsOnDate = events.filter(ev => ev.date === iso);
+  // Fetch forms for this specific date from MongoDB
+  const forms = await fetchFormsFromMongoDB();
+  const formsOnDate = forms.filter(form => form.date === iso);
 
   const evList = document.createElement('div');
   evList.className = 'event-list';
-  if (eventsOnDate.length > 0){
-    // Show max 2 events in calendar cell to prevent overflow
-    const eventsToShow = eventsOnDate.slice(0, 2);
-    eventsToShow.forEach(ev => {
+  if (formsOnDate.length > 0){
+    // Show max 2 forms in calendar cell to prevent overflow
+    const formsToShow = formsOnDate.slice(0, 2);
+    formsToShow.forEach(form => {
       const badge = document.createElement('span');
       badge.className = 'event-badge';
-      const isPast = fromISO(ev.date) < today;
-      badge.textContent = ev.title;
+      badge.textContent = form.acronym;
       evList.appendChild(badge);
     });
-    // Show "+X more" if there are more events
-    if (eventsOnDate.length > 2) {
+    // Show "+X more" if there are more forms
+    if (formsOnDate.length > 2) {
       const moreBadge = document.createElement('span');
       moreBadge.className = 'event-badge';
-      moreBadge.textContent = `+${eventsOnDate.length - 2} more`;
+      moreBadge.textContent = `+${formsOnDate.length - 2} more`;
       moreBadge.style.background = '#f0f0f0';
       moreBadge.style.color = '#666';
       evList.appendChild(moreBadge);
@@ -145,18 +194,20 @@ function makeDayCell(dateObj, inactive=false){
   }
   el.appendChild(evList);
 
-  el.addEventListener('click', () => {
+  el.addEventListener('click', async () => {
     // only act when clicking current-month days
     if (inactive) return;
     clearDayHighlights();
     el.classList.add('highlight');
 
     const isoStr = iso;
-    const pastEvents = events.filter(ev => ev.date === isoStr && fromISO(ev.date) < today);
-    if (pastEvents.length){
-      // open the first matching event in the events list
-      const firstEv = pastEvents[0];
-      const card = document.querySelector(`.event-card[data-id="${firstEv.id}"]`);
+    const forms = await fetchFormsFromMongoDB();
+    const pastForms = forms.filter(form => form.date === isoStr && fromISO(form.date) < today);
+    
+    if (pastForms.length){
+      // open the first matching form in the events list
+      const firstForm = pastForms[0];
+      const card = document.querySelector(`.event-card[data-id="${firstForm.id}"]`);
       if (card) {
         // FIXED SCROLLING: Only scroll if the card is not in view
         const cardRect = card.getBoundingClientRect();
@@ -165,8 +216,8 @@ function makeDayCell(dateObj, inactive=false){
         if (cardRect.top < containerRect.top || cardRect.bottom > containerRect.bottom) {
           card.scrollIntoView({behavior:'smooth', block:'nearest'});
         }
-        // open detail panel for that event
-        openDetailPanel(firstEv);
+        // open detail panel for that form
+        openDetailPanel(firstForm);
       }
     }
   });
@@ -175,45 +226,48 @@ function makeDayCell(dateObj, inactive=false){
 }
 
 // ---------------- Render Past Events panel ----------------
-function renderPastEvents(filterText = '') {
+async function renderPastEvents(filterText = '') {
   eventsListEl.innerHTML = '';
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
 
-  const monthEvents = events.filter(ev => {
-    const d = fromISO(ev.date);
+  // Fetch forms from MongoDB
+  const forms = await fetchFormsFromMongoDB();
+  
+  const monthForms = forms.filter(form => {
+    const d = fromISO(form.date);
     const isSameMonth = (d.getFullYear() === viewYear && d.getMonth() === viewMonth);
     const isPast = d < today;
     return isSameMonth && isPast;
   }).sort((a,b) => (b.date + b.start) > (a.date + a.start) ? 1 : -1);
 
   const q = (filterText || '').trim().toLowerCase();
-  const filtered = monthEvents.filter(ev => {
+  const filtered = monthForms.filter(form => {
     if (!q) return true;
-    return (ev.title + ' ' + ev.category + ' ' + ev.description).toLowerCase().includes(q);
+    return (form.title + ' ' + form.category + ' ' + form.description + ' ' + form.acronym + ' ' + form.completeName).toLowerCase().includes(q);
   });
 
   if (filtered.length === 0){
     const empty = document.createElement('div'); empty.className = 'event-card';
-    empty.innerHTML = `<div class="event-title">No past events</div><div class="event-meta muted">No events matching the month/search</div>`;
+    empty.innerHTML = `<div class="event-title">No past form submissions</div><div class="event-meta muted">No form submissions matching the month/search</div>`;
     eventsListEl.appendChild(empty);
     return;
   }
 
-  filtered.forEach(ev => {
+  filtered.forEach(form => {
     const card = document.createElement('div'); card.className = 'event-card'; card.tabIndex = 0;
-    card.dataset.id = ev.id;
+    card.dataset.id = form.id;
 
     const head = document.createElement('div'); head.className = 'event-head';
-    const title = document.createElement('div'); title.className = 'event-title'; title.textContent = ev.title;
-    const meta = document.createElement('div'); meta.className = 'event-meta'; meta.textContent = `${ev.date} • ${ev.start} - ${ev.end}`;
+    const title = document.createElement('div'); title.className = 'event-title'; title.textContent = `${form.acronym} - ${form.status}`;
+    const meta = document.createElement('div'); meta.className = 'event-meta'; meta.textContent = `${form.date} • ${form.school}`;
     head.appendChild(title); head.appendChild(meta);
 
     const details = document.createElement('div'); details.className = 'event-details';
     details.innerHTML = `
-      <div class="event-meta"><span class="cat">${ev.category}</span></div>
-      <div class="event-desc">${ev.description}</div>
-      <div class="event-extra">Event ID: ${ev.id}</div>
+      <div class="event-meta"><span class="cat">${form.organizationType}</span></div>
+      <div class="event-desc">${form.completeName}</div>
+      <div class="event-extra">Applicant: ${form.formData.applicantName}</div>
     `;
 
     card.appendChild(head);
@@ -223,10 +277,10 @@ function renderPastEvents(filterText = '') {
     card.addEventListener('click', (e) => {
       // don't let click bubble accidentally cause other behaviors
       e.stopPropagation();
-      openDetailPanel(ev);
+      openDetailPanel(form);
       // highlight corresponding day in calendar
       clearDayHighlights();
-      const dayEl = document.querySelector(`.day[data-date="${ev.date}"]`);
+      const dayEl = document.querySelector(`.day[data-date="${form.date}"]`);
       if (dayEl) {
         dayEl.classList.add('highlight');
         // FIXED SCROLLING: Only scroll if the day is not in view
@@ -243,7 +297,7 @@ function renderPastEvents(filterText = '') {
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openDetailPanel(ev);
+        openDetailPanel(form);
       }
     });
 
@@ -252,15 +306,65 @@ function renderPastEvents(filterText = '') {
 }
 
 // ---------------- Slide-in detail panel ----------------
-function openDetailPanel(ev) {
-  detailTitle.textContent = ev.title;
-  detailMeta.textContent = `${ev.date} • ${ev.start} - ${ev.end} • ${ev.category}`;
+function openDetailPanel(form) {
+  const formData = form.formData;
+  
+  detailTitle.textContent = `${formData.acronym} - ${form.status}`;
+  detailMeta.textContent = `${form.date} • ${formData.school} • ${formData.organizationType}`;
+  
   detailBody.innerHTML = `
-    <p style="margin-top:8px; line-height:1.5;">${ev.description}</p>
-    <hr style="margin:12px 0;">
-    <div style="font-size:13px; color:#6b7280;">
-      <div><strong>Event ID:</strong> ${ev.id}</div>
-      <div><strong>Category:</strong> ${ev.category}</div>
+    <div style="margin-bottom: 16px;">
+      <h4 style="margin-bottom: 8px; color: #1f2937;">${formData.completeName}</h4>
+      <p style="color: #6b7280; font-size: 14px;">${formData.officialEmail}</p>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <h5 style="margin-bottom: 8px; color: #374151;">Organization Details</h5>
+      <div style="font-size: 14px; color: #6b7280; line-height: 1.5;">
+        <div><strong>Category:</strong> ${formData.category}</div>
+        <div><strong>School:</strong> ${formData.school}</div>
+        <div><strong>Type:</strong> ${formData.organizationType}</div>
+        <div><strong>CBL Status:</strong> ${formData.cblStatus}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <h5 style="margin-bottom: 8px; color: #374151;">Contact Information</h5>
+      <div style="font-size: 14px; color: #6b7280; line-height: 1.5;">
+        <div><strong>Applicant:</strong> ${formData.applicantName} (${formData.applicantPosition})</div>
+        <div><strong>Applicant Email:</strong> ${formData.applicantEmail}</div>
+        <div><strong>Advisers:</strong> ${formData.adviserNames.join(', ')}</div>
+      </div>
+    </div>
+
+    ${formData.socialMediaLinks && formData.socialMediaLinks.length > 0 ? `
+    <div style="margin-bottom: 16px;">
+      <h5 style="margin-bottom: 8px; color: #374151;">Social Media</h5>
+      <div style="font-size: 14px; color: #6b7280;">
+        ${formData.socialMediaLinks.map(link => 
+          `<div><a href="${link}" target="_blank" style="color: #2563eb;">${link}</a></div>`
+        ).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <div style="margin-bottom: 16px;">
+      <h5 style="margin-bottom: 8px; color: #374151;">Documents</h5>
+      <div style="font-size: 14px; color: #6b7280; line-height: 1.5;">
+        ${formData.strategicPlans ? `<div><strong>Strategic Plans:</strong> <a href="${formData.strategicPlans.fileUrl}" target="_blank" style="color: #2563eb;">${formData.strategicPlans.fileName}</a></div>` : ''}
+        ${formData.annualReport ? `<div><strong>Annual Report:</strong> <a href="${formData.annualReport.fileUrl}" target="_blank" style="color: #2563eb;">${formData.annualReport.fileName}</a></div>` : ''}
+        ${formData.constitutionByLaws ? `<div><strong>Constitution & Bylaws:</strong> <a href="${formData.constitutionByLaws.fileUrl}" target="_blank" style="color: #2563eb;">${formData.constitutionByLaws.fileName}</a></div>` : ''}
+        ${formData.infographics ? `<div><strong>Infographics:</strong> <a href="${formData.infographics.fileUrl}" target="_blank" style="color: #2563eb;">${formData.infographics.fileName}</a></div>` : ''}
+        ${formData.videoLink ? `<div><strong>Video:</strong> <a href="${formData.videoLink}" target="_blank" style="color: #2563eb;">View Video</a></div>` : ''}
+      </div>
+    </div>
+
+    <hr style="margin: 16px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+    <div style="font-size: 13px; color: #6b7280;">
+      <div><strong>Form ID:</strong> ${form.id}</div>
+      <div><strong>Status:</strong> <span style="color: ${getStatusColor(form.status)}">${form.status}</span></div>
+      ${formData.remarks ? `<div><strong>Remarks:</strong> ${formData.remarks}</div>` : ''}
     </div>
   `;
 
@@ -271,6 +375,17 @@ function openDetailPanel(ev) {
 
   // focus for accessibility
   detailPanel.focus();
+}
+
+// Helper function for status colors
+function getStatusColor(status) {
+  const colors = {
+    'Pending Review': '#f59e0b',
+    'Approved': '#10b981',
+    'Rejected': '#ef4444',
+    'Needs Revision': '#f97316'
+  };
+  return colors[status] || '#6b7280';
 }
 
 // close detail panel
@@ -306,27 +421,37 @@ searchClear.addEventListener('click', () => {
 });
 
 // ---------------- Navigation handlers ----------------
-prevBtn.addEventListener('click', () => {
+prevBtn.addEventListener('click', async () => {
   viewDate.setMonth(viewDate.getMonth() - 1);
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-nextBtn.addEventListener('click', () => {
+nextBtn.addEventListener('click', async () => {
   viewDate.setMonth(viewDate.getMonth() + 1);
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-todayBtn.addEventListener('click', () => {
+todayBtn.addEventListener('click', async () => {
   viewDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-// initial render
-renderCalendar();
-renderPastEvents();
+// Initial render
+async function initializeCalendar() {
+  try {
+    await renderCalendar();
+    await renderPastEvents();
+    console.log('Calendar initialized with form data from MongoDB');
+  } catch (error) {
+    console.error('Error initializing calendar:', error);
+  }
+}
+
+// Start the application
+initializeCalendar();
