@@ -60,6 +60,50 @@ app.get("/api/Submissions/:organizationId", async (req, res) => {
   }
 });
 
+// 🟢 Route to get a single submission by ID (linked to Form collection via formId)
+app.get("/api/Submission/:submissionId", async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(submissionId)) {
+      return res.status(400).json({ message: "Invalid submission ID" });
+    }
+
+    // 1️⃣ Find submission from Submissions collection
+    const submission = await mongoose.connection.db
+      .collection("Submissions")
+      .findOne({ _id: new mongoose.Types.ObjectId(submissionId) });
+
+    if (!submission) {
+      console.log("❌ Submission not found in Submissions collection");
+      return res.status(404).json({ message: "Submission not found" });
+    }
+
+    console.log("✅ Found submission:", submission);
+
+    // 2️⃣ Link to Form document via formId
+    let formDetails = null;
+    if (submission.formId && mongoose.Types.ObjectId.isValid(submission.formId)) {
+      formDetails = await mongoose.connection.db
+        .collection("Form")
+        .findOne({ _id: new mongoose.Types.ObjectId(submission.formId) });
+    } else {
+      console.log("⚠️ No valid formId found in submission.");
+    }
+
+    console.log("✅ Linked form details:", formDetails);
+
+    // 3️⃣ Return merged data
+    res.json({
+      ...submission,
+      formDetails: formDetails || {},
+    });
+  } catch (error) {
+    console.error("❌ Error fetching submission details:", error);
+    res.status(500).json({ message: "Error fetching submission details", error: error.message });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

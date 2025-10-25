@@ -63,7 +63,9 @@ async function loadSubmissions() {
                 <td>${s.SDGCategory || "-"}</td>
                 <td>${s.AllottedBudget || "-"}</td>
                 <td>${s.status || "-"}</td>
-                <td><button class="view-details-btn">View Details</button></td>
+                <td>
+                  <button class="view-details-btn" data-id="${s._id}">View Details</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -83,10 +85,14 @@ async function loadSubmissions() {
       });
     });
 
-    // Button click listener
+    // ✅ Updated button click listener
     document.querySelectorAll(".view-details-btn").forEach((btn, i) => {
       btn.addEventListener("click", () => {
-        alert(`Viewing details for: ${submissions[i].eventName || "Unknown Event"}`);
+        const submissionId = btn.dataset.id;
+        const orgIdParam = encodeURIComponent(orgId);
+        const orgNameParam = encodeURIComponent(orgName || "Unknown");
+        // Redirect to details page with submission ID, org ID, and name
+        window.location.href = `submissionFullDetails.html?submissionId=${submissionId}&orgId=${orgIdParam}&orgName=${orgNameParam}`;
       });
     });
 
