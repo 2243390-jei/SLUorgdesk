@@ -1,3 +1,4 @@
+// OSASorgs.js
 const tableBody = document.getElementById("orgTableBody");
 
 async function loadOrganizations() {
@@ -14,7 +15,17 @@ async function loadOrganizations() {
           <td><img src="${org.logoUrl}" alt="${org.acronym} logo" class="org-logo"></td>
           <td>${org.acronym}</td>
           <td>${org.school}</td>
+          <td>
+            <button class="view-btn">View Submissions</button>
+          </td>
         `;
+
+       // ✅ When button is clicked, go to submissions.html
+row.querySelector(".view-btn").addEventListener("click", () => {
+  window.location.href = "../osas/OSASsubmissions.html";
+});
+
+
         tableBody.appendChild(row);
       });
     }
