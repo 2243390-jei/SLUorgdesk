@@ -508,6 +508,189 @@ body.home-body {
   color: #333;
 }
 
+/* MODAL STYLES FOR HISTORY VIEW/EDIT */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 2000;
+}
+.modal.open {
+  display: flex;
+}
+.modal-content {
+  background: #fff;
+  width: 92%;
+  max-width: 760px;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-row {
+  margin-bottom: 12px;
+}
+.modal-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.modal-row input,
+.modal-row select,
+.modal-row textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .modal-content { padding: 16px; }
+}
+
+/* SUBMISSION CARD STYLES */
+.submission-card {
+  display: flex;
+  gap: 18px;
+  background: linear-gradient(180deg, #ffffff, #fbfbfd);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+  margin-bottom: 18px;
+  align-items: center;
+}
+
+.submission-preview img {
+  width: 220px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.submission-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column; 
+}
+
+.details-body {
+  padding-right: 8px;
+  display: block;
+}
+
+.event-name {
+  font-size: 1.15rem;
+  margin: 6px 0 10px 0;
+  color: #08142a;
+}
+
+.details-body p {
+  margin: 6px 0;
+  color: #334155;
+  font-size: 0.96rem;
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.submission-header .submitted-on {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: capitalize;
+  font-size: 0.85rem;
+  color: #fff;
+}
+.status-accepted { background: #16a34a; } /* green */
+.status-pending  { background: #f59e0b; } /* amber */
+.status-revision { background: #ef4444; } /* red */
+.status-accepted, .status-pending, .status-revision { box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
+
+.sd-title { font-size: 1.05rem; margin: 4px 0 6px 0; color: #0f172a; }
+.sd-meta { color: #475569; font-size: 0.95rem; margin-bottom: 6px; }
+.sd-small { color: #475569; font-size: 0.92rem; margin-bottom: 8px; }
+.sd-row { display:flex; gap: 18px; color:#475569; font-size:0.95rem; }
+
+
+.manage-dropdown {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  margin-left: auto; /* push to the right */
+  align-items: center;
+}
+
+.manage-dropdown button {
+  background: transparent;
+  border: 1px solid rgba(2,6,23,0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.manage-dropdown .btn-edit {
+  background: #fff;
+  border: 1px solid rgba(30,19,98,0.06);
+}
+
+.manage-dropdown .btn-view {
+  background: transparent;
+  border: 1px solid rgba(30,19,98,0.12);
+}
+
+.manage-dropdown button:hover:not(.btn-disabled) {
+  background: #1e1362;
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(0,0,0,0.03);
+}
+
+@media (max-width: 900px) {
+  .submission-card { flex-direction: column; align-items: stretch; }
+  .submission-preview img { width: 100%; height: 180px; }
+  .sd-row { flex-direction: column; gap: 6px; }
+}
+
 /*SUBMISSION PAGE*/
 body.submission-body {
   background-color: #ffffff !important;
@@ -791,6 +974,141 @@ body.submission-body {
 .remove-file-btn:hover {
   background-color: #b82d3a;
 }
+
+/* HISTORY SECTION */
+.history-section {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+  font-family: Inter, sans-serif;
+}
+
+/* Search + Filters */
+.history-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+
+.history-controls {
+
+  position: sticky;
+  top: 100px; 
+  z-index: 1200;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 18px;
+  background: transparent;
+  padding: 8px 0;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.history-section {
+  padding-top: 0; 
+}
+
+
+@media (max-width: 900px) {
+  .history-controls {
+    position: static;
+    transform: none;
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  .history-section {
+    padding-top: 0;
+  }
+}
+
+#searchInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  border: none;
+  background: #E8E8E8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-btn.active {
+  background: #06134B;
+  color: #fff;
+}
+
+.time-filter {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Submission Card */
+.submission-card {
+  display: flex;
+  gap: 24px;
+  padding: 18px;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+  background: white;
+}
+
+.submission-preview img {
+  width: 220px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.submission-details {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.status-badge {
+  padding: 2px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status-pending { background: #FFF3CD; color: #856404; }
+.status-accepted { background: #D4EDDA; color: #155724; }
+.status-revision { background: #F8D7DA; color: #721C24; }
+
+.manage-dropdown {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 
 
 .sdg-options {
