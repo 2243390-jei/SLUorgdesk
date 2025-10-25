@@ -1,15 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("submissionForm");
 
+
   document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
     const dropZone = inputElement.closest(".drop-zone");
 
     dropZone.addEventListener("click", () => inputElement.click());
 
     inputElement.addEventListener("change", () => {
-      if (inputElement.files.length) {
-        updateDropZone(dropZone, inputElement.files[0]);
-      }
+      if (inputElement.files.length) updateDropZone(dropZone, inputElement.files[0]);
     });
 
     dropZone.addEventListener("dragover", (e) => {
@@ -37,21 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const filePreview = document.createElement("div");
     filePreview.classList.add("file-preview");
 
-    
     const thumb = document.createElement("div");
     thumb.classList.add("file-thumb");
 
-    
     if (file.type.startsWith("image/")) {
       const img = document.createElement("img");
       img.src = URL.createObjectURL(file);
       img.onload = () => URL.revokeObjectURL(img.src);
       thumb.appendChild(img);
     } else {
-      
       const icon = document.createElement("div");
       icon.classList.add("file-icon");
-      icon.textContent = file.name.split('.').pop().toUpperCase(); 
+      icon.textContent = file.name.split('.').pop().toUpperCase();
       thumb.appendChild(icon);
     }
 
@@ -84,6 +80,22 @@ document.addEventListener("DOMContentLoaded", () => {
     dropZone.appendChild(dropZone.querySelector(".drop-zone__input"));
   }
 
+  function createInput() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.classList.add("drop-zone__input");
+    return input;
+  }
+  const sdgCheckboxes = document.querySelectorAll(".sdg-options input[type='checkbox']");
+  sdgCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const selectedSDGs = Array.from(sdgCheckboxes)
+        .filter((c) => c.checked)
+        .map((c) => c.value);
+      console.log("Selected SDGs:", selectedSDGs); 
+    });
+  });
+
   form.addEventListener("reset", (e) => {
     const confirmReset = confirm("Are you sure you want to clear all form data?");
     if (!confirmReset) e.preventDefault();
@@ -99,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (input.files.length) updateDropZone(dropZone, input.files[0]);
         });
       });
+
+      sdgCheckboxes.forEach((c) => (c.checked = false));
     }
   });
 
@@ -108,14 +122,14 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Please fill out all required fields before submitting.");
       return;
     }
+
+
+    const selectedSDGs = Array.from(sdgCheckboxes)
+      .filter((c) => c.checked)
+      .map((c) => c.value);
+    console.log("Submitted SDGs:", selectedSDGs);
+
     alert("Submission successful! Your documents have been recorded.");
     form.reset();
   });
-
-  function createInput() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.classList.add("drop-zone__input");
-    return input;
-  }
 });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,46 +43,46 @@
   <!-- FORM SECTION -->
   <section class="submission-form-section">
     <div class="submission-form-wrapper">
-      <form id="submissionForm">
+      <form id="submissionForm" method="POST" enctype="multipart/form-data">
         <!-- Organization Information -->
         <h3 class="form-section-title">Document Forms</h3>
 
         <div class="form-group">
           <label>Complete Name of Organization or Publication</label>
-          <input type="text" placeholder="Your answer" required />
+          <input type="text" name="org_name" placeholder="Your answer" required />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Acronym or Short Name of Organization</label>
-            <input type="text" placeholder="Your answer" />
+            <input type="text" name="org_acronym" placeholder="Your answer" />
           </div>
           <div class="form-group">
             <label>Official SLU Institutional Email of Organization</label>
-            <input type="email" placeholder="Your answer" />
+            <input type="email" name="org_email" placeholder="Your answer" />
           </div>
         </div>
 
         <div class="form-group">
           <label>URL Link/s to Official Social Media Pages</label>
-          <input type="text" placeholder="Your answer" />
+          <input type="text" name="org_social" placeholder="Your answer" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Name of Applicant Representing The Organization</label>
-            <input type="text" placeholder="Your answer" />
+            <input type="text" name="applicant_name" placeholder="Your answer" />
           </div>
           <div class="form-group">
             <label>SLU Institutional Email of Applicant</label>
-            <input type="email" placeholder="Your answer" />
+            <input type="email" name="applicant_email" placeholder="Your answer" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Category The Organization Belongs To</label>
-            <select required>
+            <select name="org_category" required>
               <option value="" disabled selected>Select Category</option>
               <option value="SAMCIS">SAMCIS</option>
               <option value="SEA">SEA</option>
@@ -95,7 +96,7 @@
 
           <div class="form-group">
             <label>Type of Organization</label>
-            <select required>
+            <select name="org_type" required>
               <option value="" disabled selected>Select Type</option>
               <option value="Co-Curricular">Co-Curricular</option>
               <option value="Extra-Curricular">Extra-Curricular</option>
@@ -107,17 +108,41 @@
         <div class="form-row">
           <div class="form-group">
             <label>Position of Applicant in the Student Group</label>
-            <input type="text" placeholder="Your answer" />
+            <input type="text" name="applicant_position" placeholder="Your answer" />
           </div>
           <div class="form-group">
             <label>Name of Adviser/s (First Name, Middle Initial, Surname)</label>
-            <input type="text" placeholder="Your answer" />
+            <input type="text" name="adviser_name" placeholder="Your answer" />
           </div>
         </div>
 
         <div class="form-group">
           <label>SLU Institutional Email of Adviser/s</label>
-          <input type="email" placeholder="Your answer" />
+          <input type="email" name="adviser_email" placeholder="Your answer" />
+        </div>
+
+        <!-- SDG Checkboxes -->
+        <div class="form-group">
+          <label>Sustainable Development Goals (SDGs) aligned with this Document</label>
+          <div class="sdg-options">
+            <label><input type="checkbox" name="sdg[]" value="1. No Poverty"> 1. No Poverty</label>
+            <label><input type="checkbox" name="sdg[]" value="2. Zero Hunger"> 2. Zero Hunger</label>
+            <label><input type="checkbox" name="sdg[]" value="3. Good Health and Well-being"> 3. Good Health and Well-being</label>
+            <label><input type="checkbox" name="sdg[]" value="4. Quality Education"> 4. Quality Education</label>
+            <label><input type="checkbox" name="sdg[]" value="5. Gender Equality"> 5. Gender Equality</label>
+            <label><input type="checkbox" name="sdg[]" value="6. Clean Water and Sanitation"> 6. Clean Water and Sanitation</label>
+            <label><input type="checkbox" name="sdg[]" value="7. Affordable and Clean Energy"> 7. Affordable and Clean Energy</label>
+            <label><input type="checkbox" name="sdg[]" value="8. Decent Work and Economic Growth"> 8. Decent Work and Economic Growth</label>
+            <label><input type="checkbox" name="sdg[]" value="9. Industry, Innovation and Infrastructure"> 9. Industry, Innovation and Infrastructure</label>
+            <label><input type="checkbox" name="sdg[]" value="10. Reduced Inequalities"> 10. Reduced Inequalities</label>
+            <label><input type="checkbox" name="sdg[]" value="11. Sustainable Cities and Communities"> 11. Sustainable Cities and Communities</label>
+            <label><input type="checkbox" name="sdg[]" value="12. Responsible Consumption and Production"> 12. Responsible Consumption and Production</label>
+            <label><input type="checkbox" name="sdg[]" value="13. Climate Action"> 13. Climate Action</label>
+            <label><input type="checkbox" name="sdg[]" value="14. Life Below Water"> 14. Life Below Water</label>
+            <label><input type="checkbox" name="sdg[]" value="15. Life on Land"> 15. Life on Land</label>
+            <label><input type="checkbox" name="sdg[]" value="16. Peace, Justice and Strong Institutions"> 16. Peace, Justice and Strong Institutions</label>
+            <label><input type="checkbox" name="sdg[]" value="17. Partnerships for the Goals"> 17. Partnerships for the Goals</label>
+          </div>
         </div>
 
         <!-- Document Uploads -->
@@ -128,7 +153,7 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".pdf" class="drop-zone__input" />
+            <input type="file" name="strategic_plan" accept=".pdf" class="drop-zone__input" required />
           </div>
         </div>
 
@@ -137,7 +162,7 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".pdf" class="drop-zone__input" />
+            <input type="file" name="annual_report" accept=".pdf" class="drop-zone__input" required />
           </div>
         </div>
 
@@ -146,16 +171,16 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".pdf" class="drop-zone__input" />
+            <input type="file" name="cbl" accept=".pdf" class="drop-zone__input" required />
           </div>
         </div>
 
         <div class="form-group">
           <label>CBL Status</label>
-          <select required>
+          <select name="cbl_status" required>
             <option value="" disabled selected>Select Status</option>
-            <option value="Without revisions from last school year’s CBL">Without revisions from last school year’s CBL</option>
-            <option value="With revisions from last school year’s CBL">With revisions from last school year’s CBL</option>
+            <option value="Without revisions">Without revisions</option>
+            <option value="With revisions">With revisions</option>
           </select>
         </div>
 
@@ -164,7 +189,7 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".xlsx,.xls,.ods,.csv" class="drop-zone__input" />
+            <input type="file" name="officers_list" accept=".xlsx,.xls,.csv,.ods" class="drop-zone__input" />
           </div>
         </div>
 
@@ -173,7 +198,7 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".pdf,.png,.jpg,.jpeg" class="drop-zone__input" />
+            <input type="file" name="infographic" accept=".pdf,.png,.jpg,.jpeg" class="drop-zone__input" />
           </div>
         </div>
 
@@ -182,13 +207,13 @@
           <div class="drop-zone">
             <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
             <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-            <input type="file" accept=".pdf" class="drop-zone__input" />
+            <input type="file" name="financial_statement" accept=".pdf" class="drop-zone__input" />
           </div>
         </div>
 
         <div class="form-group">
           <label>Link of your Video about your Organization or Publication</label>
-          <input type="url" placeholder="https://..." />
+          <input type="url" name="video_link" placeholder="https://..." />
         </div>
 
         <div class="form-group confirm-group">
@@ -198,7 +223,6 @@
           </label>
         </div>
 
-        <!-- Buttons -->
         <div class="form-buttons">
           <button type="reset" class="reset-btn">Reset</button>
           <button type="submit" class="submit-btn">Submit</button>
@@ -209,4 +233,5 @@
 
   <script src="../script/submission.js"></script>
 </body>
+
 </html>
