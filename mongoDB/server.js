@@ -1,6 +1,7 @@
 // server.js
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import { Organization, Form } from "./mongodb.js";
 
 const app = express();
@@ -25,7 +26,7 @@ app.get("/api/organizations", async (req, res) => {
   }
 });
 
-// ✅ FIXED ROUTE NAME — lowercase plural to match frontend
+// Fetch all forms
 app.get("/api/forms", async (req, res) => {
   try {
     const forms = await Form.find().sort({ createdAt: -1 });
@@ -36,7 +37,28 @@ app.get("/api/forms", async (req, res) => {
     res.status(500).json({ message: "Error fetching forms", error: error.message });
   }
 });
-    
+
+// ✅ Route: Get submissions for a specific organization
+app.get("/api/Submissions/:organizationId", async (req, res) => {
+  try {
+    const { organizationId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+      return res.status(400).json({ message: "Invalid organization ID" });
+    }
+
+    const Submissions = await mongoose.connection.db
+      .collection("Submissions")
+      .find({ organizationId: new mongoose.Types.ObjectId(organizationId) })
+      .toArray();
+
+    console.log(`✅ Found ${Submissions.length} submissions for org ${organizationId}`);
+    res.json(Submissions);
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ message: "Error fetching submissions" });
+  }
+});
 
 // Start server
 app.listen(PORT, () => {
