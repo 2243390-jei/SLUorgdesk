@@ -114,50 +114,11 @@ document.addEventListener("DOMContentLoaded", () => {
       navbarProfilePic.style.borderRadius = "50%"; // make it round
     } else {
       // If not logged in, redirect back to login page
-      window.location.href = "../index.html";
+      // window.location.href = "../index.html";
     }
   }
 
-  // --- Mock organization data ---
-  const organizations = [
-    { 
-      name: "ICON", 
-      school: "SAMCIS", 
-      programs: "BSIT, BSCS, BMMA", 
-      image: "/Images/orgs/ICON.jpg" 
-    },
-    { 
-      name: "JPIA", 
-      school: "SAMCIS", 
-      programs: "BSBA, BSAC", 
-      image: "/Images/orgs/JPIA.jpg" 
-    },
-    { 
-      name: "RPG", 
-      school: "SAMCIS", 
-      programs: "SAMCIS", 
-      image: "/Images/orgs/RPG.jpg" 
-    }
-  ];
 
-  const tableBody = document.getElementById("orgTableBody");
-
-  if (tableBody) {
-    tableBody.innerHTML = "";
-
-    organizations.forEach(org => {
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td><img src="${org.image}" alt="${org.name} logo" class="org-logo"></td>
-        <td>${org.name}</td>
-        <td>${org.school}</td>
-        <td>${org.programs}</td>
-      `;
-
-      tableBody.appendChild(row);
-    });
-  }
 });
 
 

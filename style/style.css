@@ -292,7 +292,7 @@ body.home-body {
 .home-body .schools-section {
   display: block;
   margin-top: 0;
-  background-color: #2F3C4C;
+  background: linear-gradient(125deg, rgb(14, 4, 101), rgb(50, 94, 208));
   padding: 40px 60px;
   color: #ffffff;
   min-height: 30vh;
@@ -454,5 +454,190 @@ body.home-body {
 .org-group img:hover {
   transform: scale(1.1);
 }
+
+/* ORGDESK DESCRIPTION SECTION */
+.orgdesk-description-section {
+  background: #242E3A; 
+   padding-top: 50px;
+}
+
+.orgdesk-inner {
+  max-width: 1200px; 
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 40px; 
+  box-sizing: border-box;
+}
+
+.orgdesk-description-image {
+  width: 620px;
+  height: auto;
+  max-width: 40%;
+  object-fit: contain;
+  
+}
+
+.org-desk-content {
+  max-width: 680px;
+  flex: 1;
+  text-align: right;
+  padding-left: 16px;
+}
+
+.org-desk-title {
+  color: #FFF;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 3rem;
+  margin: 0 0 10px 0; 
+  line-height: 1.2;
+  text-align: right;
+}
+
+.org-desk-text {
+  color: #FFF;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: right;
+  max-width: 480px;
+  margin-left: auto;
+  margin-bottom: 12px;
+}
+
+.org-desk-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-outlined {
+  border: 1px solid #FFF;
+  border-radius: 12px;
+  background: transparent;
+  color: #FFF;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-outlined:hover {
+  background: #FFF;
+  color: #242E3A;
+}
+
+/* STEP-BY-STEP SECTION */
+.step-by-step-topic {
+  background: #ffffff; 
+  padding-top: 40px;
+}
+
+.step-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.step-text {
+  flex: 1;
+  max-width: 500px;
+}
+
+.step-by-step-top-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.6rem;
+  margin: 0 0 8px 0;
+  color: #000;
+}
+
+.step-by-step-top-text {
+  font-family: Inter, sans-serif;
+  font-size: 1.1rem;
+  margin: 0 0 12px 0;
+  color: #333;
+  max-width: 680px;
+}
+
+.step-image {
+  width: 420px;
+  max-width: 38%;
+}
+
+.step-image img {
+  width: 60%;
+  height: auto;
+  display: block;
+}
+
+/* STEP-BY-STEP BOTTOM */
+
+.step-by-step-bottom {
+  background: #ffffff;
+  padding: 0 0 60px 0;
+}
+
+.step-bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.step-bottom-image {
+  width: 420px;
+  max-width: 38%;
+}
+
+.step-bottom-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.step-box {
+  background: white;
+  border-radius: 18px;
+  padding: 28px 32px;
+  border: 1px solid #E5E5E5;
+  max-width: 580px;
+  width: 100%;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.step-num {
+  width: 34px;
+  height: auto;
+}
+
+.step-item p {
+  font-family: Inter, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+
+
 
 
