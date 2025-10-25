@@ -18,29 +18,83 @@ const detailClose = document.getElementById('detailClose');
 
 document.getElementById('curYear').textContent = new Date().getFullYear();
 
-// Use a fixed "today" for demo (change to new Date() for live)
-let viewDate = new Date(2025, 9, 13); // Oct 13, 2025
-const today = new Date(2025, 9, 13);
+// Use current system date - no hardcoded dates
+let viewDate = new Date(); // Current system date
+const today = new Date(); // Current system date
 
-// ---------------- EXPANDED Demo events ----------------
-const events = [
-  {id: 101, title: "Orientation Meeting", date: "2025-10-02", start:"09:00", end:"10:00", category:"Meeting", description:"Discuss orientation plan with staff."},
-  {id: 102, title: "Team Sync", date: "2025-10-05", start:"11:00", end:"11:30", category:"Standup", description:"Weekly sprint sync and blockers."},
-  {id: 103, title: "Client Debrief", date: "2025-10-10", start:"14:00", end:"15:00", category:"Client", description:"Debrief on recent delivery and feedback."},
-  {id: 104, title: "Security Patch", date: "2025-10-12", start:"22:00", end:"23:30", category:"Maintenance", description:"Apply emergency security patch to servers."},
-  {id: 105, title: "Townhall", date: "2025-10-25", start:"15:00", end:"16:00", category:"All-hands", description:"Monthly company townhall."},
-  {id: 106, title: "Budget Review", date: "2025-10-18", start:"10:00", end:"11:30", category:"Finance", description:"Quarterly budget review meeting."},
-  {id: 107, title: "Product Launch", date: "2025-10-30", start:"13:00", end:"14:30", category:"Marketing", description:"Launch event for new product line."},
-  {id: 108, title: "Training Session", date: "2025-10-08", start:"09:30", end:"12:00", category:"HR", description:"Employee training on new software."},
-  
-  // Previous months events
-  {id: 201, title: "Project Kickoff", date: "2025-08-20", start:"09:30", end:"10:30", category:"Meeting", description:"Kickoff for new client project."},
-  {id: 202, title: "Design Review", date: "2025-07-10", start:"14:00", end:"15:00", category:"Review", description:"UX/UI design review."},
-  {id: 203, title: "Release 1.2", date: "2025-06-02", start:"02:00", end:"03:00", category:"Release", description:"Deployment of release v1.2."},
-  {id: 204, title: "Quarterly Planning", date: "2025-09-15", start:"10:00", end:"12:00", category:"Strategy", description:"Q4 planning session with department heads."},
-  {id: 205, title: "Client Workshop", date: "2025-09-22", start:"13:00", end:"17:00", category:"Client", description:"Full-day workshop with key client."},
-  {id: 206, title: "System Upgrade", date: "2025-08-05", start:"20:00", end:"23:00", category:"Maintenance", description:"Scheduled system maintenance and upgrades."}
-];
+// Base URL (adjust port if needed)
+const API_BASE_URL = "http://localhost:3000/api";
+
+// Make events list scrollable
+function makeEventsListScrollable() {
+  eventsListEl.style.flex = '1';
+  eventsListEl.style.overflowY = 'auto';
+  eventsListEl.style.maxHeight = '400px';
+  eventsListEl.style.paddingRight = '8px';
+  eventsListEl.style.minHeight = '200px';
+}
+
+// ---------------- MongoDB Integration ----------------
+async function fetchFormsFromMongoDB() {
+  try {
+    console.log("Fetching forms from MongoDB...");
+    const response = await fetch(`${API_BASE_URL}/forms`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const forms = await response.json();
+    console.log(`✅ Successfully fetched ${forms.length} forms from MongoDB`);
+
+    if (forms.length === 0) {
+      console.warn("⚠️ No forms found in database");
+      return [];
+    }
+
+    // Transform forms to events
+    const transformedForms = forms.map((form) => {
+      let formDate = new Date(form.createdAt || Date.now());
+      if (isNaN(formDate)) formDate = new Date();
+
+      const eventDate = toISO(formDate);
+
+      return {
+        id: form._id?.$oid || form._id || `temp-${Math.random()}`,
+        title: `${form.acronym} - ${form.status || "No Status"}`,
+        date: eventDate,
+        start: "09:00",
+        end: "10:00",
+        category: getCategoryFromOrgType(form.organizationType),
+        description: `${form.completeName} - ${form.school}`,
+        formData: form,
+        status: form.status || "Unknown",
+        school: form.school || "Unknown School",
+        organizationType: form.organizationType || "Unknown Type",
+        acronym: form.acronym || "No Acronym",
+        completeName: form.completeName || "Unknown Name",
+      };
+    });
+
+    return transformedForms;
+  } catch (error) {
+    console.error("❌ Error fetching forms from MongoDB:", error);
+    return [];
+  }
+}
+
+// Helper function to categorize organizations
+function getCategoryFromOrgType(orgType) {
+  const categories = {
+    'Co-Curricular': 'Academic',
+    'Extra-Curricular': 'Activities',
+    'Academic': 'Academic',
+    'Cultural': 'Cultural',
+    'Sports': 'Sports',
+    'Religious': 'Religious'
+  };
+  return categories[orgType] || 'General';
+}
 
 // Utility functions
 function toISO(dateObj){
@@ -49,16 +103,18 @@ function toISO(dateObj){
   const d = String(dateObj.getDate()).padStart(2,'0');
   return `${y}-${m}-${d}`;
 }
+
 function fromISO(iso){
   const [y,m,d] = iso.split('-').map(Number);
   return new Date(y, m-1, d);
 }
+
 function clearDayHighlights(){
   document.querySelectorAll('.day.highlight').forEach(el => el.classList.remove('highlight'));
 }
 
 // ---------------- Render calendar ----------------
-function renderCalendar(){
+async function renderCalendar(){
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   monthNameEl.textContent = MONTHS[month];
@@ -96,6 +152,10 @@ function renderCalendar(){
       calendarGrid.appendChild(cell);
     }
   }
+
+  // Update calendar cells with events after rendering
+  const forms = await fetchFormsFromMongoDB();
+  updateCalendarCellsWithEvents(forms);
 }
 
 // Create a day cell element
@@ -107,67 +167,63 @@ function makeDayCell(dateObj, inactive=false){
 
   const dateRow = document.createElement('div');
   dateRow.className = 'date-row';
-  const dayNum = document.createElement('div'); dayNum.textContent = dateObj.getDate();
+  const dayNum = document.createElement('div'); 
+  dayNum.textContent = dateObj.getDate();
   const todayMark = document.createElement('div');
   if (iso === toISO(today) && !inactive) {
     todayMark.textContent = 'Today';
     todayMark.style.fontSize = '12px';
     todayMark.style.color = '#2563eb';
   }
-  dateRow.appendChild(dayNum); dateRow.appendChild(todayMark);
+  dateRow.appendChild(dayNum); 
+  dateRow.appendChild(todayMark);
   el.appendChild(dateRow);
-
-  const eventsOnDate = events.filter(ev => ev.date === iso);
 
   const evList = document.createElement('div');
   evList.className = 'event-list';
-  if (eventsOnDate.length > 0){
-    // Show max 2 events in calendar cell to prevent overflow
-    const eventsToShow = eventsOnDate.slice(0, 2);
-    eventsToShow.forEach(ev => {
-      const badge = document.createElement('span');
-      badge.className = 'event-badge';
-      const isPast = fromISO(ev.date) < today;
-      badge.textContent = ev.title;
-      evList.appendChild(badge);
-    });
-    // Show "+X more" if there are more events
-    if (eventsOnDate.length > 2) {
-      const moreBadge = document.createElement('span');
-      moreBadge.className = 'event-badge';
-      moreBadge.textContent = `+${eventsOnDate.length - 2} more`;
-      moreBadge.style.background = '#f0f0f0';
-      moreBadge.style.color = '#666';
-      evList.appendChild(moreBadge);
-    }
-  } else {
-    const spacer = document.createElement('div'); spacer.style.minHeight = '6px'; evList.appendChild(spacer);
-  }
+  
+  // Create empty spacer - events will be populated separately
+  const spacer = document.createElement('div'); 
+  spacer.style.minHeight = '6px'; 
+  evList.appendChild(spacer);
+  
   el.appendChild(evList);
 
-  el.addEventListener('click', () => {
-    // only act when clicking current-month days
+  // Add click event to ALL cells (both active and inactive)
+  el.addEventListener('click', async () => {
+    // Only act when clicking current-month days
     if (inactive) return;
+    
     clearDayHighlights();
     el.classList.add('highlight');
 
     const isoStr = iso;
-    const pastEvents = events.filter(ev => ev.date === isoStr && fromISO(ev.date) < today);
-    if (pastEvents.length){
-      // open the first matching event in the events list
-      const firstEv = pastEvents[0];
-      const card = document.querySelector(`.event-card[data-id="${firstEv.id}"]`);
+    const forms = await fetchFormsFromMongoDB();
+    const pastForms = forms.filter(form => form.date === isoStr && fromISO(form.date) < today);
+    
+    if (pastForms.length > 0){
+      // Find and highlight the first matching event card
+      const firstForm = pastForms[0];
+      const card = document.querySelector(`.event-card[data-id="${firstForm.id}"]`);
       if (card) {
-        // FIXED SCROLLING: Only scroll if the card is not in view
+        // Scroll to the card if needed
         const cardRect = card.getBoundingClientRect();
         const containerRect = eventsListEl.getBoundingClientRect();
         
         if (cardRect.top < containerRect.top || cardRect.bottom > containerRect.bottom) {
-          card.scrollIntoView({behavior:'smooth', block:'nearest'});
+          card.scrollIntoView(false); // No animation
         }
-        // open detail panel for that event
-        openDetailPanel(firstEv);
+        
+        // Also highlight the card
+        document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        
+        // Open detail panel for that form
+        openDetailPanel(firstForm);
       }
+    } else {
+      // If no forms for this date, just clear any active event cards
+      document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
     }
   });
 
@@ -175,75 +231,95 @@ function makeDayCell(dateObj, inactive=false){
 }
 
 // ---------------- Render Past Events panel ----------------
-function renderPastEvents(filterText = '') {
+async function renderPastEvents(filterText = '') {
   eventsListEl.innerHTML = '';
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
 
-  const monthEvents = events.filter(ev => {
-    const d = fromISO(ev.date);
+  // Fetch forms from MongoDB
+  const forms = await fetchFormsFromMongoDB();
+  
+  const monthForms = forms.filter(form => {
+    const d = fromISO(form.date);
     const isSameMonth = (d.getFullYear() === viewYear && d.getMonth() === viewMonth);
     const isPast = d < today;
     return isSameMonth && isPast;
   }).sort((a,b) => (b.date + b.start) > (a.date + a.start) ? 1 : -1);
 
   const q = (filterText || '').trim().toLowerCase();
-  const filtered = monthEvents.filter(ev => {
+  const filtered = monthForms.filter(form => {
     if (!q) return true;
-    return (ev.title + ' ' + ev.category + ' ' + ev.description).toLowerCase().includes(q);
+    return (form.title + ' ' + form.category + ' ' + form.description + ' ' + form.acronym + ' ' + form.completeName).toLowerCase().includes(q);
   });
 
   if (filtered.length === 0){
-    const empty = document.createElement('div'); empty.className = 'event-card';
-    empty.innerHTML = `<div class="event-title">No past events</div><div class="event-meta muted">No events matching the month/search</div>`;
+    const empty = document.createElement('div'); 
+    empty.className = 'event-card';
+    empty.innerHTML = `<div class="event-title">No past form submissions</div><div class="event-meta muted">No form submissions matching the month/search</div>`;
     eventsListEl.appendChild(empty);
     return;
   }
 
-  filtered.forEach(ev => {
-    const card = document.createElement('div'); card.className = 'event-card'; card.tabIndex = 0;
-    card.dataset.id = ev.id;
+  filtered.forEach(form => {
+    const card = document.createElement('div'); 
+    card.className = 'event-card'; 
+    card.tabIndex = 0;
+    card.dataset.id = form.id;
 
-    const head = document.createElement('div'); head.className = 'event-head';
-    const title = document.createElement('div'); title.className = 'event-title'; title.textContent = ev.title;
-    const meta = document.createElement('div'); meta.className = 'event-meta'; meta.textContent = `${ev.date} • ${ev.start} - ${ev.end}`;
-    head.appendChild(title); head.appendChild(meta);
+    const head = document.createElement('div'); 
+    head.className = 'event-head';
+    const title = document.createElement('div'); 
+    title.className = 'event-title'; 
+    title.textContent = `${form.acronym} - ${form.status}`;
+    const meta = document.createElement('div'); 
+    meta.className = 'event-meta'; 
+    meta.textContent = `${form.date} • ${form.school}`;
+    head.appendChild(title); 
+    head.appendChild(meta);
 
-    const details = document.createElement('div'); details.className = 'event-details';
+    const details = document.createElement('div'); 
+    details.className = 'event-details';
     details.innerHTML = `
-      <div class="event-meta"><span class="cat">${ev.category}</span></div>
-      <div class="event-desc">${ev.description}</div>
-      <div class="event-extra">Event ID: ${ev.id}</div>
+      <div class="event-meta"><span class="cat">${form.organizationType}</span></div>
+      <div class="event-desc">${form.completeName}</div>
+      <div class="event-extra">Applicant: ${form.formData.applicantName}</div>
     `;
 
     card.appendChild(head);
     card.appendChild(details);
 
-    // clicking opens slide-in panel with full details
+    // Clicking opens slide-in panel with full details
     card.addEventListener('click', (e) => {
-      // don't let click bubble accidentally cause other behaviors
+      // Don't let click bubble accidentally cause other behaviors
       e.stopPropagation();
-      openDetailPanel(ev);
-      // highlight corresponding day in calendar
+      
+      // Remove active class from all other cards
+      document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
+      // Add active class to clicked card
+      card.classList.add('active');
+      
+      openDetailPanel(form);
+      
+      // Highlight corresponding day in calendar
       clearDayHighlights();
-      const dayEl = document.querySelector(`.day[data-date="${ev.date}"]`);
+      const dayEl = document.querySelector(`.day[data-date="${form.date}"]`);
       if (dayEl) {
         dayEl.classList.add('highlight');
-        // FIXED SCROLLING: Only scroll if the day is not in view
+        // Scroll to day if needed
         const dayRect = dayEl.getBoundingClientRect();
         const calendarRect = calendarGrid.getBoundingClientRect();
         
         if (dayRect.top < calendarRect.top || dayRect.bottom > calendarRect.bottom) {
-          dayEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+          dayEl.scrollIntoView(false); // No animation
         }
       }
     });
 
-    // keyboard accessibility: Enter/Space opens details
+    // Keyboard accessibility: Enter/Space opens details
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openDetailPanel(ev);
+        openDetailPanel(form);
       }
     });
 
@@ -251,16 +327,207 @@ function renderPastEvents(filterText = '') {
   });
 }
 
+// Update calendar cells with events (NO ANIMATION)
+function updateCalendarCellsWithEvents(forms) {
+  // Clear all existing event badges
+  document.querySelectorAll('.event-list').forEach(eventList => {
+    eventList.innerHTML = '';
+  });
+
+  // Group forms by date
+  const formsByDate = {};
+  forms.forEach(form => {
+    if (!formsByDate[form.date]) {
+      formsByDate[form.date] = [];
+    }
+    formsByDate[form.date].push(form);
+  });
+
+  // Add events to each day cell
+  Object.keys(formsByDate).forEach(date => {
+    const dayEl = document.querySelector(`.day[data-date="${date}"]`);
+    if (dayEl) {
+      const eventList = dayEl.querySelector('.event-list');
+      if (eventList) {
+        eventList.innerHTML = ''; // Clear existing content
+        
+        const formsOnDate = formsByDate[date];
+        const formsToShow = formsOnDate.slice(0, 2);
+        
+        formsToShow.forEach(formItem => {
+          const badge = document.createElement('span');
+          badge.className = 'event-badge';
+          badge.textContent = formItem.acronym;
+          eventList.appendChild(badge);
+        });
+        
+        // Show "+X more" if there are more forms
+        if (formsOnDate.length > 2) {
+          const moreBadge = document.createElement('span');
+          moreBadge.className = 'event-badge more-badge';
+          moreBadge.textContent = `+${formsOnDate.length - 2} more`;
+          moreBadge.style.background = '#f0f0f0';
+          moreBadge.style.color = '#666';
+          eventList.appendChild(moreBadge);
+        }
+      }
+    }
+  });
+
+  // Add spacers to days with no events
+  document.querySelectorAll('.day').forEach(dayEl => {
+    const eventList = dayEl.querySelector('.event-list');
+    if (eventList && eventList.children.length === 0) {
+      const spacer = document.createElement('div');
+      spacer.style.minHeight = '6px';
+      eventList.appendChild(spacer);
+    }
+  });
+}
+
 // ---------------- Slide-in detail panel ----------------
-function openDetailPanel(ev) {
-  detailTitle.textContent = ev.title;
-  detailMeta.textContent = `${ev.date} • ${ev.start} - ${ev.end} • ${ev.category}`;
+function openDetailPanel(form) {
+  const formData = form.formData;
+  
+  detailTitle.textContent = `${formData.acronym} - ${form.status}`;
+  detailMeta.textContent = `${form.date} • ${formData.school} • ${formData.organizationType}`;
+  
+  // Improved design for detail panel
   detailBody.innerHTML = `
-    <p style="margin-top:8px; line-height:1.5;">${ev.description}</p>
-    <hr style="margin:12px 0;">
-    <div style="font-size:13px; color:#6b7280;">
-      <div><strong>Event ID:</strong> ${ev.id}</div>
-      <div><strong>Category:</strong> ${ev.category}</div>
+    <div class="detail-section">
+      <div class="detail-header">
+        <h3 class="detail-org-name">${formData.completeName}</h3>
+        <p class="detail-email">${formData.officialEmail}</p>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">Organization Details</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Category:</span>
+          <span class="detail-value">${formData.category || 'N/A'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">School:</span>
+          <span class="detail-value">${formData.school}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Type:</span>
+          <span class="detail-value">${formData.organizationType}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">CBL Status:</span>
+          <span class="detail-value status-${(formData.cblStatus || '').toLowerCase().replace(' ', '-')}">${formData.cblStatus || 'N/A'}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">Contact Information</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Applicant:</span>
+          <span class="detail-value">${formData.applicantName} (${formData.applicantPosition})</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Applicant Email:</span>
+          <span class="detail-value">${formData.applicantEmail}</span>
+        </div>
+        <div class="detail-item full-width">
+          <span class="detail-label">Advisers:</span>
+          <span class="detail-value">${formData.adviserNames.join(', ') || 'None specified'}</span>
+        </div>
+      </div>
+    </div>
+
+    ${formData.socialMediaLinks && formData.socialMediaLinks.length > 0 ? `
+    <div class="detail-section">
+      <h4 class="detail-section-title">Social Media Links</h4>
+      <div class="social-links">
+        ${formData.socialMediaLinks.map(link => 
+          `<a href="${link}" target="_blank" class="social-link">
+            <span class="link-icon">🔗</span>
+            ${link}
+          </a>`
+        ).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">Documents & Files</h4>
+      <div class="document-list">
+        ${formData.strategicPlans ? `
+        <div class="document-item">
+          <span class="doc-icon">📊</span>
+          <div class="doc-info">
+            <span class="doc-name">Strategic Plans</span>
+            <a href="${formData.strategicPlans.fileUrl}" target="_blank" class="doc-link">Download</a>
+          </div>
+        </div>
+        ` : ''}
+        
+        ${formData.annualReport ? `
+        <div class="document-item">
+          <span class="doc-icon">📈</span>
+          <div class="doc-info">
+            <span class="doc-name">Annual Report</span>
+            <a href="${formData.annualReport.fileUrl}" target="_blank" class="doc-link">Download</a>
+          </div>
+        </div>
+        ` : ''}
+        
+        ${formData.constitutionByLaws ? `
+        <div class="document-item">
+          <span class="doc-icon">📜</span>
+          <div class="doc-info">
+            <span class="doc-name">Constitution & Bylaws</span>
+            <a href="${formData.constitutionByLaws.fileUrl}" target="_blank" class="doc-link">Download</a>
+          </div>
+        </div>
+        ` : ''}
+        
+        ${formData.infographics ? `
+        <div class="document-item">
+          <span class="doc-icon">🖼️</span>
+          <div class="doc-info">
+            <span class="doc-name">Infographics</span>
+            <a href="${formData.infographics.fileUrl}" target="_blank" class="doc-link">Download</a>
+          </div>
+        </div>
+        ` : ''}
+        
+        ${formData.videoLink ? `
+        <div class="document-item">
+          <span class="doc-icon">🎥</span>
+          <div class="doc-info">
+            <span class="doc-name">Presentation Video</span>
+            <a href="${formData.videoLink}" target="_blank" class="doc-link">Watch Video</a>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="detail-section-title">Submission Details</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Form ID:</span>
+          <span class="detail-value monospace">${form.id}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value status-badge status-${(form.status || '').toLowerCase().replace(' ', '-')}">${form.status}</span>
+        </div>
+        ${formData.remarks ? `
+        <div class="detail-item full-width">
+          <span class="detail-label">Remarks:</span>
+          <span class="detail-value">${formData.remarks}</span>
+        </div>
+        ` : ''}
+      </div>
     </div>
   `;
 
@@ -269,23 +536,38 @@ function openDetailPanel(ev) {
   overlay.setAttribute('aria-hidden', 'false');
   detailPanel.setAttribute('aria-hidden', 'false');
 
-  // focus for accessibility
+  // Focus for accessibility
   detailPanel.focus();
 }
 
-// close detail panel
+// Helper function for status colors
+function getStatusColor(status) {
+  const colors = {
+    'Pending Review': '#f59e0b',
+    'Approved': '#10b981',
+    'Rejected': '#ef4444',
+    'Needs Revision': '#f97316'
+  };
+  return colors[status] || '#6b7280';
+}
+
+// Close detail panel
 function closeDetailPanel(){
   overlay.classList.remove('show');
   detailPanel.classList.remove('open');
   overlay.setAttribute('aria-hidden', 'true');
   detailPanel.setAttribute('aria-hidden', 'true');
+  
+  // Clear highlights when closing panel
+  clearDayHighlights();
+  document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
 }
 
-// close on overlay click or close button
+// Close on overlay click or close button
 overlay.addEventListener('click', closeDetailPanel);
 detailClose.addEventListener('click', closeDetailPanel);
 
-// close with Esc
+// Close with Esc
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeDetailPanel();
@@ -306,27 +588,38 @@ searchClear.addEventListener('click', () => {
 });
 
 // ---------------- Navigation handlers ----------------
-prevBtn.addEventListener('click', () => {
+prevBtn.addEventListener('click', async () => {
   viewDate.setMonth(viewDate.getMonth() - 1);
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-nextBtn.addEventListener('click', () => {
+nextBtn.addEventListener('click', async () => {
   viewDate.setMonth(viewDate.getMonth() + 1);
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-todayBtn.addEventListener('click', () => {
-  viewDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  renderCalendar();
-  renderPastEvents(searchInput.value);
+todayBtn.addEventListener('click', async () => {
+  viewDate = new Date(); // Reset to current system date
+  await renderCalendar();
+  await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-// initial render
-renderCalendar();
-renderPastEvents();
+// Initial render
+async function initializeCalendar() {
+  try {
+    makeEventsListScrollable(); // Make events list scrollable
+    await renderCalendar();
+    await renderPastEvents();
+    console.log('Calendar initialized with form data from MongoDB');
+  } catch (error) {
+    console.error('Error initializing calendar:', error);
+  }
+}
+
+// Start the application
+initializeCalendar();
