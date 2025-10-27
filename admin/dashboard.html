@@ -46,36 +46,40 @@
       <!-- Analytics Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
     <div class="stat-card">
-      <div class="flex items-center justify-between mb-4">
-        <div class="text-2xl">👥</div>
-      </div>
+      <div class="center-flex">
+  <img src="../Images/Users_Many.png" alt="Total Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
+
       <div class="metric-value" id="totalUsers">2,847</div>
       <div class="metric-label">Total Users</div>
       <div class="metric-change positive">↑ 12.5% from last month</div>
     </div>
 
     <div class="stat-card">
-      <div class="flex items-center justify-between mb-4">
-        <div class="text-2xl">✓</div>
-      </div>
+      <!-- Active Users -->
+<div class="center-flex">
+  <img src="../Images/Users_Online.png" alt="Active Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
       <div class="metric-value" id="activeUsers">1,923</div>
       <div class="metric-label">Active Users</div>
       <div class="metric-change positive">↑ 8.2% from last month</div>
     </div>
 
     <div class="stat-card">
-      <div class="flex items-center justify-between mb-4">
-        <div class="text-2xl">🏢</div>
-      </div>
+      <!-- Organizations -->
+<div class="center-flex">
+  <img src="../Images/Users_Orgs.png" alt="Organizations" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
       <div class="metric-value" id="totalOrgs">47</div>
       <div class="metric-label">Organizations</div>
       <div class="metric-change positive">↑ 3 new this month</div>
     </div>
 
     <div class="stat-card">
-      <div class="flex items-center justify-between mb-4">
-        <div class="text-2xl">⏸</div>
-      </div>
+      <!-- Inactive Users -->
+<div class="center-flex">
+  <img src="../Images/Users_Down.png" alt="Inactive Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
       <div class="metric-value" id="inactiveUsers">924</div>
       <div class="metric-label">Inactive Users</div>
       <div class="metric-change negative">↓ 4.1% from last month</div>
@@ -83,79 +87,127 @@
   </div>
 
   <!-- User Management Section -->
-  <div class="table-container">
-    <div class="p-6 border-b border-gray-200">
-      <h2 class="text-xl font-bold mb-4">User Management</h2>
+<div class="table-container">
+  <div class="table-header">
+    <h2>User Management</h2>
 
-      <!-- Filters and Search -->
-      <div class="flex flex-col md:flex-row gap-4 mb-4">
-        <div class="flex-1">
-          <input 
-            type="text" 
-            id="searchInput" 
-            class="search-input" 
-            placeholder="Search users by name or email..."
-          >
-        </div>
-        <div class="flex gap-2 flex-wrap">
-          <button class="filter-btn active" data-filter="all">All Users</button>
-          <button class="filter-btn" data-filter="active">Active</button>
-          <button class="filter-btn" data-filter="inactive">Inactive</button>
-        </div>
+    <!-- Search and Filter Section -->
+    <div class="search-section">
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search users by name or email..." />
+        <button id="searchClear" title="Clear">✕</button>
       </div>
 
-      <!-- Organization Filter -->
-     <!-- Organization Filter -->
-<div class="flex gap-2 flex-wrap items-center">
-  <span class="text-sm text-gray-500 mr-2">Filter by School:</span>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All Users</button>
+        <button class="filter-btn" data-filter="active">Active</button>
+        <button class="filter-btn" data-filter="inactive">Inactive</button>
+      </div>
+    </div>
 
-  <!-- SAMCIS School Button with Dropdown -->
+    <!-- Organization Filter -->
+    <div class="org-filter">
+  <span class="filter-label">Filter by School:</span>
+
+  <!-- SAMCIS School Wide -->
   <div class="dropdown">
     <button class="filter-btn dropdown-toggle" id="samcisBtn">SAMCIS ▾</button>
     <div class="dropdown-menu hidden" id="samcisDropdown">
-      <button class="filter-btn" data-org="ICON">ICON</button>
+      <button class="filter-btn" data-org="SCHEMA">SCHEMA</button>
       <button class="filter-btn" data-org="RPG">RPG</button>
-      <button class="filter-btn" data-org="CCS">CCS</button>
-      <button class="filter-btn" data-org="TCS">TCS</button>
+      <button class="filter-btn" data-org="GCS">GCS</button>
+      <button class="filter-btn" data-org="MSS">MSS</button>
+      <button class="filter-btn" data-org="YES">YES</button>
+      <button class="filter-btn" data-org="ICON">ICON</button>
+      <button class="filter-btn" data-org="AIM">AIM</button>
+      <button class="filter-btn" data-org="JRFINEX">JRFINEX</button>
+      <button class="filter-btn" data-org="JPIA">JPIA</button>
+      <button class="filter-btn" data-org="LIGHT">LIGHT</button>
+      <button class="filter-btn" data-org="MM">MM</button>
     </div>
   </div>
 
-  <!-- Optional: Other schools (future-ready) -->
+  <!-- SLU Uni Wide -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="sluUniWideBtn">SLU Uni Wide ▾</button>
+    <div class="dropdown-menu hidden" id="sluUniWideDropdown">
+      <button class="filter-btn" data-org="SLU Debate Society">SLU Debate Society</button>
+      <button class="filter-btn" data-org="RCY">RCY - Red Cross Youth (SLU Chapter)</button>
+      <button class="filter-btn" data-org="SLU COMELEC">SLU COMELEC</button>
+      <button class="filter-btn" data-org="SLU COA">SLU COA - Commission On Audit</button>
+      <button class="filter-btn" data-org="WHITE & BLUE">WHITE & BLUE</button>
+      <button class="filter-btn" data-org="ROTARACT CLUB">ROTARACT CLUB</button>
+      <button class="filter-btn" data-org="Tinig Himig SLU">Tinig Himig SLU</button>
+      <button class="filter-btn" data-org="SICAP">SICAP - Society of Integrated Affairs and Services</button>
+      <button class="filter-btn" data-org="SLU MEAAW">SLU MEAAW - Motion to Encourage and Advocate for Animal Welfare</button>
+      <button class="filter-btn" data-org="Luwisyano Beta Sigma Fraternity">Luwisyano Beta Sigma Fraternity - Brotherhood of Scholars</button>
+    </div>
+  </div>
+
+  <!-- Baguio Association of Government Grantees & Scholars -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="baggsBtn">BAGGS ▾</button>
+    <div class="dropdown-menu hidden" id="baggsDropdown">
+      <button class="filter-btn" data-org="BAGGS">Baguio Association of Government Grantees & Scholars</button>
+    </div>
+  </div>
+
+  <!-- Political Orgs -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="politicalBtn">Political Orgs ▾</button>
+    <div class="dropdown-menu hidden" id="politicalDropdown">
+      <button class="filter-btn" data-org="REPORMA-ACS">REPORMA-ACS</button>
+      <button class="filter-btn" data-org="RIGHTS">RIGHTS</button>
+      <button class="filter-btn" data-org="DASIG">DASIG</button>
+    </div>
+  </div>
+
+  <!-- Youth Organizations -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="youthBtn">Youth Orgs ▾</button>
+    <div class="dropdown-menu hidden" id="youthDropdown">
+      <button class="filter-btn" data-org="ANAKBAYAN SLU">ANAKBAYAN SLU</button>
+      <button class="filter-btn" data-org="BAHAGHARI SLU">BAHAGHARI SLU</button>
+    </div>
+  </div>
+
+  <!-- Show All -->
   <button class="filter-btn" data-org="all">All</button>
 </div>
 
-    </div>
+  </div>
 
-    <!-- Users Table -->
-    <div class="overflow-x-auto">
-      <table id="usersTable">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Email</th>
-            <th>Organization</th>
-            <th>Status</th>
-            <th>Joined</th>
-            <th>Last Active</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-    </div>
+  <!-- Users Table -->
+  <div class="table-wrapper">
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Organization</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Last Active</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
 
-    <!-- Pagination -->
-    <div class="p-4 border-t border-gray-200 flex items-center justify-between">
-      <div class="text-sm text-gray-500">
-        Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> users
-      </div>
-      <div class="flex gap-2">
-        <button id="prevBtn" class="filter-btn" disabled>Previous</button>
-        <button id="nextBtn" class="filter-btn">Next</button>
-      </div>
+  <!-- Pagination -->
+  <div class="table-footer">
+    <div class="text-info">
+      Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> users
+    </div>
+    <div class="pagination-controls">
+      <button id="prevBtn" class="filter-btn" disabled>Previous</button>
+      <button id="nextBtn" class="filter-btn">Next</button>
     </div>
   </div>
+</div>
+
 
 
       <footer class="footer muted">© <span id="curYear"></span> Admin Home</footer>

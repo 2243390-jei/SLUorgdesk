@@ -228,7 +228,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 .footer { 
   margin-top: 20px; 
   padding: 16px 8px 8px 8px; 
-  text-align: right; 
+  text-align: center; 
   border-top: 1px solid #eef2f6;
 }
 
@@ -314,11 +314,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 
 
-/* Home */
-
-/* ============== Dashboard Integration Styles ============== */
-
-/* Grid fallback for non-Tailwind */
+/* Dashboard */
 .grid {
   display: grid;
 }
@@ -344,16 +340,19 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 
 .metric-value {
+   text-align: center;
   font-size: 2rem;
   font-weight: 700;
   color: #0f1720;
 }
 .metric-label {
+  text-align: center;
   font-size: 0.875rem;
   color: var(--muted);
   margin-top: 0.5rem;
 }
 .metric-change {
+  text-align: center;
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
@@ -482,12 +481,12 @@ tr:hover {
   color: #64748b;
 }
 
-/* --------------------------------------------------
-   Styles moved from admin/usermanagement.html <style>
-   (modal styles, add-org modal, google modal, create-org modal)
-   -------------------------------------------------- */
-
-/* --- Reuse existing modal style --- */
+.center-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
 
 .modal {
   display: none;
@@ -708,4 +707,133 @@ tr:hover {
   }
 }
 
-/* End moved styles */
+/* --- User Management Search Section --- */
+.search-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 8px 0;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* === Refined Table Layout (Flexible Version) === */
+.table-container {
+  background-color: var(--card);
+  border-radius: var(--rounded);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+
+  /* Flexibility tweaks */
+  height: auto;              /* expand naturally with content */
+  max-height: 85vh;          /* optional cap (prevents going beyond screen) */
+  overflow-y: visible;       /* allows dropdowns to expand outside */
+  transition: all 0.3s ease; /* smooth expand animation */
+}
+
+/* Add inner padding around header section */
+.table-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--deep-blue);
+}
+
+/* Organization filter layout */
+.org-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.filter-label {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Add soft spacing around the table */
+.table-wrapper {
+  padding: 0 24px 24px 24px;
+  overflow-x: auto;
+}
+
+/* Table styling with extra spacing */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px; /* space between rows */
+}
+
+th {
+  background-color: #f9fafb;
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+td {
+  padding: 14px 18px;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+}
+
+tr:hover td {
+  background-color: #f8fafc;
+  transition: background 0.2s ease;
+}
+
+/* Make cells have subtle rounded corners */
+tbody tr:first-child td:first-child {
+  border-top-left-radius: 8px;
+}
+tbody tr:first-child td:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Footer section (pagination) */
+.table-footer {
+  margin-top: auto;       /* pushes footer to the bottom */
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: var(--card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.text-info {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+}

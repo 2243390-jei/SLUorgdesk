@@ -49,6 +49,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("totalOrgs").textContent = orgs;
   }
 
+ 
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    filteredData = [...organizations];
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  });
+
   // === Filtering ===
   function filterUsers() {
     filteredUsers = users.filter(user => {
@@ -122,32 +131,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         filterUsers();
       });
 
-      // === 🔽 SAMCIS Dropdown logic ===
-  const samcisBtn = document.getElementById('samcisBtn');
-  const samcisDropdown = document.getElementById('samcisDropdown');
+     // === 🔽 Universal Dropdown Logic (for all schools) ===
+document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+  const dropdownMenu = btn.nextElementSibling;
 
-  if (samcisBtn && samcisDropdown) {
-    samcisBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      samcisDropdown.classList.toggle('hidden');
+  // Toggle dropdown visibility
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+
+    // Close any other open dropdowns first
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (menu !== dropdownMenu) menu.classList.add('hidden');
     });
 
-    // Hide dropdown when clicking outside
-    window.addEventListener('click', () => {
-      samcisDropdown.classList.add('hidden');
-    });
+    dropdownMenu.classList.toggle('hidden');
+  });
 
-    // Handle dropdown item clicks
-    document.querySelectorAll('#samcisDropdown .filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const org = btn.dataset.org;
-        console.log("Filtering organization:", org);
-        currentOrgFilter = org; // ✅ integrate with your existing filter logic
-        filterUsers();
-        samcisDropdown.classList.add('hidden');
-      });
+  // Handle clicks on dropdown items
+  dropdownMenu.querySelectorAll('.filter-btn').forEach(item => {
+    item.addEventListener('click', () => {
+      const org = item.dataset.org;
+      console.log("Filtering organization:", org);
+      currentOrgFilter = org;
+      filterUsers();
+      dropdownMenu.classList.add('hidden');
     });
-  }
+  });
+});
+
+// Hide dropdown when clicking anywhere else
+window.addEventListener('click', () => {
+  document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+});
+
     }
 
     const prevBtn = document.getElementById("prevBtn");
