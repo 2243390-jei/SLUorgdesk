@@ -1,32 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submission</title>
-    <link rel="stylesheet" href="../style/style.css">
-    <script src="../script/main.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submission Page</title>
+  <link rel="stylesheet" href="../style/style.css" />
 </head>
-<body>
+
+<body class="submission-body">
   <!-- NAVIGATION BAR -->
-    <header class="navbar">
+  <header class="navbar">
     <div class="logo">
       <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" />
     </div>
 
     <nav>
       <ul>
-        <li><a href="home.html" class="active">Home</a></li>
-        <li><a href="submission.html">Submission</a></li>
-        <li><a href="#">FAQ</a></li>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="submission.html" class="active">Submission</a></li>
+        <li><a href="history.html">History</a></li>
       </ul>
     </nav>
+
     <div class="profile-icon">
-      <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile" />
+      <img src="../Images/student_img/profile.png" alt="Profile" />
     </div>
   </header>
 
-  
-    
+  <!-- HERO SECTION -->
+  <section class="submission-hero">
+    <div class="submission-hero-text">
+      <h1>SUBMISSION OF ORGANIZATION DOCUMENTS</h1>
+      <p>Fill out all required fields and attach the necessary files below.</p>
+    </div>
+
+    <div class="submission-hero-image">
+      <img src="../Images/student_img/submit/hero_submission.png" alt="Submission Illustration" />
+    </div>
+  </section>
+
+  <!-- FORM SECTION -->
+  <section class="submission-form-section">
+    <div class="submission-form-wrapper">
+      <form id="submissionForm" method="POST" enctype="multipart/form-data">
+        <!-- Organization Information -->
+        <h3 class="form-section-title">Document Forms</h3>
+
+        <div class="form-group">
+          <label>Complete Name of Organization or Publication</label>
+          <input type="text" name="org_name" placeholder="Your answer" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Acronym or Short Name of Organization</label>
+            <input type="text" name="org_acronym" placeholder="Your answer" />
+          </div>
+          <div class="form-group">
+            <label>Official SLU Institutional Email of Organization</label>
+            <input type="email" name="org_email" placeholder="Your answer" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>URL Link/s to Official Social Media Pages</label>
+          <input type="text" name="org_social" placeholder="Your answer" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name of Applicant Representing The Organization</label>
+            <input type="text" name="applicant_name" placeholder="Your answer" />
+          </div>
+          <div class="form-group">
+            <label>SLU Institutional Email of Applicant</label>
+            <input type="email" name="applicant_email" placeholder="Your answer" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category The Organization Belongs To</label>
+            <select name="org_category" required>
+              <option value="" disabled selected>Select Category</option>
+              <option value="SAMCIS">SAMCIS</option>
+              <option value="SEA">SEA</option>
+              <option value="SOM">SOM</option>
+              <option value="SONAHBS">SONAHBS</option>
+              <option value="SOL">SOL</option>
+              <option value="STELA">STELA</option>
+              <option value="University-Wide">University-Wide</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Type of Organization</label>
+            <select name="org_type" required>
+              <option value="" disabled selected>Select Type</option>
+              <option value="Co-Curricular">Co-Curricular</option>
+              <option value="Extra-Curricular">Extra-Curricular</option>
+              <option value="Publication">Publication</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Position of Applicant in the Student Group</label>
+            <input type="text" name="applicant_position" placeholder="Your answer" />
+          </div>
+          <div class="form-group">
+            <label>Name of Adviser/s (First Name, Middle Initial, Surname)</label>
+            <input type="text" name="adviser_name" placeholder="Your answer" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>SLU Institutional Email of Adviser/s</label>
+          <input type="email" name="adviser_email" placeholder="Your answer" />
+        </div>
+
+        <!-- SDG Checkboxes -->
+        <div class="form-group">
+          <label>Sustainable Development Goals (SDGs) aligned with this Document</label>
+          <div class="sdg-options">
+            <label><input type="checkbox" name="sdg[]" value="1. No Poverty"> 1. No Poverty</label>
+            <label><input type="checkbox" name="sdg[]" value="2. Zero Hunger"> 2. Zero Hunger</label>
+            <label><input type="checkbox" name="sdg[]" value="3. Good Health and Well-being"> 3. Good Health and Well-being</label>
+            <label><input type="checkbox" name="sdg[]" value="4. Quality Education"> 4. Quality Education</label>
+            <label><input type="checkbox" name="sdg[]" value="5. Gender Equality"> 5. Gender Equality</label>
+            <label><input type="checkbox" name="sdg[]" value="6. Clean Water and Sanitation"> 6. Clean Water and Sanitation</label>
+            <label><input type="checkbox" name="sdg[]" value="7. Affordable and Clean Energy"> 7. Affordable and Clean Energy</label>
+            <label><input type="checkbox" name="sdg[]" value="8. Decent Work and Economic Growth"> 8. Decent Work and Economic Growth</label>
+            <label><input type="checkbox" name="sdg[]" value="9. Industry, Innovation and Infrastructure"> 9. Industry, Innovation and Infrastructure</label>
+            <label><input type="checkbox" name="sdg[]" value="10. Reduced Inequalities"> 10. Reduced Inequalities</label>
+            <label><input type="checkbox" name="sdg[]" value="11. Sustainable Cities and Communities"> 11. Sustainable Cities and Communities</label>
+            <label><input type="checkbox" name="sdg[]" value="12. Responsible Consumption and Production"> 12. Responsible Consumption and Production</label>
+            <label><input type="checkbox" name="sdg[]" value="13. Climate Action"> 13. Climate Action</label>
+            <label><input type="checkbox" name="sdg[]" value="14. Life Below Water"> 14. Life Below Water</label>
+            <label><input type="checkbox" name="sdg[]" value="15. Life on Land"> 15. Life on Land</label>
+            <label><input type="checkbox" name="sdg[]" value="16. Peace, Justice and Strong Institutions"> 16. Peace, Justice and Strong Institutions</label>
+            <label><input type="checkbox" name="sdg[]" value="17. Partnerships for the Goals"> 17. Partnerships for the Goals</label>
+          </div>
+        </div>
+
+        <!-- Document Uploads -->
+        <h3 class="form-section-title">Document Uploads</h3>
+
+        <div class="form-group">
+          <label>Strategic Plans for 2025–2026 (PDF)</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="strategic_plan" accept=".pdf" class="drop-zone__input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Annual Report 2025–2026 (PDF)</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="annual_report" accept=".pdf" class="drop-zone__input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Constitution & By-Laws (PDF)</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="cbl" accept=".pdf" class="drop-zone__input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>CBL Status</label>
+          <select name="cbl_status" required>
+            <option value="" disabled selected>Select Status</option>
+            <option value="Without revisions">Without revisions</option>
+            <option value="With revisions">With revisions</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>List of Officers (Spreadsheet)</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="officers_list" accept=".xlsx,.xls,.csv,.ods" class="drop-zone__input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Updated Infographic for SLU Website</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="infographic" accept=".pdf,.png,.jpg,.jpeg" class="drop-zone__input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Financial Statement (2024–2025 to July 2026, PDF)</label>
+          <div class="drop-zone">
+            <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon" />
+            <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
+            <input type="file" name="financial_statement" accept=".pdf" class="drop-zone__input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Link of your Video about your Organization or Publication</label>
+          <input type="url" name="video_link" placeholder="https://..." />
+        </div>
+
+        <div class="form-group confirm-group">
+          <label>
+            <input type="checkbox" required />
+            I confirm that the information provided above is accurate and complete.
+          </label>
+        </div>
+
+        <div class="form-buttons">
+          <button type="reset" class="reset-btn">Reset</button>
+          <button type="submit" class="submit-btn">Submit</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script src="../script/submission.js"></script>
 </body>
+
 </html>
