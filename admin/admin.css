@@ -232,6 +232,88 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   border-top: 1px solid #eef2f6;
 }
 
+/* === Action Buttons === */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.action-icon:hover {
+  transform: scale(1.15);
+  opacity: 0.8;
+}
+
+/* ✅ Modal overlay */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* ✅ Modal content box */
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px 30px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+/* ✅ Buttons inside modal */
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-btn-modal {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.delete-btn-modal {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #777;
+  color: white;
+}
+
+.modal-buttons button:hover {
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
 /* Home */
 
 /* ============== Dashboard Integration Styles ============== */
@@ -358,3 +440,231 @@ tr:hover {
   background-color: rgba(156, 163, 175, 0.15);
   color: #64748b;
 }
+
+/* --------------------------------------------------
+   Styles moved from admin/usermanagement.html <style>
+   (modal styles, add-org modal, google modal, create-org modal)
+   -------------------------------------------------- */
+
+/* --- Reuse existing modal style --- */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content,
+.addorg-modal-content,
+.google-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #777;
+  color: white;
+}
+
+.delete-confirm {
+  background-color: #f44336;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Add Organization button section --- */
+.top-right-action {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 40px 10px;
+}
+
+#addOrgBtn {
+  background-color: #0066cc;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#addOrgBtn:hover {
+  background-color: #0052a3;
+}
+
+/* --- Add Organization Modal --- */
+.addorg-modal-content h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
+
+.divider:not(:empty)::before {
+  margin-right: 0.75em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 0.75em;
+}
+
+#signInGoogleBtn {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  width: 100%;
+}
+
+#signInGoogleBtn:hover {
+  background-color: #357ae8;
+}
+
+#createAccountSection button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
+
+#createAccountSection button:hover {
+  background-color: #3e9143;
+}
+
+/* --- Google Email Modal --- */
+.google-modal-content input {
+  width: 90%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.google-modal-content h3 {
+  margin-bottom: 10px;
+}
+
+/* --- Create New Organization Modal (new style) --- */
+.createorg-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2000;
+}
+
+.createorg-modal.open {
+  display: flex;
+}
+
+.createorg-modal-content {
+  background: #fff;
+  width: 92%;
+  max-width: 760px;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.createorg-modal-row {
+  margin-bottom: 12px;
+}
+
+.createorg-modal-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.createorg-modal-row input,
+.createorg-modal-row select,
+.createorg-modal-row textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.createorg-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .createorg-modal-content {
+    padding: 16px;
+  }
+}
+
+/* End moved styles */

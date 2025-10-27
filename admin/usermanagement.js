@@ -59,9 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${org.school || "N/A"}</td>
         <td>${org.programs ? org.programs.join(", ") : "N/A"}</td>
         <td>${org.updatedAt ? new Date(org.updatedAt).toLocaleDateString() : "—"}</td>
-        <td>
-          <button class="view-btn" data-id="${org._id}"><i class="fa-solid fa-eye"></i></button>
-          <button class="edit-btn" data-id="${org._id}"><i class="fa-solid fa-pen"></i></button>
+        <td class="action-buttons">
+          <img src="/Images/write.png" alt="Edit" class="action-icon edit-btn" title="Edit" data-id="${org._id}">
+          <img src="/Images/delete.png" alt="Delete" class="action-icon delete-btn" title="Delete" data-id="${org._id}">
         </td>
       `;
       orgTableBody.appendChild(row);
@@ -132,6 +132,117 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable();
     renderPagination();
   });
+
+  // ✅ Handle edit and delete clicks (with modal)
+  // ✅ Handle edit and delete clicks using the confirm modal present in the HTML
+  document.addEventListener("click", (e) => {
+    const editBtn = e.target.closest(".edit-btn");
+    const deleteBtn = e.target.closest(".delete-btn");
+
+    if (editBtn || deleteBtn) {
+      const isEdit = !!editBtn;
+      const id = (editBtn || deleteBtn).dataset.id;
+      const modal = document.getElementById("confirmModal");
+      const title = document.getElementById("confirmTitle");
+      const yesBtn = document.getElementById("confirmYes");
+      const cancelBtn = document.getElementById("confirmCancel");
+
+      if (!modal || !title || !yesBtn || !cancelBtn) return;
+
+      title.textContent = isEdit
+        ? "Are you sure you want to edit this organization?"
+        : "Are you sure you want to delete this organization?";
+      yesBtn.className = isEdit ? "confirm-btn" : "confirm-btn delete-confirm";
+      modal.style.display = "block";
+
+      yesBtn.onclick = () => {
+        alert(
+          isEdit
+            ? `📝 Edit organization ID: ${id}`
+            : `❌ Delete organization ID: ${id}`
+        );
+        modal.style.display = "none";
+      };
+
+      cancelBtn.onclick = () => (modal.style.display = "none");
+    }
+  });
+
+  // --- Add Organization modal & Google/Create Org flows (moved from inline HTML script) ---
+  const addOrgBtn = document.getElementById("addOrgBtn");
+  const addOrgModal = document.getElementById("addOrgModal");
+  const closeAddOrg = document.getElementById("closeAddOrg");
+
+  if (addOrgBtn && addOrgModal && closeAddOrg) {
+    addOrgBtn.onclick = () => (addOrgModal.style.display = "block");
+    closeAddOrg.onclick = () => (addOrgModal.style.display = "none");
+  }
+
+  // Google Email Modal
+  const googleBtn = document.getElementById("signInGoogleBtn");
+  const googleModal = document.getElementById("googleEmailModal");
+  const cancelGoogle = document.getElementById("cancelGoogle");
+  const nextGoogle = document.getElementById("googleNext");
+
+  if (googleBtn && googleModal) {
+    googleBtn.onclick = () => {
+      if (addOrgModal) addOrgModal.style.display = "none";
+      googleModal.style.display = "block";
+    };
+  }
+  if (cancelGoogle) {
+    cancelGoogle.onclick = () => {
+      googleModal.style.display = "none";
+      if (addOrgModal) addOrgModal.style.display = "block";
+    };
+  }
+  if (nextGoogle) {
+    nextGoogle.onclick = () => {
+      const emailEl = document.getElementById("orgEmailInput");
+      const email = emailEl ? emailEl.value.trim() : "";
+      if (!email) {
+        alert("Please enter an email or username.");
+        return;
+      }
+      alert(`Google Sign-In for: ${email} (non-functional demo)`);
+      googleModal.style.display = "none";
+    };
+  }
+
+  // Create Org modal
+  const createAccountBtn = document.querySelector("#createAccountSection button");
+  const createOrgModal = document.getElementById("createOrgModal");
+  const cancelCreateOrg = document.getElementById("cancelCreateOrg");
+
+  if (createAccountBtn && createOrgModal) {
+    createAccountBtn.onclick = () => {
+      if (addOrgModal) addOrgModal.style.display = "none";
+      createOrgModal.style.display = "flex";
+    };
+  }
+  if (cancelCreateOrg) {
+    cancelCreateOrg.onclick = () => {
+      createOrgModal.style.display = "none";
+      if (addOrgModal) addOrgModal.style.display = "block";
+    };
+  }
+
+  const saveOrgBtn = document.getElementById("saveOrgBtn");
+  if (saveOrgBtn && createOrgModal) {
+    saveOrgBtn.onclick = () => {
+      alert("✅ Organization saved (non-functional demo).");
+      createOrgModal.style.display = "none";
+    };
+  }
+
+  // Close some modals by clicking outside
+  window.onclick = (event) => {
+    if (event.target === addOrgModal) addOrgModal.style.display = "none";
+    if (event.target === googleModal) googleModal.style.display = "none";
+    if (event.target === createOrgModal) createOrgModal.style.display = "none";
+    const confirmModal = document.getElementById("confirmModal");
+    if (event.target === confirmModal) confirmModal.style.display = "none";
+  };
 
   // ✅ Initialize
   fetchOrganizations();
