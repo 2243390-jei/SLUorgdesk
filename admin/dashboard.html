@@ -15,7 +15,7 @@
 </head>
 
 <body>
-  <div class="app">
+  <div class="app"> 
     <!-- Left circular sidebar -->
       <aside class="leftbar" aria-label="Main navigation">
         <div class="brand">
@@ -23,8 +23,8 @@
         </div>
 
         <nav class="left-nav" role="navigation" aria-label="Sidebar">
-          <a href="../admin/dashboard.html"><button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/statistics.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
-          <a href="../admin/usermanagement.html"><button class="circle-btn active" title="User Management" aria-label="User Management"><img src="/Images/user_management.png" alt="User Management" class="nav-icon"></button></a>    
+          <a href="../admin/dashboard.html"><button class="circle-btn active" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/statistics.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
+          <a href="../admin/usermanagement.html"><button class="circle-btn" title="User Management" aria-label="User Management"><img src="/Images/user_management.png" alt="User Management" class="nav-icon"></button></a>    
         </nav>
       </aside>
 
@@ -105,14 +105,25 @@
       </div>
 
       <!-- Organization Filter -->
-      <div class="flex gap-2 flex-wrap">
-        <span class="text-sm text-gray-500 mr-2">Filter by Organization:</span>
-        <button class="filter-btn active" data-org="all">All</button>
-        <button class="filter-btn" data-org="Acme Corp">Acme Corp</button>
-        <button class="filter-btn" data-org="TechStart Inc">TechStart Inc</button>
-        <button class="filter-btn" data-org="Global Solutions">Global Solutions</button>
-        <button class="filter-btn" data-org="Innovation Labs">Innovation Labs</button>
-      </div>
+     <!-- Organization Filter -->
+<div class="flex gap-2 flex-wrap items-center">
+  <span class="text-sm text-gray-500 mr-2">Filter by School:</span>
+
+  <!-- SAMCIS School Button with Dropdown -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="samcisBtn">SAMCIS ▾</button>
+    <div class="dropdown-menu hidden" id="samcisDropdown">
+      <button class="filter-btn" data-org="ICON">ICON</button>
+      <button class="filter-btn" data-org="RPG">RPG</button>
+      <button class="filter-btn" data-org="CCS">CCS</button>
+      <button class="filter-btn" data-org="TCS">TCS</button>
+    </div>
+  </div>
+
+  <!-- Optional: Other schools (future-ready) -->
+  <button class="filter-btn" data-org="all">All</button>
+</div>
+
     </div>
 
     <!-- Users Table -->
@@ -156,6 +167,6 @@
  
     
   </div>
-  <script src="../script/main.js"></script>
+  <script src="../admin/admin.js"></script>
 </body>
 </html>
