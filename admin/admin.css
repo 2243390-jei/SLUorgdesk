@@ -234,327 +234,127 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 
 /* Home */
 
-/* Dashboard integration styles */
+/* ============== Dashboard Integration Styles ============== */
 
-/* Hide the dashboard's internal menu (we use .leftbar instead) */
-.dashboard .menu {
-  display: none;
+/* Grid fallback for non-Tailwind */
+.grid {
+  display: grid;
+}
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.gap-6 { gap: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mt-6 { margin-top: 1.5rem; }
+
+/* Stat Card */
+.stat-card {
+  background-color: var(--card);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--rounded);
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.stat-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
-/* Make dashboard content fill available space */
-.dashboard {
-  background: #291623;
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f1720;
+}
+.metric-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+.metric-change {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+.metric-change.positive { color: #10b981; }
+.metric-change.negative { color: #ef4444; }
+
+/* Table Container */
+.table-container {
+  background-color: var(--card);
   border-radius: var(--rounded);
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 1rem;
+}
+
+/* Filter & Search */
+.search-input {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f1720;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   width: 100%;
-  min-height: 700px; /* Adjust as needed */
-  display: flex;
-  margin-top: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.dashboard .content {
-  flex: 1;
-  display: flex;
-  padding: 0;
+.filter-btn {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover {
+  background-color: #e2e8f0;
+}
+.filter-btn.active {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 
-/* Main content area (76%) */
-.main-content {
-  width: 76%;
-  padding: 3rem;
-  background: #291623;
-}
-
-/* Profile sidebar (24%) */
-.profile {
-  background: #2f1a27;
-  padding: 2rem;
-  width: 24%;
-  color: #927685;
-  font-family: "Time New Roman", sans-serif;
-}
-
-/* Flex utilities (from your dashboard CSS) */
-.flex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-c {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Typography */
-.heading {
-  font-size: 1.8rem;
-  color: #fcfcfc;
-  font-weight: 500;
-  text-align: left;
-  margin-bottom: 2rem;
-  font-family: "Time New Roman", sans-serif;
-}
-
-/* Stats section */
-.stats {
-  background: #33202c;
-  margin-top: 4rem;
-  padding: 2rem 1rem;
-  font-size: 1.6rem;
-  justify-content: space-between;
-  display: flex;
-  border-radius: 8px;
-}
-
-.stats-box {
-  min-height: 30rem;
-  padding: 2rem 1rem;
-}
-
-.sales {
-  flex: 0 0 60%;
-}
-
-.earning {
-  background: #3f2532;
-  width: 38%;
-}
-
-.earning-amount {
-  font-size: 2rem;
-  color: #fff;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.earning-icon {
-  font-size: 4rem;
-  color: #3f2532;
-  background: linear-gradient(to right bottom, #faad72, #f89456);
-  padding: 15px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-}
-
-/* Product Stats */
-.product-stats {
-  justify-content: space-between;
-  margin-top: 2rem;
-  display: flex;
-}
-
-.product-stats .stats-box {
-  background: #33202c;
-  border-radius: 8px;
-}
-
-.product-sales {
-  width: 38%;
-}
-
-.top-selling {
-  width: 60%;
-}
-
-.top-selling-products {
-  text-align: left;
-  font-size: 1.8rem;
+/* Table */
+table {
   width: 100%;
   border-collapse: collapse;
 }
-
-.top-selling-products th,
-.top-selling-products td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #44303a;
+th {
+  background-color: #f8fafc;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+td {
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+tr:hover {
+  background-color: #f8fafc;
 }
 
-.top-selling-products th {
-  background: #3f2532;
-  color: #fff;
+/* Status Badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
-
-.product-name {
-  justify-content: flex-start;
+.status-active {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
 }
-
-.product-name p {
-  margin-left: 10px;
-  color: #e6e3e5;
-}
-
-.product-name .icon {
-  margin: 0;
-  background: #ff8bb4;
-  border-radius: 50%;
-  color: #291623;
-  font-size: 3rem;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.product-name.iphone .icon {
-  background: #f89456;
-}
-
-.product-name.windows .icon {
-  background: #dc9afc;
-}
-
-/* Profile section */
-.user {
-  color: #fff;
-  text-align: center;
-  margin: 3rem 0 5rem 0;
-}
-
-.user img {
-  width: 100px;
-  height: 100px;
-  display: block;
-  margin: 0 auto;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.user h2 {
-  font-size: 2rem;
-  margin: 8px 0;
-  font-family: "Time New Roman", sans-serif;
-}
-
-.user p {
-  color: #ccc;
-  font-family: "Time New Roman", sans-serif;
-}
-
-.title {
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.title .heading {
-  margin-bottom: 0;
-}
-
-.activities {
-  margin: 10px 0;
-  font-size: 14px;
-}
-
-.activity {
-  justify-content: flex-start;
-  font-size: 14px;
-  margin: 2rem 0;
-  color: #ddd;
-}
-
-.activity h2 {
-  font-size: 12px;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.task p {
-  color: #ddd;
-  margin: 0;
-}
-
-.time {
-  margin-top: 4px;
-  color: #aaa;
-  font-size: 12px;
-}
-
-.activity .icon {
-  font-size: 3rem;
-  width: 40px;
-  height: 40px;
-  background: #33202c;
-  margin: 0 10px 5px 0;
-  border-radius: 50%;
-  color: #faad72;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.upgrade {
-  width: 100%;
-  margin: 5rem auto 0 auto;
-  background: #33202c;
-  padding: 2rem;
-  color: #ccc;
-  text-align: center;
-  font-size: 14px;
-  border-radius: 8px;
-}
-
-.upgrade .icon {
-  font-size: 8rem;
-  margin-bottom: 1rem;
-}
-
-.btn {
-  width: 100%;
-  margin: 1.5rem auto 0 auto;
-  background: linear-gradient(to right bottom, #faad72, #f89456);
-  padding: 1.2rem 0;
-  color: #2f1a27;
-  font-size: 1.4rem;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 8px;
-  text-align: center;
-  font-family: "Time New Roman", sans-serif;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1000px) {
-  .dashboard {
-    flex-direction: column;
-  }
-
-  .main-content,
-  .profile {
-    width: 100%;
-  }
-
-  .main-content {
-    padding: 1.5rem;
-  }
-
-  .profile {
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  /* Optional: hide less critical sections on mobile */
-  .title h2,
-  .upgrade,
-  .btn {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 650px) {
-  .product-stats {
-    flex-direction: column;
-  }
-
-  .product-sales,
-  .top-selling {
-    width: 100% !important;
-    margin-bottom: 1.5rem;
-  }
+.status-inactive {
+  background-color: rgba(156, 163, 175, 0.15);
+  color: #64748b;
 }
