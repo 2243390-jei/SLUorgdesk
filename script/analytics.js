@@ -213,40 +213,40 @@ class LargeChart {
         this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Submissions');
     }
 
-    drawBottomLabels(labels) {
-        const ctx = this.ctx;
-        const canvas = this.ctx.canvas;
-        const padding = { top: 60, right: 60, bottom: 80, left: 80 };
-        const chartWidth = canvas.width - padding.left - padding.right;
-        const chartHeight = canvas.height - padding.top - padding.bottom;
+   drawBottomLabels(labels) {
+    const ctx = this.ctx;
+    const canvas = this.ctx.canvas;
+    const padding = { top: 60, right: 60, bottom: 80, left: 80 };
+    const chartWidth = canvas.width - padding.left - padding.right;
+    const chartHeight = canvas.height - padding.top - padding.bottom;
 
-        // Draw bottom labels
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#8f9aa3';
-        ctx.font = '12px Arial';
+    // Draw bottom labels
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#8f9aa3';
+    ctx.font = '12px Arial';
+    
+    if (this.type === 'bar') {
+        const barWidth = (chartWidth / labels.length) * 0.6;
         
-        if (this.type === 'bar') {
-            const barWidth = (chartWidth / labels.length) * 0.6;
+        labels.forEach((label, i) => {
+            const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
             
-            labels.forEach((label, i) => {
-                const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
-                
-                if (this.options.isSDG) {
-                    // For SDG chart, show "SDG 1", "SDG 2", etc.
-                    ctx.fillText(`SDG ${i + 1}`, x + barWidth / 2, padding.top + chartHeight + 15);
-                } else {
-                    // For schools chart, show school names
-                    ctx.fillText(label, x + barWidth / 2, padding.top + chartHeight + 15);
-                }
-            });
-        } else if (this.type === 'line') {
-            // For line chart, show month names
-            labels.forEach((label, i) => {
-                const x = padding.left + (i * chartWidth / (labels.length - 1));
-                ctx.fillText(label, x, padding.top + chartHeight + 20);
-            });
-        }
+            if (this.options.isSDG) {
+                // For SDG chart, show just the numbers "1", "2", etc.
+                ctx.fillText(`${i + 1}`, x + barWidth / 2, padding.top + chartHeight + 15);
+            } else {
+                // For schools chart, show school names
+                ctx.fillText(label, x + barWidth / 2, padding.top + chartHeight + 15);
+            }
+        });
+    } else if (this.type === 'line') {
+        // For line chart, show month names
+        labels.forEach((label, i) => {
+            const x = padding.left + (i * chartWidth / (labels.length - 1));
+            ctx.fillText(label, x, padding.top + chartHeight + 20);
+        });
     }
+}
 
     drawAxes(padding, chartWidth, chartHeight, maxValue, yLabel) {
         const ctx = this.ctx;
