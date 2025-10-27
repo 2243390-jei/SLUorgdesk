@@ -73,6 +73,7 @@ async function fetchFormsFromMongoDB() {
         organizationType: form.organizationType || "Unknown Type",
         acronym: form.acronym || "No Acronym",
         completeName: form.completeName || "Unknown Name",
+        SDGCategory: form.SDGCategory || "Not specified" // Add SDG category
       };
     });
 
@@ -249,7 +250,7 @@ async function renderPastEvents(filterText = '') {
   const q = (filterText || '').trim().toLowerCase();
   const filtered = monthForms.filter(form => {
     if (!q) return true;
-    return (form.title + ' ' + form.category + ' ' + form.description + ' ' + form.acronym + ' ' + form.completeName).toLowerCase().includes(q);
+    return (form.title + ' ' + form.category + ' ' + form.description + ' ' + form.acronym + ' ' + form.completeName + ' ' + form.SDGCategory).toLowerCase().includes(q);
   });
 
   if (filtered.length === 0){
@@ -279,8 +280,20 @@ async function renderPastEvents(filterText = '') {
 
     const details = document.createElement('div'); 
     details.className = 'event-details';
+    
+    // Show SDG in the event card if available
+    let sdgDisplay = '';
+    if (form.SDGCategory && form.SDGCategory !== "Not specified") {
+      // Extract just the SDG number and name (remove "SDG XX - " if present)
+      const sdgText = form.SDGCategory.replace(/^SDG\s*\d+\s*[-:]?\s*/i, '');
+      sdgDisplay = `<span class="sdg-badge">${sdgText}</span>`;
+    }
+    
     details.innerHTML = `
-      <div class="event-meta"><span class="cat">${form.organizationType}</span></div>
+      <div class="event-meta">
+        <span class="cat">${form.organizationType}</span>
+        ${sdgDisplay}
+      </div>
       <div class="event-desc">${form.completeName}</div>
       <div class="event-extra">Applicant: ${form.formData.applicantName}</div>
     `;
@@ -392,7 +405,7 @@ function openDetailPanel(form) {
   detailTitle.textContent = `${formData.acronym} - ${form.status}`;
   detailMeta.textContent = `${form.date} • ${formData.school} • ${formData.organizationType}`;
   
-  // Improved design for detail panel
+  // Improved design for detail panel with simplified SDG display
   detailBody.innerHTML = `
     <div class="detail-section">
       <div class="detail-header">
@@ -422,6 +435,15 @@ function openDetailPanel(form) {
         </div>
       </div>
     </div>
+
+    ${form.SDGCategory && form.SDGCategory !== "Not specified" ? `
+    <div class="detail-section">
+      <h4 class="detail-section-title">Sustainable Development Goals</h4>
+      <div class="sdg-section">
+        <div class="sdg-badge-large">${form.SDGCategory}</div>
+      </div>
+    </div>
+    ` : ''}
 
     <div class="detail-section">
       <h4 class="detail-section-title">Contact Information</h4>

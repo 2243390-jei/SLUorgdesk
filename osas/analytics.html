@@ -51,6 +51,37 @@
       </header>
 
       <div class="body">
+        <!-- Stats Overview Cards - REMOVED TOTAL ORGANIZATIONS -->
+        <div class="stats-overview">
+          <div class="stat-card">
+            <div class="stat-icon total-forms">
+              <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="totalForms">0</div>
+              <div class="stat-label">Form Submissions</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon pending">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="pendingForms">0</div>
+              <div class="stat-label">Pending Review</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon approved">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="approvedForms">0</div>
+              <div class="stat-label">Approved</div>
+            </div>
+          </div>
+        </div>
+
         <div class="stats-row">
           <div class="orgs-section">
             <div class="section-header">
@@ -64,10 +95,11 @@
           <div class="charts-section">
             <div class="chart-card large-chart">
               <div class="chart-header">
-                <h3>Monthly Events</h3>
+                <h3>Monthly Submissions</h3>
               </div>
               <div class="chart-container-large">
-                <canvas id="eventsChart"></canvas>
+                <canvas id="submissionsChart"></canvas>
+                <div class="chart-hover-info" id="submissionsHover"></div>
               </div>
             </div>
           </div>
@@ -77,12 +109,23 @@
           <div class="section-header">
             <h2>SDG Submissions</h2>
             <div class="sdg-stats">
-              <span class="sdg-count">500 Submissions</span>
-              <span class="sdg-goals">22 Goals</span>
+              <span class="sdg-count" id="sdgSubmissions">0 Submissions</span>
+              <span class="sdg-goals" id="sdgGoals">0 Goals</span>
             </div>
           </div>
           <div class="chart-container-extra-large">
             <canvas id="sdgChart"></canvas>
+            <div class="chart-hover-info" id="sdgHover"></div>
+          </div>
+        </div>
+
+        <div class="schools-section">
+          <div class="section-header">
+            <h2>Submissions by School</h2>
+          </div>
+          <div class="chart-container-large">
+            <canvas id="schoolsChart"></canvas>
+            <div class="chart-hover-info" id="schoolsHover"></div>
           </div>
         </div>
       </div>

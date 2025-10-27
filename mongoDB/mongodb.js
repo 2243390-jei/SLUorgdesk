@@ -28,7 +28,7 @@ const organizationSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// ✅ Form Schema — matches your MongoDB structure exactly
+// ✅ Form Schema — matches your MongoDB structure exactly with SDG field
 const formSchema = new mongoose.Schema({
   organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
   completeName: String,
@@ -64,6 +64,7 @@ const formSchema = new mongoose.Schema({
   submittedBy: mongoose.Schema.Types.ObjectId,
   status: String,
   remarks: String,
+  SDGCategory: String, // Added SDG field
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
