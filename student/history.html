@@ -8,7 +8,7 @@
         <script src="../script/main.js"></script>
 
 </head>
-<body>
+<body class="home-body">
      <!-- NAVIGATION BAR -->
   <header class="navbar">
     <div class="logo">
@@ -26,6 +26,125 @@
       <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile" />
     </div>
   </header>
-    
+
+  <section class="history-section">
+  <!-- Search and Filters -->
+  <div class="history-controls">
+    <input type="text" id="searchInput" placeholder="Search Event Name..." />
+
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-status="all">All Submissions</button>
+      <button class="filter-btn" data-status="approved">Accepted</button>
+      <button class="filter-btn" data-status="pending review">Pending</button>
+      <button class="filter-btn" data-status="needs revision">Needs Revision</button>
+    </div>
+
+    <select id="timeFilter" class="time-filter">
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+      <option value="year">This Year</option>
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  <!-- Submission Cards (Dynamic) -->
+  <div id="submissionList"></div>
+
+  <script src="../script/organization_history.js"></script>
+  <div id="submissionList"></div>
+
+  <script src="../script/organization_history.js"></script>
+
+  <!-- MODAL: Edit / View Submission -->
+  <div id="submissionModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+
+      <h2 id="modalTitle">Submission</h2>
+
+      <form id="modalForm">
+        <div class="modal-row">
+          <label>Organization Name</label>
+          <input type="text" id="modalCompleteName" />
+        </div>
+
+        <div class="modal-row">
+          <label>Acronym</label>
+          <input type="text" id="modalAcronym" />
+        </div>
+
+        <div class="modal-row">
+          <label>Official Email</label>
+          <input type="email" id="modalOfficialEmail" />
+        </div>
+
+        <div class="modal-row">
+          <label>Applicant Name</label>
+          <input type="text" id="modalApplicantName" />
+        </div>
+
+        <div class="modal-row">
+          <label>Adviser Names (comma separated)</label>
+          <input type="text" id="modalAdviserNames" />
+        </div>
+
+        <div class="modal-row">
+          <label>School</label>
+          <input type="text" id="modalSchool" />
+        </div>
+
+        <div class="modal-row">
+          <label>Category</label>
+          <input type="text" id="modalCategory" />
+        </div>
+
+        <div class="modal-row">
+          <label>Organization Type</label>
+          <input type="text" id="modalOrganizationType" />
+        </div>
+
+        <div class="modal-row">
+          <label>Applicant Position</label>
+          <input type="text" id="modalApplicantPosition" />
+        </div>
+
+        <div class="modal-row">
+          <label>Applicant Email</label>
+          <input type="email" id="modalApplicantEmail" />
+        </div>
+
+        <div class="modal-row">
+          <label>Video Link</label>
+          <input type="text" id="modalVideoLink" />
+        </div>
+
+        <div class="modal-row">
+          <label>Status</label>
+          <select id="modalStatus">
+            <option value="pending">pending</option>
+            <option value="accepted">accepted</option>
+            <option value="revision">revision</option>
+          </select>
+        </div>
+
+        <div class="modal-row">
+          <label>Remarks</label>
+          <textarea id="modalRemarks"></textarea>
+        </div>
+
+        <div class="modal-row">
+          <label>Created At</label>
+          <input type="text" id="modalCreatedAt" disabled />
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="modalSave" class="btn-outlined">Save changes</button>
+          <button type="button" id="modalCloseBtn" class="reset-btn">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</section>
 </body>
 </html>
