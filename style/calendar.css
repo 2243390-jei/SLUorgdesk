@@ -470,6 +470,17 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   color: #eaf6ff; 
 }
 
+/* SDG badge */
+.sdg-badge { 
+  font-size: 11px; 
+  padding: 4px 8px; 
+  border-radius: 999px; 
+  background: rgba(255,255,255,0.1); 
+  color: #eaf6ff; 
+  border: 1px solid rgba(255,255,255,0.2);
+  margin-top: 4px;
+}
+
 /* footer */
 .footer { 
   margin-top: 20px; 
@@ -514,53 +525,6 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 .detail-close { background: transparent; border: none; font-size: 18px; cursor: pointer; color: #334; padding: 4px; }
 .detail-body { overflow: auto; padding-right: 8px; flex: 1; }
 
-/* responsive */
-@media (max-width: 1200px){
-  .events-list { height: 46vh; }
-  .detail-panel { width: 360px; }
-}
-
-@media (max-width: 980px){
-  .body { flex-direction: column; }
-  .right-panel { width: 100%; order: 2; }
-  .leftbar { display: none; }
-  .events-list { height: 36vh; }
-  .detail-panel { width: 100%; }
-  .calendar-grid { 
-    padding: 16px; 
-    gap: 8px;
-    min-height: 500px;
-  }
-  .day { min-height: 90px; }
-}
-
-@media (max-width: 768px){
-  .calendar-head {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  .nav-controls {
-    align-self: center;
-  }
-  .top-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .search-wrap {
-    width: 100%;
-    max-width: 300px;
-  }
-  .header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  .month-block {
-    min-width: auto;
-    justify-content: center;
-  }
-}
 /* Improved Detail Panel Styles */
 #detailPanel {
   background: white;
@@ -743,6 +707,25 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   background: #1d4ed8;
 }
 
+/* SDG specific styles */
+.sdg-section {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.sdg-badge-large {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #1e40af;
+  color: white;
+  margin-bottom: 8px;
+}
+
 /* Scrollbar styling for events list */
 #eventsList::-webkit-scrollbar {
   width: 6px;
@@ -760,4 +743,52 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 
 #eventsList::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* responsive */
+@media (max-width: 1200px){
+  .events-list { height: 46vh; }
+  .detail-panel { width: 360px; }
+}
+
+@media (max-width: 980px){
+  .body { flex-direction: column; }
+  .right-panel { width: 100%; order: 2; }
+  .leftbar { display: none; }
+  .events-list { height: 36vh; }
+  .detail-panel { width: 100%; }
+  .calendar-grid { 
+    padding: 16px; 
+    gap: 8px;
+    min-height: 500px;
+  }
+  .day { min-height: 90px; }
+}
+
+@media (max-width: 768px){
+  .calendar-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .nav-controls {
+    align-self: center;
+  }
+  .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .search-wrap {
+    width: 100%;
+    max-width: 300px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .month-block {
+    min-width: auto;
+    justify-content: center;
+  }
 }

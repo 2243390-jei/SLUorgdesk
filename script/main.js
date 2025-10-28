@@ -104,23 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Navbar profile update (if user is logged in) ---
   const navbarProfilePic = document.getElementById("nav-profile-pic");
 
   if (navbarProfilePic) {
     const user = JSON.parse(localStorage.getItem("googleUser"));
     if (user && user.picture) {
       navbarProfilePic.src = user.picture;
-      navbarProfilePic.style.borderRadius = "50%"; // make it round
+      navbarProfilePic.style.borderRadius = "50%";
     } else {
-      // If not logged in, redirect back to login page
       // window.location.href = "../index.html";
     }
   }
-
-
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const prevBtn = document.getElementById("prev-btn");
@@ -144,13 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Initial load
   updateGallery();
-
-  // Update when carousel moves
   prevBtn.addEventListener("click", updateGallery);
   nextBtn.addEventListener("click", updateGallery);
 });
-
-
-

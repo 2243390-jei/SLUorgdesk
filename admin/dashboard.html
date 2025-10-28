@@ -13,20 +13,20 @@
 
   <link rel="stylesheet" href="admin.css">
 </head>
-<body>
-  <div class="app">
-    <!-- Left circular sidebar -->
-    <aside class="leftbar" aria-label="Main navigation">
-      <div class="brand">
-        <div class="logo">AD</div>
-      </div>
 
-      <nav class="left-nav" role="navigation" aria-label="Admin Sidebar">
-        <button class="circle-btn" title="Home (Analytics)" aria-label="Home (Analytics)" onclick="window.location.href='home.html'">
-        <i class="fa-solid fa-chart-column"></i></button>
-        <button class="circle-btn" title="Create Organization Account" aria-label="Create Organization Account" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-user-plus"></i></button>
-      </nav>
-    </aside>
+<body>
+  <div class="app"> 
+    <!-- Left circular sidebar -->
+      <aside class="leftbar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="logo">AD</div>
+        </div>
+
+        <nav class="left-nav" role="navigation" aria-label="Sidebar">
+          <a href="../admin/dashboard.html"><button class="circle-btn active" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/statistics.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
+          <a href="../admin/usermanagement.html"><button class="circle-btn" title="User Management" aria-label="User Management"><img src="/Images/user_management.png" alt="User Management" class="nav-icon"></button></a>    
+        </nav>
+      </aside>
 
     <!-- Main area -->
     <main class="main-area" role="main">
@@ -43,96 +43,172 @@
         </div>
       </header>
 
-      <!-- ✅ FULL DASHBOARD HTML (with .dashboard wrapper) -->
-      <div class="dashboard">
-        <!-- Menu (we'll hide it visually since you have leftbar, but keep for structure) -->
-        <div class="menu flex-c">
-          <div class="logo">
-            <div class="icon">
-              <ion-icon name="logo-bitbucket"></ion-icon>
-            </div>
-          </div>
-          <div class="navigation">
-            <div class="icon"><ion-icon name="filter-circle-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="file-tray-full-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="mail-unread-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="pulse-outline"></ion-icon></div>
-            <div class="icon"><ion-icon name="storefront-outline"></ion-icon></div>
-          </div>
-          <div class="settings">
-            <div class="icon"><ion-icon name="settings-outline"></ion-icon></div>
-          </div>
-        </div>
+      <!-- Analytics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
+    <div class="stat-card">
+      <div class="center-flex">
+  <img src="../Images/Users_Many.png" alt="Total Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
 
-        <div class="content">
-          <div class="main-content">
-            <!-- Stats -->
-            <div class="stats flex">
-              <div class="stats-box sales">
-                <h2 class="heading">Sales</h2>
-                <canvas id="sales"></canvas>
-              </div>
-              <div class="stats-box earning">
-                <h2 class="heading">Earning</h2>
-                <div class="earning-amount flex-c">
-                  <div class="earning-icon flex">
-                    <ion-icon name="logo-paypal"></ion-icon>
-                  </div>
-                  <p>$9125.33</p>
-                </div>
-                <canvas id="earning"></canvas>
-              </div>
-            </div>
+      <div class="metric-value" id="totalUsers">2,847</div>
+      <div class="metric-label">Total Users</div>
+      <div class="metric-change positive">↑ 12.5% from last month</div>
+    </div>
 
-            <!-- Product Stats -->
-            <div class="product-stats flex">
-              <div class="product-sales stats-box">
-                <h2 class="heading">Sales</h2>
-                <canvas id="products"></canvas>
-              </div>
-              <div class="top-selling stats-box">
-                <h2 class="heading">Top Selling Product</h2>
-                <table class="top-selling-products" height="100%" width="100%">
-                  <tr><th>ID</th><th>Product</th><th>Price</th><th>Sold</th></tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name flex">
-                        <div class="icon"><ion-icon name="logo-amazon"></ion-icon></div>
-                        <p>Amazon Kindle 4th Gen</p>
-                      </div>
-                    </td>
-                    <td>$1900</td>
-                    <td>351</td>
-                  </tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name iphone flex">
-                        <div class="icon"><ion-icon name="logo-apple"></ion-icon></div>
-                        <p>Iphone 11 Pro</p>
-                      </div>
-                    </td>
-                    <td>$1300</td>
-                    <td>121</td>
-                  </tr>
-                  <tr>
-                    <td>68231</td>
-                    <td>
-                      <div class="product-name windows flex">
-                        <div class="icon"><ion-icon name="logo-microsoft"></ion-icon></div>
-                        <p>Windows 11</p>
-                      </div>
-                    </td>
-                    <td>$180</td>
-                    <td>195</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div> <!-- ⚠️ This was missing! Closes .content -->
-      </div> <!-- Closes .dashboard -->
+    <div class="stat-card">
+      <!-- Active Users -->
+<div class="center-flex">
+  <img src="../Images/Users_Online.png" alt="Active Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
+      <div class="metric-value" id="activeUsers">1,923</div>
+      <div class="metric-label">Active Users</div>
+      <div class="metric-change positive">↑ 8.2% from last month</div>
+    </div>
+
+    <div class="stat-card">
+      <!-- Organizations -->
+<div class="center-flex">
+  <img src="../Images/Users_Orgs.png" alt="Organizations" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
+      <div class="metric-value" id="totalOrgs">47</div>
+      <div class="metric-label">Organizations</div>
+      <div class="metric-change positive">↑ 3 new this month</div>
+    </div>
+
+    <div class="stat-card">
+      <!-- Inactive Users -->
+<div class="center-flex">
+  <img src="../Images/Users_Down.png" alt="Inactive Users" style="width: 64px; height: 64px; object-fit: contain;" />
+</div>
+      <div class="metric-value" id="inactiveUsers">924</div>
+      <div class="metric-label">Inactive Users</div>
+      <div class="metric-change negative">↓ 4.1% from last month</div>
+    </div>
+  </div>
+
+  <!-- User Management Section -->
+<div class="table-container">
+  <div class="table-header">
+    <h2>User Management</h2>
+
+    <!-- Search and Filter Section -->
+    <div class="search-section">
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search users by name or email..." />
+        <button id="searchClear" title="Clear">✕</button>
+      </div>
+
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All Users</button>
+        <button class="filter-btn" data-filter="active">Active</button>
+        <button class="filter-btn" data-filter="inactive">Inactive</button>
+      </div>
+    </div>
+
+    <!-- Organization Filter -->
+    <div class="org-filter">
+  <span class="filter-label">Filter by School:</span>
+
+  <!-- SAMCIS School Wide -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="samcisBtn">SAMCIS ▾</button>
+    <div class="dropdown-menu hidden" id="samcisDropdown">
+      <button class="filter-btn" data-org="SCHEMA">SCHEMA</button>
+      <button class="filter-btn" data-org="RPG">RPG</button>
+      <button class="filter-btn" data-org="GCS">GCS</button>
+      <button class="filter-btn" data-org="MSS">MSS</button>
+      <button class="filter-btn" data-org="YES">YES</button>
+      <button class="filter-btn" data-org="ICON">ICON</button>
+      <button class="filter-btn" data-org="AIM">AIM</button>
+      <button class="filter-btn" data-org="JRFINEX">JRFINEX</button>
+      <button class="filter-btn" data-org="JPIA">JPIA</button>
+      <button class="filter-btn" data-org="LIGHT">LIGHT</button>
+      <button class="filter-btn" data-org="MM">MM</button>
+    </div>
+  </div>
+
+  <!-- SLU Uni Wide -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="sluUniWideBtn">SLU Uni Wide ▾</button>
+    <div class="dropdown-menu hidden" id="sluUniWideDropdown">
+      <button class="filter-btn" data-org="SLU Debate Society">SLU Debate Society</button>
+      <button class="filter-btn" data-org="RCY">RCY - Red Cross Youth (SLU Chapter)</button>
+      <button class="filter-btn" data-org="SLU COMELEC">SLU COMELEC</button>
+      <button class="filter-btn" data-org="SLU COA">SLU COA - Commission On Audit</button>
+      <button class="filter-btn" data-org="WHITE & BLUE">WHITE & BLUE</button>
+      <button class="filter-btn" data-org="ROTARACT CLUB">ROTARACT CLUB</button>
+      <button class="filter-btn" data-org="Tinig Himig SLU">Tinig Himig SLU</button>
+      <button class="filter-btn" data-org="SICAP">SICAP - Society of Integrated Affairs and Services</button>
+      <button class="filter-btn" data-org="SLU MEAAW">SLU MEAAW - Motion to Encourage and Advocate for Animal Welfare</button>
+      <button class="filter-btn" data-org="Luwisyano Beta Sigma Fraternity">Luwisyano Beta Sigma Fraternity - Brotherhood of Scholars</button>
+    </div>
+  </div>
+
+  <!-- Baguio Association of Government Grantees & Scholars -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="baggsBtn">BAGGS ▾</button>
+    <div class="dropdown-menu hidden" id="baggsDropdown">
+      <button class="filter-btn" data-org="BAGGS">Baguio Association of Government Grantees & Scholars</button>
+    </div>
+  </div>
+
+  <!-- Political Orgs -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="politicalBtn">Political Orgs ▾</button>
+    <div class="dropdown-menu hidden" id="politicalDropdown">
+      <button class="filter-btn" data-org="REPORMA-ACS">REPORMA-ACS</button>
+      <button class="filter-btn" data-org="RIGHTS">RIGHTS</button>
+      <button class="filter-btn" data-org="DASIG">DASIG</button>
+    </div>
+  </div>
+
+  <!-- Youth Organizations -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle" id="youthBtn">Youth Orgs ▾</button>
+    <div class="dropdown-menu hidden" id="youthDropdown">
+      <button class="filter-btn" data-org="ANAKBAYAN SLU">ANAKBAYAN SLU</button>
+      <button class="filter-btn" data-org="BAHAGHARI SLU">BAHAGHARI SLU</button>
+    </div>
+  </div>
+
+  <!-- Show All -->
+  <button class="filter-btn" data-org="all">All</button>
+</div>
+
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-wrapper">
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Organization</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Last Active</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="table-footer">
+    <div class="text-info">
+      Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> users
+    </div>
+    <div class="pagination-controls">
+      <button id="prevBtn" class="filter-btn" disabled>Previous</button>
+      <button id="nextBtn" class="filter-btn">Next</button>
+    </div>
+  </div>
+</div>
+
+
 
       <footer class="footer muted">© <span id="curYear"></span> Admin Home</footer>
     </main>
@@ -140,8 +216,9 @@
     <script>
       document.getElementById('curYear').textContent = new Date().getFullYear();
     </script>
-    <!-- Make sure this points to your actual JS file -->
-    <script src="admin/admin.js"></script>
+ 
+    
   </div>
+  <script src="../admin/admin.js"></script>
 </body>
 </html>
