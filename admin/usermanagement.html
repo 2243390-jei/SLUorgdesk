@@ -168,14 +168,85 @@
     </div>
 
     <!-- ✅ Second Modal: Google Email Input -->
-    <div id="googleEmailModal" class="modal">
-      <div class="google-modal-content">
-        <h3>Enter Organization Email</h3>
-        <input type="email" id="orgEmailInput" placeholder="organization@gmail.com" />
-        <div class="modal-buttons">
-          <button id="googleNext" class="confirm-btn">Next</button>
-          <button id="cancelGoogle" class="cancel-btn">Cancel</button>
-        </div>
+    <div id="googleEmailModal" class="createorg-modal">
+      <div class="createorg-modal-content">
+        <h2>Enter Organization Email</h2>
+
+        <form id="googleEmailForm">
+          <div class="createorg-modal-row">
+            <label>Organization Name</label>
+            <input type="text" id="orgNameGoogle" placeholder="Enter organization name" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Acronym</label>
+            <input type="text" id="orgAcronymGoogle" placeholder="Enter acronym" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Official Email</label>
+            <input type="email" id="orgEmailGoogle" placeholder="organization@gmail.com" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Applicant Name</label>
+            <input type="text" id="applicantNameGoogle" placeholder="Enter applicant name" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Adviser Names (comma separated)</label>
+            <input type="text" id="adviserNamesGoogle" placeholder="e.g., Dr. Smith, Prof. Lee" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>School</label>
+            <input type="text" id="orgSchoolGoogle" placeholder="Enter school" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Category</label>
+            <input type="text" id="orgCategoryGoogle" placeholder="Enter category" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Organization Type</label>
+            <input type="text" id="orgTypeGoogle" placeholder="Enter type (e.g., Academic)" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Applicant Position</label>
+            <input type="text" id="applicantPositionGoogle" placeholder="Enter position" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Applicant Email</label>
+            <input type="email" id="applicantEmailGoogle" placeholder="Enter applicant email" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Video Link</label>
+            <input type="text" id="videoLinkGoogle" placeholder="Enter Google Drive link" />
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Status</label>
+            <select id="orgStatusGoogle">
+              <option value="pending">Pending</option>
+              <option value="accepted">Accepted</option>
+              <option value="revision">Needs Revision</option>
+            </select>
+          </div>
+
+          <div class="createorg-modal-row">
+            <label>Remarks</label>
+            <textarea id="orgRemarksGoogle" placeholder="Enter remarks (optional)"></textarea>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="button" id="googleNext" class="confirm-btn">Save</button>
+            <button type="button" id="cancelGoogle" class="cancel-btn">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -199,6 +270,11 @@
             <label>Official Email</label>
             <input type="email" id="orgEmail" placeholder="Enter official email" />
           </div>
+
+          <div class="createorg-modal-row">
+            <label>Password</label>
+            <input type="password" id="orgPassword" placeholder="Enter password" />
+          </div>          
 
           <div class="createorg-modal-row">
             <label>Applicant Name</label>
@@ -261,7 +337,5 @@
         </form>
       </div>
     </div>
-
-    <!-- All modal and add-org scripts moved to external admin/usermanagement.js -->
   </body>
 </html>
