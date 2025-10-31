@@ -121,29 +121,96 @@
           <input type="email" name="adviser_email" placeholder="Your answer" />
         </div>
 
-        <!-- SDG Checkboxes -->
-        <div class="form-group">
-          <label>Sustainable Development Goals (SDGs) aligned with this Document</label>
-          <div class="sdg-options">
-            <label><input type="checkbox" name="sdg[]" value="1. No Poverty"> 1. No Poverty</label>
-            <label><input type="checkbox" name="sdg[]" value="2. Zero Hunger"> 2. Zero Hunger</label>
-            <label><input type="checkbox" name="sdg[]" value="3. Good Health and Well-being"> 3. Good Health and Well-being</label>
-            <label><input type="checkbox" name="sdg[]" value="4. Quality Education"> 4. Quality Education</label>
-            <label><input type="checkbox" name="sdg[]" value="5. Gender Equality"> 5. Gender Equality</label>
-            <label><input type="checkbox" name="sdg[]" value="6. Clean Water and Sanitation"> 6. Clean Water and Sanitation</label>
-            <label><input type="checkbox" name="sdg[]" value="7. Affordable and Clean Energy"> 7. Affordable and Clean Energy</label>
-            <label><input type="checkbox" name="sdg[]" value="8. Decent Work and Economic Growth"> 8. Decent Work and Economic Growth</label>
-            <label><input type="checkbox" name="sdg[]" value="9. Industry, Innovation and Infrastructure"> 9. Industry, Innovation and Infrastructure</label>
-            <label><input type="checkbox" name="sdg[]" value="10. Reduced Inequalities"> 10. Reduced Inequalities</label>
-            <label><input type="checkbox" name="sdg[]" value="11. Sustainable Cities and Communities"> 11. Sustainable Cities and Communities</label>
-            <label><input type="checkbox" name="sdg[]" value="12. Responsible Consumption and Production"> 12. Responsible Consumption and Production</label>
-            <label><input type="checkbox" name="sdg[]" value="13. Climate Action"> 13. Climate Action</label>
-            <label><input type="checkbox" name="sdg[]" value="14. Life Below Water"> 14. Life Below Water</label>
-            <label><input type="checkbox" name="sdg[]" value="15. Life on Land"> 15. Life on Land</label>
-            <label><input type="checkbox" name="sdg[]" value="16. Peace, Justice and Strong Institutions"> 16. Peace, Justice and Strong Institutions</label>
-            <label><input type="checkbox" name="sdg[]" value="17. Partnerships for the Goals"> 17. Partnerships for the Goals</label>
+        <!-- EVENT DETAILS SECTION -->
+        <div class="event-details-section">
+          <h3>Event Details</h3>
+          <button id="openEventModalBtn" type="button" class="add-event-btn">
+            + Add Event
+          </button>
+          <div id="eventList"></div>
+        </div>
+
+        <div class="event-modal" id="eventModal">
+          <div class="event-modal-content">
+
+
+            <span class="event-modal-close" id="closeEventModal">&times;</span>
+            <h3 class="event-modal-title">Event Details Form</h3>
+
+            <div class="event-form">
+
+              <label>Event Name</label>
+              <input type="text" id="eventName" placeholder="Your answer">
+
+              <label>Event Type</label>
+              <input type="text" id="eventType" placeholder="Your answer">
+
+              <label>Event Date</label>
+              <input type="date" id="eventDate" required>
+
+
+              <label>Event Time</label>
+              <div class="event-time-container">
+
+                <div class="time-box">
+                  <input type="text" id="startTime" class="time-input" placeholder="00:00" maxlength="5" required>
+                  <select id="startPeriod">
+                    <option>AM</option>
+                    <option>PM</option>
+                  </select>
+                </div>
+
+                <span>-</span>
+
+                <div class="time-box">
+                  <input type="text" id="endTime" class="time-input" placeholder="00:00" maxlength="5" required>
+                  <select id="endPeriod">
+                    <option>AM</option>
+                    <option>PM</option>
+                  </select>
+                </div>
+
+              </div>
+
+              <label>Venue</label>
+              <input type="text" id="eventVenue" placeholder="Your answer">
+
+              <label>Total Number of Attendees</label>
+              <input type="number" id="eventAttendees" placeholder="Your answer">
+
+              <label>Link of your Proof</label>
+              <input type="text" id="eventProof" placeholder="URL link">
+
+              <label>SDG</label>
+              <div class="event-sdg-options">
+                <label><input type="checkbox" value="1. No Poverty"> No Poverty</label>
+                <label><input type="checkbox" value="2. Zero Hunger"> Zero Hunger</label>
+                <label><input type="checkbox" value="3. Good Health"> Good Health & Well-being</label>
+                <label><input type="checkbox" value="4. Quality Education"> Quality Education</label>
+                <label><input type="checkbox" value="5. Gender Equality"> Gender Equality</label>
+                <label><input type="checkbox" value="6. Clean Water"> Clean Water & Sanitation</label>
+                <label><input type="checkbox" value="7. Clean Energy"> Affordable & Clean Energy</label>
+                <label><input type="checkbox" value="8. Decent Work"> Decent Work & Economic Growth</label>
+                <label><input type="checkbox" value="9. Innovation"> Industry, Innovation & Infrastructure</label>
+                <label><input type="checkbox" value="10. Reduced Inequality"> Reduced Inequalities</label>
+                <label><input type="checkbox" value="11. Sustainable Cities"> Sustainable Cities & Communities</label>
+                <label><input type="checkbox" value="12. Consumption"> Responsible Consumption & Production</label>
+                <label><input type="checkbox" value="13. Climate Action"> Climate Action</label>
+                <label><input type="checkbox" value="14. Life Below Water"> Life Below Water</label>
+                <label><input type="checkbox" value="15. Life on Land"> Life on Land</label>
+                <label><input type="checkbox" value="16. Peace & Justice"> Peace, Justice & Strong Institutions</label>
+                <label><input type="checkbox" value="17. Partnerships"> Partnerships for the Goals</label>
+              </div>
+
+              <div class="event-modal-actions">
+                <button type="button" id="saveEventBtn">Save Event</button>
+                <button type="button" id="closeEventModal">Cancel</button>
+              </div>
+
+            </div>
           </div>
         </div>
+
 
         <!-- Document Uploads -->
         <h3 class="form-section-title">Document Uploads</h3>
@@ -213,7 +280,12 @@
 
         <div class="form-group">
           <label>Link of your Video about your Organization or Publication</label>
-          <input type="url" name="video_link" placeholder="https://..." />
+          <input type="url" name="video_link" placeholder="URL link" />
+        </div>
+
+        <div class="form-group">
+          <label>Additional Note/Message</label>
+          <input type="text" name="add_note" placeholder="Your message" />
         </div>
 
         <div class="form-group confirm-group">
