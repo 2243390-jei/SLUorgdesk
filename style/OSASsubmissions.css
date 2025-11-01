@@ -251,3 +251,138 @@ tr:hover td {
   background: #1e4fb8;
   transform: translateY(-1px);
 }
+
+/* Filter Button */
+.filter-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.filter-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.filter-btn:hover {
+  background-color: #e3e3e3;
+}
+
+/* Dropdown */
+.filter-dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 220px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 10px;
+  z-index: 100;
+}
+
+.filter-dropdown.hidden {
+  display: none;
+}
+
+.filter-category {
+  width: 100%;
+  text-align: left;
+  background: #f7f7f7;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.filter-category:hover {
+  background: #e7e7e7;
+}
+
+/* Sub-options */
+.filter-sub {
+  margin-left: 10px;
+  margin-bottom: 8px;
+}
+
+.filter-sub.hidden {
+  display: none;
+}
+
+.filter-sub button, .filter-sub2 button {
+  display: block;
+  width: 100%;
+  background: white;
+  border: none;
+  text-align: left;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filter-sub button:hover, .filter-sub2 button:hover {
+  background: #f0f0f0;
+}
+
+/* Nested location */
+.filter-sub2 {
+  margin-left: 15px;
+}
+
+.filter-sub2.hidden {
+  display: none;
+}
+
+.filter-btn {
+  background-color: #1f2937; /* dark gray (like Tailwind's gray-800) */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px; /* slightly rounded corners */
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn:hover {
+  background-color: #374151; /* lighter gray on hover */
+  transform: translateY(-1px);
+}
+
+.filter-btn:active {
+  transform: scale(0.97);
+}
+
+.filter-clear {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#clearFilterBtn {
+  background-color: #f44336;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#clearFilterBtn:hover {
+  background-color: #d32f2f;
+}
+
+
+
+
+
