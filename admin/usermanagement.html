@@ -17,7 +17,6 @@
 
   <body>
     <div class="app">
-      <!-- Sidebar -->
       <aside class="leftbar">
         <div class="brand">
           <div class="logo">AD</div>
@@ -38,7 +37,6 @@
         </nav>
       </aside>
 
-      <!-- Main area -->
       <main class="main-area">
         <header class="header">
           <div class="greeting">
@@ -49,13 +47,11 @@
           </div>
 
           <div class="top-actions">
+            <button id="addOrgBtn" class="add-org-header-btn">+ Add Organization</button>
+
             <div class="search-wrap">
               <input id="searchInput" type="search" placeholder="Search an Organization" />
-              <button id="searchClear" title="Clear">✕</button>
-            </div>
-
-            <div class="hide-filter">
-              <button id="toggleFilters"><i class="fa-solid fa-filter"></i> Filters</button>
+              <button id="searchClear" title="Clear">×</button>
             </div>
 
             <div class="profile-header">
@@ -64,12 +60,6 @@
           </div>
         </header>
 
-        <!-- ✅ Add Organization Button -->
-        <div class="top-right-action">
-          <button id="addOrgBtn">+ Add Organization</button>
-        </div>
-
-        <!-- Filters -->
         <section id="filterSection" class="filters">
           <label>
             School:
@@ -94,7 +84,6 @@
           <div id="extraFilters" class="extra-filters"></div>
         </section>
 
-        <!-- Table -->
         <table class="org-table">
           <thead>
             <tr>
@@ -131,7 +120,6 @@
       </main>
     </div>
 
-    <!-- ✅ Edit/Delete Modal -->
     <div id="confirmModal" class="modal">
       <div class="modal-content">
         <h3 id="confirmTitle"></h3>
@@ -142,7 +130,16 @@
       </div>
     </div>
 
-    <!-- ✅ Add Organization Modal -->
+    <div id="editConfirmModal" class="createorg-modal">
+      <div class="createorg-modal-content small-confirm">
+        <h3>Are you sure you want to edit this organization?</h3>
+        <div class="createorg-modal-actions">
+          <button id="confirmEditYes" class="btn-outlined">Yes</button>
+          <button id="confirmEditCancel" class="reset-btn">Cancel</button>
+        </div>
+      </div>
+    </div>    
+
     <div id="addOrgModal" class="modal">
       <div class="addorg-modal-content">
         <h2>Add Organization</h2>
@@ -167,7 +164,6 @@
       </div>
     </div>
 
-    <!-- ✅ Second Modal: Google Email Input -->
     <div id="googleEmailModal" class="createorg-modal">
       <div class="createorg-modal-content">
         <h2>Enter Organization Email</h2>
@@ -189,58 +185,14 @@
           </div>
 
           <div class="createorg-modal-row">
-            <label>Applicant Name</label>
-            <input type="text" id="applicantNameGoogle" placeholder="Enter applicant name" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Adviser Names (comma separated)</label>
-            <input type="text" id="adviserNamesGoogle" placeholder="e.g., Dr. Smith, Prof. Lee" />
-          </div>
-
-          <div class="createorg-modal-row">
             <label>School</label>
             <input type="text" id="orgSchoolGoogle" placeholder="Enter school" />
           </div>
 
           <div class="createorg-modal-row">
-            <label>Category</label>
-            <input type="text" id="orgCategoryGoogle" placeholder="Enter category" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Organization Type</label>
-            <input type="text" id="orgTypeGoogle" placeholder="Enter type (e.g., Academic)" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Applicant Position</label>
-            <input type="text" id="applicantPositionGoogle" placeholder="Enter position" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Applicant Email</label>
-            <input type="email" id="applicantEmailGoogle" placeholder="Enter applicant email" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Video Link</label>
-            <input type="text" id="videoLinkGoogle" placeholder="Enter Google Drive link" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Status</label>
-            <select id="orgStatusGoogle">
-              <option value="pending">Pending</option>
-              <option value="accepted">Accepted</option>
-              <option value="revision">Needs Revision</option>
-            </select>
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Remarks</label>
-            <textarea id="orgRemarksGoogle" placeholder="Enter remarks (optional)"></textarea>
-          </div>
+            <label>Logo</label>
+            <input type="text" id="orgLogoGoogle" placeholder="Enter the URL Image Logo" />
+          </div>          
 
           <div class="modal-buttons">
             <button type="button" id="googleNext" class="confirm-btn">Save</button>
@@ -250,7 +202,6 @@
       </div>
     </div>
 
-    <!-- ✅ Create New Organization Modal (modernized) -->
     <div id="createOrgModal" class="createorg-modal">
       <div class="createorg-modal-content">
         <h2>Create New Organization</h2>
@@ -277,58 +228,14 @@
           </div>          
 
           <div class="createorg-modal-row">
-            <label>Applicant Name</label>
-            <input type="text" id="applicantName" placeholder="Enter applicant name" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Adviser Names (comma separated)</label>
-            <input type="text" id="adviserNames" placeholder="e.g., Dr. Smith, Prof. Lee" />
-          </div>
-
-          <div class="createorg-modal-row">
             <label>School</label>
             <input type="text" id="orgSchool" placeholder="Enter school" />
           </div>
 
           <div class="createorg-modal-row">
-            <label>Category</label>
-            <input type="text" id="orgCategory" placeholder="Enter category" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Organization Type</label>
-            <input type="text" id="orgType" placeholder="Enter type (e.g., Academic)" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Applicant Position</label>
-            <input type="text" id="applicantPosition" placeholder="Enter position" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Applicant Email</label>
-            <input type="email" id="applicantEmail" placeholder="Enter applicant email" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Video Link</label>
-            <input type="text" id="videoLink" placeholder="Enter Google Drive link" />
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Status</label>
-            <select id="orgStatus">
-              <option value="pending">Pending</option>
-              <option value="accepted">Accepted</option>
-              <option value="revision">Needs Revision</option>
-            </select>
-          </div>
-
-          <div class="createorg-modal-row">
-            <label>Remarks</label>
-            <textarea id="orgRemarks" placeholder="Enter remarks (optional)"></textarea>
-          </div>
+            <label>Logo</label>
+            <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo" />
+          </div>               
 
           <div class="createorg-modal-actions">
             <button type="button" id="saveOrgBtn" class="btn-outlined">Save</button>

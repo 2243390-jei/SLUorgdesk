@@ -73,3 +73,34 @@ searchInput.addEventListener("input", filterOrganizations);
 
 // Initial load
 loadOrganizations();
+
+// === Filter Dropdown ===
+const filterToggle = document.getElementById("filterToggle");
+const filterMenu = document.getElementById("filterMenu");
+
+filterToggle.addEventListener("click", () => {
+  filterMenu.classList.toggle("hidden");
+});
+
+// Filter by School
+document.querySelectorAll(".filter-item").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const school = btn.dataset.filter;
+    const filtered = organizationsData.filter(org => org.school === school);
+    renderTable(filtered);
+    filterMenu.classList.add("hidden");
+  });
+});
+
+// Clear Filters
+document.querySelector(".filter-clear").addEventListener("click", () => {
+  renderTable(organizationsData);
+  filterMenu.classList.add("hidden");
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!filterMenu.contains(e.target) && !filterToggle.contains(e.target)) {
+    filterMenu.classList.add("hidden");
+  }
+});
