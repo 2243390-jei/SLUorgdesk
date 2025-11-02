@@ -24,7 +24,7 @@
     </nav>
 
     <div class="profile-icon">
-      <img src="../Images/student_img/profile.png" alt="Profile" />
+      <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile" />
     </div>
   </header>
 
@@ -120,6 +120,27 @@
           <label>SLU Institutional Email of Adviser/s</label>
           <input type="email" name="adviser_email" placeholder="Your answer" />
         </div>
+
+   <h3 class="form-section-title">Academic Year Information</h3>
+<div class="form-row">
+  <div class="form-group">
+    <label for="startYear">Start Year</label>
+    <input type="number" id="startYear" name="start_year" placeholder="e.g. 2025" min="2000" required />
+  </div>
+  <div class="form-group">
+    <label for="endYear">End Year</label>
+    <input type="number" id="endYear" name="end_year" placeholder="e.g. 2026" min="2000" required />
+  </div>
+  <div class="form-group">
+    <label for="semester">Semester</label>
+    <select id="semester" name="semester" required>
+      <option value="" disabled selected>Select Semester</option>
+    </select>
+  </div>
+</div>
+
+
+
 
         <!-- EVENT DETAILS SECTION -->
         <div class="event-details-section">
@@ -304,6 +325,7 @@
   </section>
 
   <script src="../script/submission.js"></script>
+  <script src="../script/main.js"></script>
 </body>
 
 </html>

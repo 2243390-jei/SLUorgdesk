@@ -1,7 +1,6 @@
-// mongodb.js
 import mongoose from "mongoose";
 
-// ✅ Connect to MongoDB Atlas
+// Connect immediately
 const connectDB = async () => {
   try {
     await mongoose.connect(
@@ -14,9 +13,66 @@ const connectDB = async () => {
   }
 };
 
-// ✅ Organization Schema
+// Submission Schema (matches new DB example)
+const submissionSchema = new mongoose.Schema({
+  submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
+  organizationInfo: {
+    org_name: String,
+    org_acronym: String,
+    org_email: String,
+    org_social: [String],
+    org_category: String,
+    org_type: String,
+  },
+  applicantInfo: {
+    applicant_name: String,
+    applicant_email: String,
+    applicant_position: String,
+  },
+  adviserInfo: {
+    adviser_name: [String],
+    adviser_email: [String],
+  },
+  academicYear: String,
+  semester: String,
+  events: [
+    {
+      eventName: String,
+      eventType: String,
+      eventDate: Date,
+      startTime: String,
+      endTime: String,
+      eventVenue: String,
+      eventAttendees: Number,
+      eventProof: String,
+      eventSDG: [String],
+    },
+  ],
+  documentUploads: {
+    strategic_plan: { fileName: String, url: String },
+    annual_report: { fileName: String, url: String },
+    cbl: { fileName: String, url: String },
+    cbl_status: String,
+    officers_list: { fileName: String, url: String },
+    infographic: { fileName: String, url: String },
+    financial_statement: { fileName: String, url: String },
+    video_link: String,
+  },
+  additional_note: String,
+  confirmation: Boolean,
+  status: String,
+  remarks: String,
+  submittedAt: { type: Date, default: Date.now },
+});
+
+export const Submission =
+  mongoose.models.Submission ||
+  mongoose.model("Submission", submissionSchema, "Submissions");
+
+// Export Organization too
 const organizationSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: String,
   acronym: String,
   school: String,
   logoUrl: String,
@@ -28,56 +84,9 @@ const organizationSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// ✅ Form Schema — matches your MongoDB structure exactly with SDG field
-const formSchema = new mongoose.Schema({
-  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
-  completeName: String,
-  acronym: String,
-  officialEmail: String,
-  socialMediaLinks: [String],
-  applicantName: String,
-  adviserEmails: [String],
-  school: String,
-  category: String,
-  organizationType: String,
-  applicantPosition: String,
-  applicantEmail: String,
-  adviserNames: [String],
-  strategicPlans: {
-    fileName: String,
-    fileUrl: String,
-  },
-  annualReport: {
-    fileName: String,
-    fileUrl: String,
-  },
-  constitutionByLaws: {
-    fileName: String,
-    fileUrl: String,
-  },
-  cblStatus: String,
-  infographics: {
-    fileName: String,
-    fileUrl: String,
-  },
-  videoLink: String,
-  submittedBy: mongoose.Schema.Types.ObjectId,
-  status: String,
-  remarks: String,
-  SDGCategory: String, // Added SDG field
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
-// ✅ Fix: collection names (remove accidental trailing space)
 export const Organization =
   mongoose.models.Organization ||
   mongoose.model("Organization", organizationSchema, "Organizations");
 
-export const Form =
-  mongoose.models.Form || mongoose.model("Form", formSchema, "Form");
-
-// ✅ Immediately connect on import
 connectDB();
-
 export default mongoose;

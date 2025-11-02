@@ -1,79 +1,85 @@
 // ===========================
-// 📄 PRINT REQUEST FORM LOGIC
+// 📄 PRINT REQUEST FORM LOGIC (DRAG & DROP)
 // ===========================
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("printRequestForm");
-  const dropZone = document.querySelector(".drop-zone");
-  const fileInput = document.querySelector(".drop-zone-input");
+  const dropZones = document.querySelectorAll(".drop-zone");
 
-  dropZone.addEventListener("click", () => fileInput.click());
+  dropZones.forEach((dropZone) => {
+    const fileInput = dropZone.querySelector("input[type='file']");
 
-  fileInput.addEventListener("change", () => {
-    if (fileInput.files.length) {
-      updateDropZone(dropZone, fileInput.files[0]);
-    }
-  });
+    dropZone.addEventListener("click", () => fileInput.click());
 
-  dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("drop-zone--active");
-    dropZone.style.borderColor = "#3d2ee7";
-    dropZone.style.backgroundColor = "#f0f0ff";
-  });
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length) updateDropZone(dropZone, fileInput.files[0]);
+    });
 
-  ["dragleave", "dragend"].forEach((type) => {
-    dropZone.addEventListener(type, () => {
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("drop-zone--active");
+      dropZone.style.borderColor = "#3d2ee7";
+      dropZone.style.backgroundColor = "#f0f0ff";
+    });
+
+    ["dragleave", "dragend"].forEach((type) =>
+      dropZone.addEventListener(type, () => {
+        dropZone.classList.remove("drop-zone--active");
+        dropZone.style.borderColor = "#a8a8ff";
+        dropZone.style.backgroundColor = "#f9f9ff";
+      })
+    );
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        updateDropZone(dropZone, e.dataTransfer.files[0]);
+      }
       dropZone.classList.remove("drop-zone--active");
-      dropZone.style.borderColor = "#a8a8ff";
-      dropZone.style.backgroundColor = "#f9f9ff";
     });
   });
 
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files.length) {
-      fileInput.files = e.dataTransfer.files;
-      updateDropZone(dropZone, e.dataTransfer.files[0]);
-    }
-    dropZone.classList.remove("drop-zone--active");
-  });
-
   function updateDropZone(dropZone, file) {
-    const prompt = dropZone.querySelector("p, span");
-    dropZone.innerHTML = "";
-    const fileDetails = document.createElement("div");
-    fileDetails.classList.add("file-details");
-    fileDetails.innerHTML = `
-      <p><strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</p>
-    `;
-    dropZone.appendChild(fileDetails);
-  }
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const isValid = form.checkValidity();
-    if (!isValid) {
-      alert("Please complete all required fields before submitting.");
-      return;
-    }
-    alert("Print request submitted successfully!");
-    form.reset();
     dropZone.innerHTML = `
-      <p>Browse File</p>
-      <span>Drag & Drop files here</span>
-      <input type="file" name="document" class="drop-zone-input" required />
+      <div class="file-details">
+        <p><strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</p>
+      </div>
     `;
+  }
+});
+
+
+// ===========================
+// 🎓 ACADEMIC YEAR SELECTOR (AUTO-GENERATE FROM CALENDAR YEAR)
+// ===========================
+document.addEventListener("DOMContentLoaded", () => {
+  const startYearInput = document.getElementById("startYear");
+  const academicYearSelect = document.getElementById("academicYear");
+  const semesterSelect = document.getElementById("semester");
+
+  // Populate semester options
+  ["1st Semester", "2nd Semester"].forEach((sem) => {
+    const option = document.createElement("option");
+    option.value = sem;
+    option.textContent = sem;
+    semesterSelect.appendChild(option);
   });
 
-  form.addEventListener("reset", (e) => {
-    const confirmReset = confirm("Are you sure you want to reset the form?");
-    if (!confirmReset) e.preventDefault();
-    else {
-      dropZone.innerHTML = `
-        <p>Browse File</p>
-        <span>Drag & Drop files here</span>
-        <input type="file" name="document" class="drop-zone-input" required />
-      `;
+  // Generate 5 consecutive academic years from selected date
+  startYearInput.addEventListener("change", () => {
+    const dateValue = startYearInput.value;
+    if (!dateValue) return;
+
+    const startYear = new Date(dateValue).getFullYear();
+
+    academicYearSelect.innerHTML = '<option value="" disabled selected>Select Academic Year</option>';
+
+    for (let i = 0; i < 5; i++) {
+      const year1 = startYear + i;
+      const year2 = year1 + 1;
+      const option = document.createElement("option");
+      option.value = `${year1}-${year2}`;
+      option.textContent = `${year1}–${year2}`;
+      academicYearSelect.appendChild(option);
     }
   });
 });
@@ -106,26 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let editIndex = null;
   let events = JSON.parse(localStorage.getItem("eventsData")) || [];
 
-  // Load existing events
   renderEvents();
 
-  // Open modal
   openEventModalBtn.addEventListener("click", () => {
     clearForm();
     editIndex = null;
     eventModal.style.display = "flex";
   });
 
-  // Close modal
-  closeEventBtns.forEach(btn =>
+  closeEventBtns.forEach((btn) =>
     btn.addEventListener("click", () => (eventModal.style.display = "none"))
   );
 
-  // Save event
   saveEventBtn.addEventListener("click", () => {
     const selectedSDGs = Array.from(inputs.sdgs)
-      .filter(cb => cb.checked)
-      .map(cb => cb.value);
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.value);
 
     const eventData = {
       name: inputs.name.value.trim(),
@@ -139,13 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
       sdgs: selectedSDGs
     };
 
-    // Basic validation
     if (!eventData.name || !eventData.type || !eventData.date) {
       alert("Please fill in the required fields.");
       return;
     }
 
-    // Update or add
     if (editIndex !== null) {
       events[editIndex] = eventData;
     } else {
@@ -158,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clearForm();
   });
 
-  // Render event list
   function renderEvents() {
     eventList.innerHTML = "";
     events.forEach((ev, i) => {
@@ -176,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="removeEventBtn">Remove</button>
       `;
 
-      // Remove event
       card.querySelector(".removeEventBtn").addEventListener("click", (e) => {
         e.stopPropagation();
         if (confirm(`Delete event "${ev.name}"?`)) {
@@ -186,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // Edit event
       card.addEventListener("click", () => {
         const evData = events[i];
         inputs.name.value = evData.name;
@@ -203,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inputs.venue.value = evData.venue;
         inputs.attendees.value = evData.attendees;
         inputs.proof.value = evData.proof;
-        inputs.sdgs.forEach(cb => cb.checked = evData.sdgs.includes(cb.value));
+        inputs.sdgs.forEach((cb) => (cb.checked = evData.sdgs.includes(cb.value)));
 
         editIndex = i;
         eventModal.style.display = "flex";
@@ -214,8 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearForm() {
-    Object.values(inputs).forEach(input => {
-      if (input instanceof NodeList) input.forEach(cb => (cb.checked = false));
+    Object.values(inputs).forEach((input) => {
+      if (input instanceof NodeList) input.forEach((cb) => (cb.checked = false));
       else input.value = "";
     });
   }
@@ -224,6 +221,50 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("eventsData", JSON.stringify(events));
   }
 });
+
 document.querySelectorAll(".event-sdg-options label").forEach((label, index) => {
   label.setAttribute("data-number", index + 1);
+});
+
+
+// ===========================
+// 🚫 DUPLICATE SUBMISSION VALIDATION
+// ===========================
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("submissionForm");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = form.querySelector("input[name='org_email']").value.trim();
+    const academicYear = document.getElementById("academicYear").value;
+    const semester = document.getElementById("semester").value;
+
+    if (!email || !academicYear || !semester) {
+      alert("Please fill in all required fields, including Academic Year and Semester.");
+      return;
+    }
+
+    const submissionKey = `${email}_${academicYear}_${semester}`;
+    const existingSubmissions = JSON.parse(localStorage.getItem("orgSubmissions")) || {};
+
+    if (existingSubmissions[submissionKey]) {
+      alert(
+        `You have already submitted a form for Academic Year ${academicYear}, ${semester}.\nPlease go to your History page to edit your previous submission instead.`
+      );
+      return;
+    }
+
+    existingSubmissions[submissionKey] = {
+      email,
+      academicYear,
+      semester,
+      timestamp: new Date().toISOString()
+    };
+
+    localStorage.setItem("orgSubmissions", JSON.stringify(existingSubmissions));
+    alert("✅ Submission successful!");
+    form.reset();
+    document.getElementById("academicYear").innerHTML = '<option value="" disabled selected>Select Academic Year</option>';
+  });
 });
