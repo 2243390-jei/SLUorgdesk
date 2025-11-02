@@ -491,7 +491,7 @@ body.home-body {
 
 .step-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
   margin-bottom: 18px;
 }

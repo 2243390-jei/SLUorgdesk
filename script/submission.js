@@ -4,11 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
     const dropZone = inputElement.closest(".drop-zone");
+    if (!dropZone) return;
 
-    dropZone.addEventListener("click", () => inputElement.click());
+    const defaultContent = dropZone.innerHTML;
+    const originalInput = inputElement.cloneNode(true);
 
-    inputElement.addEventListener("change", () => {
-      if (inputElement.files.length) updateDropZone(dropZone, inputElement.files[0]);
+    dropZone.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("remove-file-btn")) {
+        const currentInput = dropZone.querySelector(".drop-zone__input");
+        if (currentInput) currentInput.click();
+      }
+    });
+
+    inputElement.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) updateDropZone(dropZone, file, defaultContent, originalInput);
     });
 
     dropZone.addEventListener("dragover", (e) => {
@@ -22,16 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
-      if (e.dataTransfer.files.length) {
-        inputElement.files = e.dataTransfer.files;
-        updateDropZone(dropZone, e.dataTransfer.files[0]);
+      const file = e.dataTransfer?.files?.[0];
+      if (file) {
+        const currentInput = dropZone.querySelector(".drop-zone__input");
+        if (currentInput) {
+          currentInput.files = e.dataTransfer.files;
+          updateDropZone(dropZone, file, defaultContent, originalInput);
+        }
       }
       dropZone.classList.remove("drop-zone--over");
     });
   });
 
-  function updateDropZone(dropZone, file) {
-    dropZone.innerHTML = ""; 
+  function updateDropZone(dropZone, file, defaultContent, originalInput) {
+    if (!file || !dropZone) return;
+    
+    const newInput = originalInput.cloneNode(true);
+    newInput.files = new FileList();
 
     const filePreview = document.createElement("div");
     filePreview.classList.add("file-preview");
@@ -39,20 +56,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const thumb = document.createElement("div");
     thumb.classList.add("file-thumb");
 
-    if (file.type.startsWith("image/")) {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.onload = () => URL.revokeObjectURL(img.src);
-      thumb.appendChild(img);
-    } else {
+    try {
+      if (file.type?.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        thumb.appendChild(img);
+      } else {
+        const icon = document.createElement("div");
+        icon.classList.add("file-icon");
+        const ext = file.name?.split(".")?.pop() || "FILE";
+        icon.textContent = ext.toUpperCase();
+        thumb.appendChild(icon);
+      }
+    } catch (e) {
       const icon = document.createElement("div");
       icon.classList.add("file-icon");
-      icon.textContent = file.name.split('.').pop().toUpperCase();
+      icon.textContent = "FILE";
       thumb.appendChild(icon);
     }
 
     const fileName = document.createElement("span");
-    fileName.textContent = file.name;
+    fileName.textContent = file.name || "Unknown File";
     fileName.classList.add("file-name");
 
     const removeBtn = document.createElement("button");
@@ -60,24 +85,29 @@ document.addEventListener("DOMContentLoaded", () => {
     removeBtn.classList.add("remove-file-btn");
     removeBtn.textContent = "Remove";
 
-    removeBtn.addEventListener("click", () => {
-      const input = dropZone.querySelector(".drop-zone__input") || createInput();
-      input.value = "";
-      dropZone.innerHTML = `
-        <img src="../Images/student_img/submit/upload_icon.png" alt="Upload Icon" class="upload-icon">
-        <span class="drop-zone__prompt">Drag & Drop file here or click to browse</span>
-      `;
-      dropZone.appendChild(input);
-      input.addEventListener("change", () => {
-        if (input.files.length) updateDropZone(dropZone, input.files[0]);
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropZone.innerHTML = defaultContent;
+      const newInput = originalInput.cloneNode(true);
+      dropZone.querySelector("input")?.remove();
+      dropZone.appendChild(newInput);
+
+      newInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          updateDropZone(dropZone, file, defaultContent, originalInput);
+        }
       });
     });
 
     filePreview.appendChild(thumb);
     filePreview.appendChild(fileName);
     filePreview.appendChild(removeBtn);
+
+    dropZone.innerHTML = "";
     dropZone.appendChild(filePreview);
-    dropZone.appendChild(dropZone.querySelector(".drop-zone__input"));
+    newInput.files = file.files || new FileList();
+    dropZone.appendChild(newInput);
   }
 
   function createInput() {
