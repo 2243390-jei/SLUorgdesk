@@ -36,14 +36,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   width: 52px; 
   height: 52px; 
   border-radius: 12px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  background: linear-gradient(135deg, #3498db, #2980b9); 
-  color: white; 
-  font-weight: 700; 
-  box-shadow: 0 4px 12px rgba(52,152,219,0.3); 
-  font-size: 16px; 
+  object-fit: cover;
   margin-bottom: 8px;
 }
 
@@ -79,7 +72,11 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   color: #ecf0f1;
 }
 
-.circle-btn i { font-size: 18px; }
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 
 .circle-btn.active { 
   background: linear-gradient(135deg, #3498db, #2980b9); 
@@ -117,10 +114,13 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 .search-wrap { 
   position: relative; 
   width: 360px; 
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .search-wrap input[type="search"] {
-  width: 100%; 
+  flex: 1;
   padding: 12px 40px 12px 16px; 
   border-radius: 10px; 
   border: 1px solid #e1e8ed;
@@ -207,17 +207,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   background: #1d4ed8;
 }
 
-
-
 /* FILTER DROPDOWN */
-.search-wrap {
-  position: relative;
-  width: 360px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 #filterToggle {
   background: #1f2b34;
   border: none;
@@ -236,14 +226,10 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   background: #26343f;
 }
 
-.search-wrap input[type="search"] {
-  flex: 1;
-  padding: 12px 40px 12px 16px;
-  border-radius: 10px;
-  border: 1px solid #e1e8ed;
-  background: white;
-  box-shadow: 0 2px 8px rgba(10, 20, 30, 0.04);
-  font-size: 14px;
+.filter-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 #filterMenu {
@@ -293,8 +279,6 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 #clearFilterBtn:hover {
   background-color: #d32f2f;
 }
-
-
 
 /* responsive */
 @media (max-width: 1200px){

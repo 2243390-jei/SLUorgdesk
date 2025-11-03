@@ -7,7 +7,7 @@ let organizationsData = [];
 
 async function loadOrganizations() {
   try {
-    const response = await fetch("http://localhost:3000/api/organizations");
+    const response = await fetch("../dataFetch/fetchDatabase.php");
     const organizations = await response.json();
     organizationsData = organizations; // save for filtering
 
@@ -104,3 +104,4 @@ document.addEventListener("click", (e) => {
     filterMenu.classList.add("hidden");
   }
 });
+
