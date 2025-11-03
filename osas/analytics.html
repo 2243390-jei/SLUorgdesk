@@ -10,25 +10,25 @@
   <div class="app">
     <aside class="leftbar" aria-label="Main navigation">
       <div class="brand">
-        <div class="logo">OSAS</div>
+        <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
       </div>
 
       <nav class="left-nav" role="navigation" aria-label="Sidebar">
-        <button class="circle-btn" title="Calendar" aria-label="Calendar">
-          <img src="../Images/calendar.png" alt="Calendar" class="nav-icon">
-        </button>
-        <button class="circle-btn active" title="Organizations" aria-label="Organizations">
-          <img src="../Images/grid.png" alt="Organizations" class="nav-icon">
-        </button>
-        <button class="circle-btn" title="" aria-label="Email">
-          <i class="fa-regular fa-envelope"></i>
-        </button>
-        <button class="circle-btn" title="Form List" aria-label="Form List">
-          <i class="fa-solid fa-list-check"></i>
-        </button>
-        <button class="circle-btn" title="View All Users" aria-label="View All Users">
-          <i class="fa-solid fa-users"></i>
-        </button>
+        <a href="../osas/calendar.html">
+          <button class="circle-btn" title="Calendar" aria-label="Calendar">
+            <img src="../Images/calendar.png" alt="Calendar" class="nav-icon">
+          </button>
+        </a>
+        <a href="../osas/orgs.html">
+          <button class="circle-btn" title="Organizations" aria-label="Organizations">
+            <img src="../Images/grid.png" alt="Organizations" class="nav-icon">
+          </button>
+        </a>
+        <a href="../osas/analytics.html">
+          <button class="circle-btn active" title="Analytics" aria-label="Analytics">
+            <img src="../Images/analytics.png" alt="Analytics" class="nav-icon">
+          </button>
+        </a>
       </nav>
     </aside>  
 
@@ -55,7 +55,7 @@
         <div class="stats-overview">
           <div class="stat-card">
             <div class="stat-icon total-forms">
-              <i class="fa-solid fa-file-lines"></i>
+              <img src="../Images/compliant.png" alt="Forms" class="stat-icon-img">
             </div>
             <div class="stat-info">
               <div class="stat-value" id="totalForms">0</div>
@@ -64,7 +64,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon pending">
-              <i class="fa-solid fa-clock"></i>
+              <img src="../Images/clock-icon.png" alt="Pending" class="stat-icon-img">
             </div>
             <div class="stat-info">
               <div class="stat-value" id="pendingForms">0</div>
@@ -73,7 +73,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon approved">
-              <i class="fa-solid fa-check"></i>
+              <img src="../Images/check-icon.png" alt="Approved" class="stat-icon-img">
             </div>
             <div class="stat-info">
               <div class="stat-value" id="approvedForms">0</div>
