@@ -523,15 +523,35 @@ function openDetailPanel(event) {
     <div class="detail-section">
       <h4 class="detail-section-title">Supporting Documents</h4>
       <div class="document-list">
-        ${eventData.supportingDocuments.map((doc, index) => `
-          <div class="document-item">
-            <span class="doc-icon"></span>
-            <div class="doc-info">
-              <span class="doc-name">Document ${index + 1}</span>
-              <a href="${doc}" target="_blank" class="doc-link">View</a>
+        ${eventData.supportingDocuments.map((doc, index) => {
+          // Extract document title from filename or use a meaningful title
+          let docTitle = 'Supporting Document';
+          if (typeof doc === 'string') {
+            // If it's a URL or filename, extract the meaningful part
+            const fileName = doc.split('/').pop() || doc;
+            docTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
+            docTitle = docTitle.replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
+            docTitle = docTitle.charAt(0).toUpperCase() + docTitle.slice(1); // Capitalize first letter
+          } else if (doc.title) {
+            // If it's an object with title property
+            docTitle = doc.title;
+          } else if (doc.name) {
+            // If it's an object with name property
+            docTitle = doc.name;
+          }
+          
+          const docUrl = typeof doc === 'string' ? doc : (doc.url || doc.link || '#');
+          
+          return `
+            <div class="document-item">
+              <span class="doc-icon"></span>
+              <div class="doc-info">
+                <span class="doc-name">${docTitle}</span>
+                <a href="${docUrl}" target="_blank" class="doc-link">View</a>
+              </div>
             </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     </div>
     ` : ''}
@@ -577,6 +597,51 @@ function openDetailPanel(event) {
 
   // Focus for accessibility
   detailPanel.focus();
+}
+
+// Helper function to extract meaningful document titles
+function getDocumentTitle(doc) {
+  if (!doc) return 'Document';
+  
+  if (typeof doc === 'string') {
+    // If it's a URL or filename, extract the meaningful part
+    const fileName = doc.split('/').pop() || doc;
+    let title = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
+    title = title.replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
+    title = title.charAt(0).toUpperCase() + title.slice(1); // Capitalize first letter
+    
+    // Common document type mappings
+    const docTypeMappings = {
+      'proposal': 'Event Proposal',
+      'budget': 'Budget Plan',
+      'permit': 'Permit Document',
+      'endorsement': 'Endorsement Letter',
+      'attendance': 'Attendance Sheet',
+      'minutes': 'Meeting Minutes',
+      'photos': 'Event Photos',
+      'report': 'Event Report',
+      'proof': 'Event Proof',
+      'evaluation': 'Evaluation Form'
+    };
+    
+    // Check if the title matches any common document types
+    const lowerTitle = title.toLowerCase();
+    for (const [key, value] of Object.entries(docTypeMappings)) {
+      if (lowerTitle.includes(key)) {
+        return value;
+      }
+    }
+    
+    return title || 'Supporting Document';
+  } else if (doc.title) {
+    // If it's an object with title property
+    return doc.title;
+  } else if (doc.name) {
+    // If it's an object with name property
+    return doc.name;
+  }
+  
+  return 'Document';
 }
 
 // Close detail panel
