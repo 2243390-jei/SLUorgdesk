@@ -55,7 +55,7 @@ async function initialize() {
 // Fetch users from MongoDB
 async function fetchUsers() {
     try {
-        const apiBase = "http://localhost:3000/api/users";  // Update this URL to match your MongoDB API endpoint
+        const apiBase = "../dataFetch/fetchUsers.php";  // Update this URL to match your MongoDB API endpoint
         console.log('Fetching users from:', apiBase);
         const response = await fetch(apiBase);
         console.log('Response status:', response.status);
