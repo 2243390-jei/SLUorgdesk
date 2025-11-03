@@ -158,8 +158,7 @@
 .submission-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2.5rem;
-    padding: 0.5rem;
+    gap: 1.5rem;
 }
 
 .submission-card {
@@ -587,6 +586,103 @@
     }
 }
 
+/* --- MOBILE RESPONSIVE STYLES FOR HISTORY PAGE --- */
+@media (max-width: 900px) {
+  .history-section {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  .history-controls {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  .filter-container {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .submission-cards {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .submission-card {
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .submission-details {
+    padding: 1rem;
+  }
+  .view-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.7rem 0;
+  }
+  .modal-content {
+    width: 98vw;
+    max-width: 98vw;
+    padding: 10px;
+    border-radius: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 10px;
+  }
+  .navbar nav {
+    position: static;
+    left: auto;
+    transform: none;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .navbar nav ul {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+    border-radius: 20px;
+    width: 100%;
+    background-color: #1e1362;
+  }
+  .navbar .logo img {
+    height: 50px;
+  }
+  .profile-icon img {
+    height: 32px;
+  }
+  .history-section {
+    padding: 0.5rem;
+  }
+  .submission-cards {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .submission-card {
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .submission-details {
+    padding: 0.5rem;
+  }
+  .view-btn {
+    font-size: 0.95rem;
+    padding: 0.6rem 0;
+  }
+  .modal-content {
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .org-info h3 {
+    font-size: 1.1rem;
+  }
+  .event-details h4 {
+    font-size: 1rem;
+  }
+}
+/* --- END MOBILE RESPONSIVE --- */
+
 /* Updated Card Styles */
 .event-details h4 {
     font-size: 1.125rem;
@@ -645,4 +741,3 @@
         max-height: 100vh;
         border-radius: 0;
     }
-}

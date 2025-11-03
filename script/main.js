@@ -71,37 +71,6 @@ function handleCredentialResponse(response) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const images = document.querySelectorAll('.schools-section .carousel-slide img');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  let current = 0;
-
-  function updateCarousel() {
-    images.forEach(img => img.classList.remove('active', 'prev', 'next'));
-
-    const total = images.length;
-    const prevIndex = (current - 1 + total) % total;
-    const nextIndex = (current + 1) % total;
-
-    images[current].classList.add('active');
-    images[prevIndex].classList.add('prev');
-    images[nextIndex].classList.add('next');
-  }
-
-  prevBtn.addEventListener('click', () => {
-    current = (current - 1 + images.length) % images.length;
-    updateCarousel();
-  });
-
-  nextBtn.addEventListener('click', () => {
-    current = (current + 1) % images.length;
-    updateCarousel();
-  });
-
-  updateCarousel();
-});
-
 // --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
   const navbarProfilePic = document.getElementById("nav-profile-pic");
@@ -139,7 +108,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  updateGallery();
-  prevBtn.addEventListener("click", updateGallery);
-  nextBtn.addEventListener("click", updateGallery);
 });
