@@ -382,6 +382,66 @@ tr:hover td {
   background-color: #d32f2f;
 }
 
+/* ===== Search Bar Styling ===== */
+.search-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #dcdcdc;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  width: 260px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: #004aad;
+  box-shadow: 0 0 0 2px rgba(0, 74, 173, 0.2);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  background: transparent;
+  color: #333;
+}
+
+.search-box input::placeholder {
+  color: #999;
+}
+
+/* Clear button (X) inside input */
+.clear-btn {
+  border: none;
+  background: none;
+  color: #888;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.clear-btn:hover {
+  background: #f1f1f1;
+  color: #333;
+}
+
+/* Keep header layout aligned */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 
 

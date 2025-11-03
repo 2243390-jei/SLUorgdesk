@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Get organization info from URL
+  // --- Get organization info from URL ---
   const urlParams = new URLSearchParams(window.location.search);
   const orgId = urlParams.get("orgId");
   const orgName = urlParams.get("orgName");
@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     orgNameDisplay.textContent = decodeURIComponent(orgName);
   }
 
-  // If no orgId in the URL, stop here
+  // --- Stop if no orgId found ---
   if (!orgId) {
     console.error("No orgId found in URL");
     document.getElementById("submissionsContainer").innerHTML = `
@@ -18,11 +18,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  try {
-    // Fetch submissions filtered by orgId
-    const response = await fetch(`../dataFetch/fetchSubmissions.php?orgId=${orgId}`);
-    const submissions = await response.json();
+  let submissions = [];
 
+  // --- Fetch submissions ---
+  try {
+    const response = await fetch(`../dataFetch/fetchSubmissions.php?orgId=${orgId}`);
+    submissions = await response.json();
     renderSubmissions(submissions);
   } catch (error) {
     console.error("Error fetching submissions:", error);
@@ -30,9 +31,138 @@ document.addEventListener("DOMContentLoaded", async () => {
       <p style="color:red;">Failed to load submissions. Please try again later.</p>
     `;
   }
+
+  // --- FILTER TOGGLE FUNCTIONALITY ---
+  const filterToggle = document.getElementById("filterToggle");
+  const filterDropdown = document.getElementById("filterDropdown");
+
+  if (filterToggle && filterDropdown) {
+    filterToggle.addEventListener("click", (e) => {
+      e.stopPropagation(); // avoid immediate document click
+      filterDropdown.classList.toggle("hidden");
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!filterDropdown) return;
+    if (!filterDropdown.classList.contains("hidden")) {
+      // If click is outside the dropdown and not the toggle, close it
+      const isClickInside = filterDropdown.contains(e.target) || (filterToggle && filterToggle.contains(e.target));
+      if (!isClickInside) filterDropdown.classList.add("hidden");
+    }
+  });
+
+  // --- HANDLE SUBFILTER DROPDOWNS (first-level) ---
+  document.querySelectorAll(".filter-category").forEach((categoryBtn) => {
+    categoryBtn.addEventListener("click", () => {
+      const nextEl = categoryBtn.nextElementSibling;
+      if (nextEl && nextEl.classList.contains("filter-sub")) {
+        nextEl.classList.toggle("hidden");
+      }
+    });
+  });
+
+  // --- Handle nested submenus (data-sub -> data-parent mapping) ---
+  document.querySelectorAll(".filter-sub [data-sub]").forEach((subBtn) => {
+    subBtn.addEventListener("click", () => {
+      const parentValue = subBtn.getAttribute("data-sub");
+      const subMenu = document.querySelector(`.filter-sub2[data-parent="${parentValue}"]`);
+      if (subMenu) {
+        subMenu.classList.toggle("hidden");
+      }
+    });
+  });
+
+  // --- SDG FILTER BUTTONS FUNCTIONALITY ---
+  // Correct selector: SDG buttons are inside .filter-sub[data-type="sdg"]
+  const sdgContainer = document.querySelector('.filter-sub[data-type="sdg"]');
+
+  if (sdgContainer) {
+    // attach click listener to each SDG button currently present
+    sdgContainer.querySelectorAll('button').forEach((sdgBtn) => {
+      sdgBtn.addEventListener('click', () => {
+        const selectedFilter = sdgBtn.textContent.trim();
+        applySDGFilter(selectedFilter);
+        // close dropdown after selection for better UX
+        if (filterDropdown) filterDropdown.classList.add('hidden');
+      });
+    });
+
+    // Also use event delegation in case buttons are changed/added later
+    sdgContainer.addEventListener('click', (ev) => {
+      const target = ev.target;
+      if (target.tagName === 'BUTTON') {
+        const selectedFilter = target.textContent.trim();
+        applySDGFilter(selectedFilter);
+        if (filterDropdown) filterDropdown.classList.add('hidden');
+      }
+    });
+  } else {
+    // If the sdg container is not found, log to console for debugging
+    console.warn('SDG filter container not found: .filter-sub[data-type="sdg"]');
+  }
+
+  // --- CLEAR FILTER BUTTON ---
+  const clearFilterBtn = document.getElementById("clearFilterBtn");
+  if (clearFilterBtn) {
+    clearFilterBtn.addEventListener("click", () => {
+      document
+        .querySelectorAll(".filter-sub, .filter-sub2")
+        .forEach((el) => el.classList.add("hidden"));
+      renderSubmissions(submissions); // reset table
+      if (filterDropdown) filterDropdown.classList.add('hidden');
+    });
+  }
+
+  // --- SEARCH FUNCTIONALITY ---
+  const searchInput = document.getElementById("searchInput");
+  const clearSearchBtn = document.getElementById("clearSearchBtn");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+      const rows = document.querySelectorAll(".submissions-table tbody tr");
+
+      rows.forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? "" : "none";
+      });
+    });
+  }
+
+  // --- CLEAR SEARCH BUTTON ---
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      const rows = document.querySelectorAll(".submissions-table tbody tr");
+      rows.forEach((row) => (row.style.display = ""));
+    });
+  }
+
+  // helper used above
+  function applySDGFilter(selectedFilter) {
+    console.log('Applying SDG filter:', selectedFilter);
+    const filtered = submissions.filter((sub) => {
+      const sdgs = (sub.event && sub.event.eventSDG) || [];
+      return sdgs.some((sdg) => normalizeSDGText(sdg) === normalizeSDGText(selectedFilter));
+    });
+    renderSubmissions(filtered);
+  }
 });
 
-// Renders the submissions table dynamically
+// --- NORMALIZE SDG TEXT FOR COMPARISON ---
+function normalizeSDGText(text) {
+  if (!text) return "";
+  return text
+    .toLowerCase()
+    .replace(/sdg\s*/g, "") // remove 'SDG'
+    .replace(/[-.]/g, "")   // remove dash and dot
+    .replace(/\s+/g, " ")   // normalize spaces
+    .trim();
+}
+
+// --- RENDER SUBMISSIONS FUNCTION ---
 function renderSubmissions(submissions) {
   const container = document.getElementById("submissionsContainer");
 
@@ -52,6 +182,7 @@ function renderSubmissions(submissions) {
           <th>End Time</th>
           <th>Venue</th>
           <th>Attendance</th>
+          <th>SDG Goals</th>
           <th>Proof</th>
           <th>Supporting Documents</th>
         </tr>
@@ -59,8 +190,12 @@ function renderSubmissions(submissions) {
       <tbody>
   `;
 
-  submissions.forEach(sub => {
+  submissions.forEach((sub) => {
     const e = sub.event || {};
+    const sdgs = (e.eventSDG && e.eventSDG.length > 0)
+      ? e.eventSDG.join(", ")
+      : "None";
+
     const docs = (e.supportingDocuments || [])
       .map((d, i) => `<a href="${d}" target="_blank">File ${i + 1}</a>`)
       .join(", ");
@@ -74,13 +209,8 @@ function renderSubmissions(submissions) {
         <td>${e.endTime || "N/A"}</td>
         <td>${e.eventVenue || "N/A"}</td>
         <td>${e.attendance || "N/A"}</td>
-        <td>
-          ${
-            e.eventProof
-              ? `<a href="${e.eventProof}" target="_blank">View Proof</a>`
-              : "N/A"
-          }
-        </td>
+        <td>${sdgs}</td>
+        <td>${e.eventProof ? `<a href="${e.eventProof}" target="_blank">View Proof</a>` : "N/A"}</td>
         <td>${docs || "None"}</td>
       </tr>
     `;
@@ -89,16 +219,3 @@ function renderSubmissions(submissions) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
-
-// Filter toggle functionality
-document.addEventListener("DOMContentLoaded", () => {
-  const filterToggle = document.getElementById("filterToggle");
-  const filterDropdown = document.getElementById("filterDropdown");
-
-  if (filterToggle && filterDropdown) {
-    filterToggle.addEventListener("click", () => {
-      filterDropdown.classList.toggle("hidden");
-    });
-  }
-});
-
