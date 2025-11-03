@@ -15,40 +15,33 @@ const connectDB = async () => {
 
 // Submission Schema (matches new DB example)
 const submissionSchema = new mongoose.Schema({
-  submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
-  organizationInfo: {
-    org_name: String,
-    org_acronym: String,
-    org_email: String,
-    org_social: [String],
-    org_category: String,
-    org_type: String,
+  applicationInfo: {
+    applicantName: String,
+    email: String,
+    position: String
   },
-  applicantInfo: {
-    applicant_name: String,
-    applicant_email: String,
-    applicant_position: String,
-  },
-  adviserInfo: {
-    adviser_name: [String],
-    adviser_email: [String],
+  orgInfo: {
+    orgId: String,
+    name: String,
+    acronym: String,
+    email: String
   },
   academicYear: String,
   semester: String,
-  events: [
-    {
-      eventName: String,
-      eventType: String,
-      eventDate: Date,
-      startTime: String,
-      endTime: String,
-      eventVenue: String,
-      eventAttendees: Number,
-      eventProof: String,
-      eventSDG: [String],
-    },
-  ],
+  event: {
+    id: String,
+    eventName: String,
+    eventType: String,
+    eventDate: String,
+    startTime: String,
+    endTime: String,
+    eventVenue: String,
+    eventDescription: String,
+    attendance: Number,
+    eventProof: String,
+    eventSDG: [String],
+    supportingDocuments: [String]
+  },
   documentUploads: {
     strategic_plan: { fileName: String, url: String },
     annual_report: { fileName: String, url: String },
@@ -87,6 +80,24 @@ const organizationSchema = new mongoose.Schema({
 export const Organization =
   mongoose.models.Organization ||
   mongoose.model("Organization", organizationSchema, "Organizations");
+
+// User Schema
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, required: true },
+  studentId: String,
+  school: String,
+  course: String,
+  yearLevel: Number,
+  isActive: { type: Boolean, default: true },
+  organizations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' }],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+export const User = mongoose.models.User || mongoose.model("User", userSchema, "User");
 
 connectDB();
 export default mongoose;
