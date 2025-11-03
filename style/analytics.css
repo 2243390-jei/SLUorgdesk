@@ -199,6 +199,13 @@ body {
   flex: 1;
 }
 
+/* Charts Row Layout */
+.charts-row {
+  display: flex;
+  gap: 30px;
+  height: 400px;
+  min-height: 400px;
+}
 
 /* Organizations Section */
 .orgs-section {
@@ -323,6 +330,13 @@ body {
   height: 100%;
 }
 
+.chart-full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .chart-card {
   background: var(--card);
   border-radius: var(--rounded);
@@ -331,47 +345,40 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.chart-card.large-chart {
-  height: 100%;
+  width: 100%;
 }
 
 .chart-header {
   margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.chart-header h2,
 .chart-header h3 {
   font-size: 20px;
   font-weight: 600;
   color: var(--deep-blue);
+  margin: 0;
 }
 
-/* Chart Containers - MUCH LARGER */
+/* Chart Containers */
+.chart-container {
+  flex: 1;
+  position: relative;
+  height: 300px;
+  min-height: 300px;
+}
+
 .chart-container-large {
   flex: 1;
   position: relative;
-  height: 400px;
-  min-height: 400px;
+  height: 350px;
+  min-height: 350px;
 }
 
-.chart-container-extra-large {
-  height: 450px;
-  position: relative;
-  margin-top: 20px;
-  min-height: 450px;
-}
-
-/* SDG Section */
-.sdg-section {
-  background: var(--card);
-  border-radius: var(--rounded);
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(10,20,30,0.04);
-  height: 550px;
-  min-height: 550px;
-}
-
+/* SDG Stats */
 .sdg-stats {
   display: flex;
   gap: 20px;
@@ -384,16 +391,7 @@ body {
   border-radius: 8px;
   font-weight: 600;
   color: var(--accent);
-}
-
-/* Schools Section */
-.schools-section {
-  background: var(--card);
-  border-radius: var(--rounded);
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(10,20,30,0.04);
-  height: 500px;
-  min-height: 500px;
+  font-size: 14px;
 }
 
 /* Ensure canvas elements take full size */
@@ -446,28 +444,9 @@ canvas {
   }
 }
 
-/* Chart bar animations */
-.chart-bar {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.chart-bar:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
-
-/* Chart point animations */
-.chart-point {
-  transition: all 0.3s ease;
-}
-
-.chart-point:hover {
-  transform: scale(1.2);
-}
-
 /* Responsive Design */
-
-  .stats-row {
+@media (max-width: 1200px) {
+  .charts-row {
     flex-direction: column;
     height: auto;
   }
@@ -476,10 +455,14 @@ canvas {
     flex: none;
     height: 400px;
   }
+  
+  .chart-container,
+  .chart-container-large {
+    height: 300px;
+  }
 }
 
-
-  
+@media (max-width: 768px) {
   .header {
     flex-direction: column;
     gap: 16px;
@@ -493,6 +476,17 @@ canvas {
   .search-wrap {
     width: 100%;
     max-width: 300px;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .sdg-stats {
+    align-self: stretch;
+    justify-content: space-between;
   }
 }
 
