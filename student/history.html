@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLU OrgDesk | History</title>
     <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/history.css" />
 </head>
 <body class="home-body">
     <!-- NAVIGATION BAR -->
@@ -14,9 +15,9 @@
         </div>
         <nav>
             <ul>
-                <li><a href="home.html" class="active">Home</a></li>
+                <li><a href="home.html">Home</a></li>
                 <li><a href="submission.html">Submission</a></li>
-                <li><a href="history.html">History</a></li>
+                <li><a href="history.html" class="active">History</a></li>
             </ul>
         </nav>
         <div class="profile-icon">
@@ -27,179 +28,25 @@
     <section class="history-section">
         <!-- Search and Filters -->
         <div class="history-controls">
-            <input type="text" id="searchInput" placeholder="Search Event Name..." />
+            <input type="text" id="searchInput" placeholder="Search by Organization or Event..." />
 
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-status="all">All Submissions</button>
-                <button class="filter-btn" data-status="approved">Accepted</button>
-                <button class="filter-btn" data-status="pending review">Pending</button>
-                <button class="filter-btn" data-status="needs revision">Needs Revision</button>
-            </div>
-
-            <select id="timeFilter" class="time-filter">
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-                <option value="all">All Time</option>
-            </select>
-        </div>
-
-        <!-- Submission Cards -->
-        <div id="submissionList"></div>
-
-        <!-- MODAL: Edit / View Submission -->
-        <div id="submissionModal" class="modal" aria-hidden="true">
-            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-                <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-                <h2 id="modalTitle">Submission Details</h2>
-
-                <form id="modalForm">
-                    <div class="modal-row">
-                        <label>Organization Name</label>
-                        <input type="text" id="modalCompleteName" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Acronym</label>
-                        <input type="text" id="modalAcronym" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Official Email</label>
-                        <input type="email" id="modalOfficialEmail" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Applicant Name</label>
-                        <input type="text" id="modalApplicantName" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Applicant Email</label>
-                        <input type="email" id="modalApplicantEmail" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Applicant Position</label>
-                        <input type="text" id="modalApplicantPosition" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Adviser Names</label>
-                        <input type="text" id="modalAdviserNames" />
-                    </div>
-                    <div class="modal-row">
-                        <label>School / Category</label>
-                        <input type="text" id="modalSchool" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Category</label>
-                        <input type="text" id="modalCategory" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Organization Type</label>
-                        <input type="text" id="modalOrganizationType" />
-                    </div>
-
-                    <div class="modal-row">
-                        <label>Start Year</label>
-                        <input type="number" id="modalStartYear" />
-                    </div>
-                    <div class="modal-row">
-                        <label>End Year</label>
-                        <input type="number" id="modalEndYear" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Semester</label>
-                        <input type="text" id="modalSemester" />
-                    </div>
-
-                    <div class="modal-row">
-                        <label>Video Link</label>
-                        <input type="text" id="modalVideoLink" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Status</label>
-                        <select id="modalStatus">
-                            <option value="pending">Pending Review</option>
-                            <option value="accepted">Accepted</option>
-                            <option value="revision">Needs Revision</option>
-                        </select>
-                    </div>
-                    <div class="modal-row">
-                        <label>Remarks</label>
-                        <textarea id="modalRemarks"></textarea>
-                    </div>
-                    <div class="modal-row">
-                        <label>Created At</label>
-                        <input type="text" id="modalCreatedAt" disabled />
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" id="modalSave" class="btn-outlined">Save changes</button>
-                        <button type="button" id="modalCloseBtn" class="reset-btn">Close</button>
-                    </div>
-                </form>
+            <div class="filter-container" id="filterContainer">
+                <select id="academicYearFilter" class="filter-select">
+                    <option value="">All Academic Years</option>
+                </select>
+                <select id="semesterFilter" class="filter-select">
+                    <option value="">All Semesters</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                </select>
             </div>
         </div>
 
-        <!-- MODAL: View/Edit Activity -->
-        <div id="activityModal" class="modal" aria-hidden="true">
-            <div class="modal-content">
-                <button class="modal-close" id="activityClose" aria-label="Close">×</button>
-                <h2 id="activityModalTitle">Activity Details</h2>
-                <form id="activityForm">
-                    <div class="modal-row">
-                        <label>Event Name</label>
-                        <input type="text" id="activityName" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Event Description</label>
-                        <textarea id="activityDescription"></textarea>
-                    </div>
-                    <div class="modal-row">
-                        <label>Event Type</label>
-                        <input type="text" id="activityType" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Event Date</label>
-                        <input type="date" id="activityDate" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Start Time</label>
-                        <input type="text" id="activityStartTime" placeholder="00:00" maxlength="5" />
-                        <select id="activityStartPeriod">
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </div>
-                    <div class="modal-row">
-                        <label>End Time</label>
-                        <input type="text" id="activityEndTime" placeholder="00:00" maxlength="5" />
-                        <select id="activityEndPeriod">
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </div>
-                    <div class="modal-row">
-                        <label>Venue</label>
-                        <input type="text" id="activityVenue" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Attendees</label>
-                        <input type="number" id="activityAttendees" />
-                    </div>
-                    <div class="modal-row">
-                        <label>Proof Link</label>
-                        <input type="text" id="activityProof" />
-                    </div>
-                    <div class="modal-row">
-    <label>SDGs</label>
-    <textarea id="activitySDG" rows="2" readonly></textarea>
-</div>
+        <!-- SUBMISSION CARDS -->
+        <div id="submissionList" class="submission-cards"></div>
 
-                    <div class="modal-actions">
-                        <button type="button" id="activitySave" class="btn-outlined">Save Changes</button>
-                        <button type="button" id="activityCloseBtn" class="reset-btn">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
+        <!-- MODAL: View Submission -->
+        <div id="submissionModal" class="modal" aria-hidden="true"></div>
     </section>
 
     <script src="../script/organization_history.js"></script>
