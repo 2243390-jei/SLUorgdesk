@@ -1,384 +1,301 @@
-// ---------------------------
-// Global submissions array
-// ---------------------------
-let submissions = [];
+/* ========================================================
+   organization_history.js – EVENTS ONLY EDITABLE
+   Works with /api/Submissions | No logo | Status top-right
+   ======================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-    const submissionList = document.getElementById('submissionList');
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const searchInput = document.getElementById('searchInput');
+const API_URL = "http://localhost:3000/api/Submissions";
+let allSubmissions = [];
+let currentEditingId = null; // Track which submission is being edited
 
-    // ---------------------------
-    // Load submissions from server
-    // ---------------------------
-    async function loadSubmissions() {
-        try {
-            const res = await fetch('http://localhost:3000/api/Submissions'); 
-            if (!res.ok) throw new Error('Network response was not ok');
-            submissions = await res.json(); // updates global array
-            renderSubmissions(submissions);
-        } catch (err) {
-            console.error(err);
-            submissionList.innerHTML = '<p style="text-align:center; opacity:0.7;">Unable to load submissions from server.</p>';
-        }
-    }
+// DOM Elements
+const submissionList = document.getElementById("submissionList");
+const searchInput = document.getElementById("searchInput");
+const filterBtns = document.querySelectorAll(".filter-btn");
+const timeFilter = document.getElementById("timeFilter");
+const modal = document.getElementById("submissionModal");
+const modalClose = document.getElementById("modalClose");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+const modalEditBtn = document.getElementById("modalEditBtn");
 
-    // ---------------------------
-    // Helper functions
-    // ---------------------------
-    function shortDate(d) {
-        const dt = new Date(d);
-        return isNaN(dt) ? '' : dt.toLocaleDateString();
-    }
+// Helper: Format date
+const formatDate = (d) =>
+  new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[s]);
-    }
+// Status badge
+const getStatusClass = (s) => {
+  s = (s || "").toUpperCase();
+  return s === "APPROVED" ? "status-accepted" :
+         s === "PENDING" ? "status-pending" :
+         s === "NEEDS REVISION" ? "status-revision" : "status-pending";
+};
 
-    function groupBySemester(submissions) {
-        const grouped = {};
-        submissions.forEach(sub => {
-            const year = sub.academicYear || 'Unknown Year';
-            const sem = sub.semester || 'Unknown Semester';
-            const key = `${year} - ${sem}`;
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(sub);
-        });
-        return grouped;
-    }
+const getStatusLabel = (s) => {
+  s = (s || "").toUpperCase();
+  return s === "APPROVED" ? "Accepted" :
+         s === "PENDING" ? "Pending" :
+         s === "NEEDS REVISION" ? "Needs Revision" : s || "Pending";
+};
 
-    // ---------------------------
-    // Render submissions
-    // ---------------------------
-    function renderSubmissions(list) {
-    submissionList.innerHTML = '';
-    if (!list || list.length === 0) {
-        submissionList.innerHTML = '<p style="text-align:center; opacity:0.7;">No submissions found.</p>';
-        return;
-    }
-
-    const grouped = groupBySemester(list);
-
-    Object.keys(grouped).forEach(group => {
-        submissionList.innerHTML += `
-            <div class="semester-group">
-                <h2 class="semester-title">${escapeHtml(group)}</h2>
-                <div class="semester-submissions" id="group-${group.replace(/\s+/g,'')}"></div>
-            </div>
-        `;
-
-        const groupContainer = document.getElementById(`group-${group.replace(/\s+/g,'')}`);
-        grouped[group].forEach(item => {
-            // Normalized submission id string
-            const submissionIdStr = normalizeId(item._id);
-
-            const status = item.status || 'PENDING';
-            const submittedOn = shortDate(item.submittedAt) || '';
-            const orgName = item.organizationInfo?.org_name || 'Untitled Org';
-            const applicant = item.applicantInfo?.applicant_name || '';
-            const school = item.organizationInfo?.org_category || '';
-            const academicYear = item.academicYear || 'Unknown';
-            const semester = item.semester || 'Unknown';
-
-            const st = status.toLowerCase();
-            const editDisabled = st === 'accepted';
-            const editBtn = editDisabled
-                ? '<button class="btn-disabled" disabled>Edit</button>'
-                : `<button class="btn-edit" onclick="editSubmission('${submissionIdStr}')">Edit</button>`;
-
-            // Build event list HTML, use either e.id or e._id (normalized)
-            const eventList = (item.events || []).map(e => {
-                const eventIdRaw = e.id ?? e._id ?? '';
-                const eventId = normalizeId(eventIdRaw); // ensure string
-                return `<li>${escapeHtml(e.eventName || 'Untitled Event')} 
-                    <button class="btn-small" onclick="viewActivity('${submissionIdStr}','${escapeHtml(eventId)}')">View/Edit</button>
-                </li>`;
-            }).join('') || '<li>No activities submitted</li>';
-
-            groupContainer.innerHTML += `
-                <div class="submission-card" data-status="${escapeHtml(status)}">
-                    <div class="submission-details">
-                        <div class="submission-header">
-                            <span class="submitted-on">${submittedOn}</span>
-                            <span class="status-badge status-${st}">${escapeHtml(status)}</span>
-                        </div>
-                        <div class="details-body">
-                            <h3>${escapeHtml(orgName)}</h3>
-                            <p class="sd-small">
-                                ${escapeHtml(applicant)}${school ? ' • ' + escapeHtml(school) : ''}<br>
-                                <strong>Academic Year:</strong> ${escapeHtml(academicYear)} • 
-                                <strong>Semester:</strong> ${escapeHtml(semester)}
-                            </p>
-                            <ul class="events-list">${eventList}</ul>
-                        </div>
-                        <div class="manage-dropdown">
-                            ${editBtn}
-                            <button class="btn-view" onclick="viewDetails('${submissionIdStr}')">View Submission</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    });
+// Render Cards (No logo)
+function renderCards(subs) {
+  submissionList.innerHTML = subs.length ? "" : `<p class="no-data">No submissions found.</p>`;
+  subs.forEach(s => {
+    const org = s.organizationInfo || {};
+    const card = document.createElement("div");
+    card.className = "submission-card";
+    card.innerHTML = `
+      <div class="submission-details">
+        <div class="submission-header">
+          <h3>${org.org_name || "Unnamed Org"}</h3>
+          <span class="status-badge ${getStatusClass(s.status)}">${getStatusLabel(s.status)}</span>
+        </div>
+        <div class="submission-meta">
+          <strong>AY:</strong> ${s.academicYear || "-"} – ${s.semester || "-"}<br>
+          <strong>Events:</strong> ${(s.events || []).length}<br>
+          <strong>Submitted:</strong> ${formatDate(s.submittedAt)}
+        </div>
+      </div>
+      <div class="submission-actions">
+        <button class="view-btn" data-id="${s._id}">View</button>
+        ${s.status === "PENDING" ? `<button class="edit-btn" data-id="${s._id}">Edit Events</button>` : ""}
+      </div>
+    `;
+    submissionList.appendChild(card);
+  });
 }
 
+// Fill Modal – ONLY EVENTS ARE EDITABLE
+function fillModal(sub, editable = false) {
+  const org = sub.organizationInfo || {};
+  const app = sub.applicantInfo || {};
+  const adv = sub.adviserInfo || {};
+  const docs = sub.documentUploads || {};
 
-    // ---------------------------
-    // Filter buttons
-    // ---------------------------
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const status = btn.dataset.status;
-            if (status === 'all') renderSubmissions(submissions);
-            else renderSubmissions(submissions.filter(s => (s.status || '').toLowerCase() === status));
-        });
+  currentEditingId = editable ? sub._id : null;
+
+  // --- READ-ONLY FIELDS (always) ---
+  const setReadOnly = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) { el.value = val || ""; el.readOnly = true; }
+  };
+
+  setReadOnly("modalCompleteName", org.org_name);
+  setReadOnly("modalAcronym", org.org_acronym);
+  setReadOnly("modalOfficialEmail", org.org_email);
+  setReadOnly("modalSocialLinks", (org.org_social || []).join(", "));
+  setReadOnly("modalApplicantName", app.applicant_name);
+  setReadOnly("modalApplicantEmail", app.applicant_email);
+  setReadOnly("modalSchool", org.org_category);
+  setReadOnly("modalOrganizationType", org.org_type);
+  setReadOnly("modalApplicantPosition", app.applicant_position);
+  setReadOnly("modalAdviserNames", (adv.adviser_name || []).join(", "));
+  setReadOnly("modalAdviserEmail", (adv.adviser_email || []).join(", "));
+
+  const [sy, ey] = (sub.academicYear || "-").split("-");
+  setReadOnly("modalStartYear", sy?.trim());
+  setReadOnly("modalEndYear", ey?.trim());
+  setReadOnly("modalSemester", sub.semester);
+
+  setReadOnly("modalStrategicPlan", docs.strategic_plan?.fileName);
+  setReadOnly("modalAnnualReport", docs.annual_report?.fileName);
+  setReadOnly("modalCBL", docs.cbl?.fileName);
+  setReadOnly("modalCBLStatus", docs.cbl_status || "—");
+  setReadOnly("modalOfficersList", docs.officers_list?.fileName);
+  setReadOnly("modalInfographic", docs.infographic?.fileName);
+  setReadOnly("modalFinancialStatement", docs.financial_statement?.fileName);
+  setReadOnly("modalVideoLink", docs.video_link || "—");
+  setReadOnly("modalNote", sub.additional_note || "—");
+  setReadOnly("modalCreatedAt", formatDate(sub.submittedAt));
+
+  // --- EDITABLE: EVENTS ONLY ---
+  const eventList = document.getElementById("modalEventList");
+  eventList.innerHTML = "";
+
+  if (Array.isArray(sub.events) && sub.events.length) {
+    sub.events.forEach((ev, idx) => {
+      const div = document.createElement("div");
+      div.className = "event-item";
+      div.dataset.index = idx;
+
+      div.innerHTML = `
+        <div class="event-fields">
+          <input type="text" class="event-name" value="${ev.eventName || ""}" ${editable ? "" : "readonly"}>
+          <div class="event-row">
+            <input type="text" class="event-type" value="${ev.eventType || ""}" ${editable ? "" : "readonly"} placeholder="Type">
+            <input type="date" class="event-date" value="${ev.eventDate || ""}" ${editable ? "" : "readonly"}>
+          </div>
+          <div class="event-row">
+            <input type="text" class="event-time" value="${ev.startTime || ""}" ${editable ? "" : "readonly"} placeholder="Start">
+            <input type="text" class="event-time" value="${ev.endTime || ""}" ${editable ? "" : "readonly"} placeholder="End">
+          </div>
+          <input type="text" class="event-venue" value="${ev.eventVenue || ""}" ${editable ? "" : "readonly"} placeholder="Venue">
+          <input type="number" class="event-attendees" value="${ev.eventAttendees || ""}" ${editable ? "" : "readonly"} placeholder="Attendees">
+          <input type="url" class="event-proof" value="${ev.eventProof || ""}" ${editable ? "" : "readonly"} placeholder="Proof Link">
+          <input type="text" class="event-sdg" value="${(ev.eventSDG || []).join(", ")}" ${editable ? "" : "readonly"} placeholder="SDGs (comma-separated)">
+          ${editable ? `<button type="button" class="remove-event">Remove</button>` : ""}
+        </div>
+      `;
+      eventList.appendChild(div);
+    });
+  } else {
+    eventList.innerHTML = "<p>No events recorded.</p>";
+  }
+
+  // Add New Event Button (only in edit mode)
+  if (editable) {
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.textContent = "+ Add Event";
+    addBtn.className = "add-event-btn";
+    addBtn.onclick = () => addNewEventField();
+    eventList.appendChild(addBtn);
+  }
+
+  // Show Save Button only in edit mode
+  modalEditBtn.style.display = editable ? "inline-block" : "none";
+}
+
+// Add new empty event
+function addNewEventField() {
+  const eventList = document.getElementById("modalEventList");
+  const idx = eventList.querySelectorAll(".event-item").length;
+  const div = document.createElement("div");
+  div.className = "event-item";
+  div.dataset.index = idx;
+  div.innerHTML = `
+    <div class="event-fields">
+      <input type="text" class="event-name" placeholder="Event Name">
+      <div class="event-row">
+        <input type="text" class="event-type" placeholder="Type">
+        <input type="date" class="event-date">
+      </div>
+      <div class="event-row">
+        <input type="text" class="event-time" placeholder="Start Time">
+        <input type="text" class="event-time" placeholder="End Time">
+      </div>
+      <input type="text" class="event-venue" placeholder="Venue">
+      <input type="number" class="event-attendees" placeholder="Attendees">
+      <input type="url" class="event-proof" placeholder="Proof Link">
+      <input type="text" class="event-sdg" placeholder="SDGs (comma-separated)">
+      <button type="button" class="remove-event">Remove</button>
+    </div>
+  `;
+  eventList.insertBefore(div, eventList.querySelector(".add-event-btn"));
+}
+
+// Collect all events from modal
+function collectEvents() {
+  const items = document.querySelectorAll("#modalEventList .event-item");
+  return Array.from(items).map(item => {
+    const inputs = item.querySelectorAll("input");
+    return {
+      eventName: inputs[0].value.trim(),
+      eventType: inputs[1].value.trim(),
+      eventDate: inputs[2].value,
+      startTime: inputs[3].value.trim(),
+      endTime: inputs[4].value.trim(),
+      eventVenue: inputs[5].value.trim(),
+      eventAttendees: inputs[6].value ? parseInt(inputs[6].value) : null,
+      eventProof: inputs[7].value.trim(),
+      eventSDG: inputs[8].value.split(",").map(s => s.trim()).filter(s => s)
+    };
+  }).filter(e => e.eventName); // Remove empty
+}
+
+// Save Changes (POST to server)
+modalEditBtn.addEventListener("click", async () => {
+  if (!currentEditingId) return;
+
+  const updatedEvents = collectEvents();
+  if (updatedEvents.length === 0) {
+    alert("Please add at least one event.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/Submission/${currentEditingId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ events: updatedEvents })
     });
 
-    // ---------------------------
-    // Search input
-    // ---------------------------
-    searchInput.addEventListener('input', () => {
-        const term = searchInput.value.trim().toLowerCase();
-        if (!term) return renderSubmissions(submissions);
-        renderSubmissions(submissions.filter(s =>
-            (s.organizationInfo?.org_name || '').toLowerCase().includes(term) ||
-            (s.applicantInfo?.applicant_name || '').toLowerCase().includes(term) ||
-            (s.events?.some(e => e.eventName.toLowerCase().includes(term)))
-        ));
-    });
+    if (!res.ok) throw new Error("Failed to save");
 
-    // ---------------------------
-    // Submission modal helpers
-    // ---------------------------
-    function openSubmissionModal(mode, item) {
-        const modal = document.getElementById('submissionModal');
-        const titleEl = document.getElementById('modalTitle');
-
-        const fields = {
-            fCompleteName: document.getElementById('modalCompleteName'),
-            fAcronym: document.getElementById('modalAcronym'),
-            fOfficialEmail: document.getElementById('modalOfficialEmail'),
-            fApplicantName: document.getElementById('modalApplicantName'),
-            fAdviserNames: document.getElementById('modalAdviserNames'),
-            fSchool: document.getElementById('modalSchool'),
-            fCategory: document.getElementById('modalCategory'),
-            fOrganizationType: document.getElementById('modalOrganizationType'),
-            fApplicantPosition: document.getElementById('modalApplicantPosition'),
-            fApplicantEmail: document.getElementById('modalApplicantEmail'),
-            fVideoLink: document.getElementById('modalVideoLink'),
-            fStatus: document.getElementById('modalStatus'),
-            fRemarks: document.getElementById('modalRemarks'),
-            fCreatedAt: document.getElementById('modalCreatedAt'),
-        };
-
-        fields.fCompleteName.value = item.organizationInfo?.org_name || '';
-        fields.fAcronym.value = item.organizationInfo?.org_acronym || '';
-        fields.fOfficialEmail.value = item.organizationInfo?.org_email || '';
-        fields.fApplicantName.value = item.applicantInfo?.applicant_name || '';
-        fields.fAdviserNames.value = (item.adviserInfo?.adviser_name || []).join(', ');
-        fields.fSchool.value = item.organizationInfo?.org_category || '';
-        fields.fCategory.value = item.organizationInfo?.org_type || '';
-        fields.fOrganizationType.value = item.organizationInfo?.org_type || '';
-        fields.fApplicantPosition.value = item.applicantInfo?.applicant_position || '';
-        fields.fApplicantEmail.value = item.applicantInfo?.applicant_email || '';
-        fields.fVideoLink.value = item.documentUploads?.video_link || '';
-        fields.fStatus.value = item.status || 'PENDING';
-        fields.fRemarks.value = item.remarks || '';
-        fields.fCreatedAt.value = shortDate(item.submittedAt) || '';
-
-        const saveBtn = document.getElementById('modalSave');
-        saveBtn.onclick = null;
-
-        if (mode === 'view') {
-            titleEl.textContent = 'View Submission';
-            Object.values(fields).forEach(f => f.setAttribute('disabled', 'true'));
-            saveBtn.style.display = 'none';
-        } else {
-            titleEl.textContent = 'Edit Submission';
-            Object.values(fields).forEach(f => f.removeAttribute('disabled'));
-            saveBtn.style.display = 'inline-block';
-            saveBtn.onclick = () => {
-                alert('Changes saved (mock)');
-                closeSubmissionModal();
-            };
-        }
-
-        modal.setAttribute('aria-hidden', 'false');
-        modal.classList.add('open');
-        document.getElementById('modalClose').onclick = closeSubmissionModal;
-        document.getElementById('modalCloseBtn').onclick = closeSubmissionModal;
-    }
-
-    function closeSubmissionModal() {
-        const modal = document.getElementById('submissionModal');
-        modal.setAttribute('aria-hidden','true');
-        modal.classList.remove('open');
-    }
-
-    function editSubmission(id) {
-        const data = submissions.find(s => s._id === id);
-        if (!data) return alert('Not found');
-        if ((data.status || '').toLowerCase() === 'accepted') return alert('Approved submissions cannot be edited.');
-        openSubmissionModal('edit', data);
-    }
-
-    function viewDetails(id) {
-        const data = submissions.find(s => s._id === id);
-        if (!data) return alert('Not found');
-        openSubmissionModal('view', data);
-    }
-
-    window.editSubmission = editSubmission;
-    window.viewDetails = viewDetails;
-
-    // Load data initially
-    loadSubmissions();
+    alert("Events updated successfully!");
+    modal.style.display = "none";
+    location.reload(); // Refresh to show updated data
+  } catch (err) {
+    alert("Error saving events: " + err.message);
+  }
 });
 
-// normalize any id-like value to a string for safe comparisons
-function normalizeId(id) {
-    if (id === null || id === undefined) return '';
-    // If it's an object like { $oid: "..." }
-    if (typeof id === 'object') {
-        if (id.$oid) return String(id.$oid);
-        // if driver returned ObjectId-like with toString
-        if (typeof id.toString === 'function') return id.toString();
-        return JSON.stringify(id);
-    }
-    return String(id);
-}
+// Remove event
+document.getElementById("modalEventList").addEventListener("click", (e) => {
+  if (e.target.classList.contains("remove-event")) {
+    e.target.closest(".event-item").remove();
+  }
+});
 
-
-// ---------------------------
-// Activity modal
-// ---------------------------
-function openActivityModal(mode, submissionId, activityId) {
-    const modal = document.getElementById('activityModal');
-    const titleEl = document.getElementById('activityModalTitle');
-
-    // DEBUG: show incoming values
-    console.log('openActivityModal called with:', { submissionId, activityId });
-
-    // Find submission by normalized ID
-    const submission = submissions.find(s => normalizeId(s._id) === normalizeId(submissionId));
-    if (!submission) {
-        console.warn('Submission not found for id:', submissionId);
-        return alert('Submission not found');
-    }
-
-    // Find activity: check either e.id or e._id (normalize both sides)
-    const activity = (submission.events || []).find(e => {
-        const evId = e.id ?? e._id ?? '';
-        return normalizeId(evId) === normalizeId(activityId);
+// Filtering
+function applyFilters() {
+  let f = [...allSubmissions];
+  const status = document.querySelector(".filter-btn.active")?.dataset.status?.toUpperCase();
+  if (status && status !== "ALL") f = f.filter(s => (s.status || "").toUpperCase() === status);
+  const term = searchInput.value.trim().toLowerCase();
+  if (term) f = f.filter(s => {
+    const org = (s.organizationInfo?.org_name || "").toLowerCase();
+    const evs = (s.events || []).map(e => (e.eventName || "").toLowerCase());
+    return org.includes(term) || evs.some(e => e.includes(term));
+  });
+  const t = timeFilter.value;
+  if (t !== "all") {
+    const now = new Date();
+    f = f.filter(s => {
+      const d = new Date(s.submittedAt);
+      return t === "week" ? d >= new Date(now - 7*24*60*60*1000) :
+             t === "month" ? d >= new Date(now.getFullYear(), now.getMonth()-1, now.getDate()) :
+             t === "year" ? d >= new Date(now.getFullYear()-1, now.getMonth(), now.getDate()) : true;
     });
-
-    if (!activity) {
-        console.warn('Activity not found. submission.events:', submission.events, 'searchedId:', activityId);
-        return alert('Activity not found');
-    }
-
-    const fields = {
-        name: document.getElementById('activityName'),
-        description: document.getElementById('activityDescription'),
-        type: document.getElementById('activityType'),
-        date: document.getElementById('activityDate'),
-        startTime: document.getElementById('activityStartTime'),
-        startPeriod: document.getElementById('activityStartPeriod'),
-        endTime: document.getElementById('activityEndTime'),
-        endPeriod: document.getElementById('activityEndPeriod'),
-        venue: document.getElementById('activityVenue'),
-        attendees: document.getElementById('activityAttendees'),
-        proof: document.getElementById('activityProof'),
-        sdg: document.getElementById('activitySDG'),
-    };
-
-    fields.name.value = activity.eventName || '';
-    fields.description.value = activity.description || '';
-    fields.type.value = activity.eventType || '';
-    // If your eventDate is stored as a string e.g. "2025-11-15", assign it; if it's Date object, convert to yyyy-mm-dd
-    fields.date.value = activity.eventDate ? (new Date(activity.eventDate)).toISOString().slice(0,10) : '';
-
-    // start / end time split (support both "1:00 PM" string or already-split)
-    if (activity.startTime) {
-        const parts = String(activity.startTime).split(' ');
-        fields.startTime.value = parts[0] || '';
-        fields.startPeriod.value = parts[1] || 'AM';
-    } else {
-        fields.startTime.value = '';
-        fields.startPeriod.value = 'AM';
-    }
-
-    if (activity.endTime) {
-        const parts = String(activity.endTime).split(' ');
-        fields.endTime.value = parts[0] || '';
-        fields.endPeriod.value = parts[1] || 'PM';
-    } else {
-        fields.endTime.value = '';
-        fields.endPeriod.value = 'AM';
-    }
-
-    fields.venue.value = activity.eventVenue || '';
-
-    // attendees: handle nested $numberInt object or plain number/string
-    if (activity.eventAttendees) {
-        if (typeof activity.eventAttendees === 'object' && activity.eventAttendees.$numberInt) {
-            fields.attendees.value = activity.eventAttendees.$numberInt;
-        } else {
-            fields.attendees.value = activity.eventAttendees;
-        }
-    } else fields.attendees.value = '';
-
-    fields.proof.value = activity.eventProof || '';
-
-    // SDGs: join array into comma-separated string
-    if (Array.isArray(activity.eventSDG)) fields.sdg.value = activity.eventSDG.join(', ');
-    else fields.sdg.value = activity.eventSDG || '';
-
-    const saveBtn = document.getElementById('activitySave');
-    saveBtn.onclick = null;
-
-    if (mode === 'view') {
-        titleEl.textContent = 'View Activity';
-        Object.values(fields).forEach(f => f.setAttribute('disabled', 'true'));
-        saveBtn.style.display = 'none';
-    } else {
-        titleEl.textContent = 'Edit Activity';
-        Object.values(fields).forEach(f => f.removeAttribute('disabled'));
-        saveBtn.style.display = 'inline-block';
-        saveBtn.onclick = () => {
-            // basic mock update in memory
-            activity.eventName = fields.name.value;
-            activity.description = fields.description.value;
-            activity.eventType = fields.type.value;
-            activity.eventDate = fields.date.value;
-            activity.startTime = fields.startTime.value + ' ' + fields.startPeriod.value;
-            activity.endTime = fields.endTime.value + ' ' + fields.endPeriod.value;
-            activity.eventVenue = fields.venue.value;
-            activity.eventAttendees = Number(fields.attendees.value) || fields.attendees.value;
-            activity.eventProof = fields.proof.value;
-            // note: eventSDG editing not implemented here
-            alert('Activity updated (mock) — in-memory only');
-            closeActivityModal();
-        };
-    }
-
-    modal.setAttribute('aria-hidden', 'false');
-    modal.classList.add('open');
-    document.getElementById('activityClose').onclick = closeActivityModal;
-    document.getElementById('activityCloseBtn').onclick = closeActivityModal;
+  }
+  renderCards(f);
 }
 
+// Event Listeners
+filterBtns.forEach(b => b.addEventListener("click", () => { filterBtns.forEach(x => x.classList.remove("active")); b.classList.add("active"); applyFilters(); }));
+searchInput.addEventListener("input", applyFilters);
+timeFilter.addEventListener("change", applyFilters);
 
-function closeActivityModal() {
-    const modal = document.getElementById('activityModal');
-    modal.setAttribute('aria-hidden', 'true');
-    modal.classList.remove('open');
-}
+submissionList.addEventListener("click", e => {
+  const id = e.target.dataset.id;
+  if (!id) return;
+  const sub = allSubmissions.find(s => s._id === id);
+  if (!sub) return;
+  if (e.target.classList.contains("view-btn")) {
+    fillModal(sub, false);
+    modal.style.display = "flex";
+  } else if (e.target.classList.contains("edit-btn") && sub.status === "PENDING") {
+    fillModal(sub, true);
+    modal.style.display = "flex";
+  }
+});
 
-// Expose globally for onclick
-window.viewActivity = function(submissionId, activityId) {
-    openActivityModal('view', submissionId, activityId);
-};
+[modalClose, modalCloseBtn].forEach(el => el.addEventListener("click", () => modal.style.display = "none"));
+window.addEventListener("click", e => { if (e.target === modal) modal.style.display = "none"; });
+
+// Load Data
+(async () => {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    allSubmissions = await res.json();
+    renderCards(allSubmissions);
+  } catch (err) {
+    submissionList.innerHTML = `<p class="error">Failed to load. Is server running?</p>`;
+  }
+})();
