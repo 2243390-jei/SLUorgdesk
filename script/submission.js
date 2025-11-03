@@ -1,270 +1,297 @@
-// ===========================
-// 📄 PRINT REQUEST FORM LOGIC (DRAG & DROP)
-// ===========================
-document.addEventListener("DOMContentLoaded", () => {
+/* submission.js – COMPLETE & FINAL */
+
+document.addEventListener("DOMContentLoaded", function () {
+  /* -----------------------------------------------------------------
+   *  1. FILE DROP ZONES (inline + modal) – REMOVABLE FILES, NO ACCIDENTAL PICKER
+   * ----------------------------------------------------------------- */
   const dropZones = document.querySelectorAll(".drop-zone");
+  const fileInputs = document.querySelectorAll(".drop-zone-input");
 
-  dropZones.forEach((dropZone) => {
-    const fileInput = dropZone.querySelector("input[type='file']");
+  dropZones.forEach((dropZone, idx) => {
+    const input = fileInputs[idx];
+    const files = [];
 
-    dropZone.addEventListener("click", () => fileInput.click());
+    // ---- preview container -------------------------------------------------
+    const preview = document.createElement("div");
+    preview.className = "file-preview-container";
+    dropZone.appendChild(preview);
 
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files.length) updateDropZone(dropZone, fileInput.files[0]);
-    });
+    // ---- browse button ----------------------------------------------------
+    const browseBtn = document.createElement("button");
+    browseBtn.type = "button";
+    browseBtn.textContent = "Browse File";
+    browseBtn.className = "browse-btn";
+    browseBtn.onclick = () => input.click();
+    dropZone.appendChild(browseBtn);
 
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("drop-zone--active");
-      dropZone.style.borderColor = "#3d2ee7";
-      dropZone.style.backgroundColor = "#f0f0ff";
-    });
-
-    ["dragleave", "dragend"].forEach((type) =>
-      dropZone.addEventListener(type, () => {
-        dropZone.classList.remove("drop-zone--active");
-        dropZone.style.borderColor = "#a8a8ff";
-        dropZone.style.backgroundColor = "#f9f9ff";
-      })
-    );
-
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        updateDropZone(dropZone, e.dataTransfer.files[0]);
+    // ---- render -----------------------------------------------------------
+    const render = () => {
+      preview.innerHTML = "";
+      if (!files.length) {
+        preview.innerHTML = '<p style="margin:0;color:#888;">No files selected.</p>';
+        return;
       }
-      dropZone.classList.remove("drop-zone--active");
+      files.forEach((f, i) => {
+        const item = document.createElement("div");
+        item.className = "file-preview-item";
+
+        const name = document.createElement("span");
+        name.textContent = f.name.length > 20 ? f.name.slice(0,17)+"..." : f.name;
+        name.title = f.name;
+
+        const rm = document.createElement("span");
+        rm.textContent = "×";
+        rm.className = "remove-file";
+        rm.onclick = e => {
+          e.stopPropagation();
+          files.splice(i, 1);
+          render();
+          sync();
+        };
+
+        item.append(name, rm);
+        preview.appendChild(item);
+      });
+    };
+
+    // ---- sync with <input> ------------------------------------------------
+    const sync = () => {
+      const dt = new DataTransfer();
+      files.forEach(f => dt.items.add(f));
+      input.files = dt.files;
+    };
+
+    // ---- drag-and-drop ----------------------------------------------------
+    const prevent = e => { e.preventDefault(); e.stopPropagation(); };
+    ["dragenter","dragover","dragleave","drop"].forEach(ev => dropZone.addEventListener(ev, prevent));
+
+    ["dragenter","dragover"].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.add("dragover")));
+    ["dragleave","drop"].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.remove("dragover")));
+
+    dropZone.addEventListener("drop", e => {
+      const newFiles = Array.from(e.dataTransfer.files).filter(f =>
+        /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
+      );
+      files.push(...newFiles);
+      render(); sync();
     });
+
+    // ---- file input change ------------------------------------------------
+    input.addEventListener("change", () => {
+      const newFiles = Array.from(input.files).filter(f =>
+        /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
+      );
+      files.push(...newFiles);
+      render(); sync();
+    });
+
+    render(); // initial empty state
   });
 
-  function updateDropZone(dropZone, file) {
-    dropZone.innerHTML = `
-      <div class="file-details">
-        <p><strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</p>
-      </div>
-    `;
-  }
-});
+  /* -----------------------------------------------------------------
+   *  2. MODAL CONTROLS
+   * ----------------------------------------------------------------- */
+  const modal       = document.getElementById("eventModal");
+  const openBtn     = document.getElementById("openEventModalBtn");
+  const closeBtn    = document.getElementById("closeEventModal");
+  const cancelBtn   = document.getElementById("modalCancelBtn");
+  const saveBtn     = document.getElementById("modalSaveEventBtn");
+  const previewList = document.getElementById("eventListPreview");
 
+  let editingIndex = null;
 
-// ===========================
-// 🎓 ACADEMIC YEAR SELECTOR (AUTO-GENERATE FROM CALENDAR YEAR)
-// ===========================
-document.addEventListener("DOMContentLoaded", () => {
-  const startYearInput = document.getElementById("startYear");
-  const academicYearSelect = document.getElementById("academicYear");
-  const semesterSelect = document.getElementById("semester");
-
-  // Populate semester options
-  ["1st Semester", "2nd Semester"].forEach((sem) => {
-    const option = document.createElement("option");
-    option.value = sem;
-    option.textContent = sem;
-    semesterSelect.appendChild(option);
-  });
-
-  // Generate 5 consecutive academic years from selected date
-  startYearInput.addEventListener("change", () => {
-    const dateValue = startYearInput.value;
-    if (!dateValue) return;
-
-    const startYear = new Date(dateValue).getFullYear();
-
-    academicYearSelect.innerHTML = '<option value="" disabled selected>Select Academic Year</option>';
-
-    for (let i = 0; i < 5; i++) {
-      const year1 = startYear + i;
-      const year2 = year1 + 1;
-      const option = document.createElement("option");
-      option.value = `${year1}-${year2}`;
-      option.textContent = `${year1}–${year2}`;
-      academicYearSelect.appendChild(option);
-    }
-  });
-});
-
-
-// ===========================
-// 📅 EVENT MANAGEMENT SYSTEM
-// ===========================
-document.addEventListener("DOMContentLoaded", () => {
-  const eventModal = document.getElementById("eventModal");
-  const openEventModalBtn = document.getElementById("openEventModalBtn");
-  const closeEventBtns = document.querySelectorAll("#closeEventModal, #closeEventModalBtn, .event-modal-close");
-  const saveEventBtn = document.getElementById("saveEventBtn");
-  const eventList = document.getElementById("eventList");
-
-  const inputs = {
-    name: document.getElementById("eventName"),
-    type: document.getElementById("eventType"),
-    date: document.getElementById("eventDate"),
-    startTime: document.getElementById("startTime"),
-    startPeriod: document.getElementById("startPeriod"),
-    endTime: document.getElementById("endTime"),
-    endPeriod: document.getElementById("endPeriod"),
-    venue: document.getElementById("eventVenue"),
-    attendees: document.getElementById("eventAttendees"),
-    proof: document.getElementById("eventProof"),
-    sdgs: document.querySelectorAll(".event-sdg-options input[type='checkbox']")
+  openBtn.onclick = () => {
+    editingIndex = null;
+    modal.style.display = "flex";
+    clearModalFields();
   };
 
-  let editIndex = null;
-  let events = JSON.parse(localStorage.getItem("eventsData")) || [];
+  const closeModal = () => { modal.style.display = "none"; };
+  closeBtn.onclick = closeModal;
+  cancelBtn.onclick = closeModal;
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 
-  renderEvents();
+  /* -----------------------------------------------------------------
+   *  3. HELPERS
+   * ----------------------------------------------------------------- */
+  const getSDGs = () => {
+    const boxes = document.querySelectorAll('#eventModal input[type="checkbox"]:checked');
+    return Array.from(boxes).map(b => b.value);
+  };
 
-  openEventModalBtn.addEventListener("click", () => {
-    clearForm();
-    editIndex = null;
-    eventModal.style.display = "flex";
-  });
+  const formatTime = (timeInput, periodSelect) => {
+    const t = timeInput.value.trim();
+    const p = periodSelect.value;
+    return t ? `${t} ${p}` : "";
+  };
 
-  closeEventBtns.forEach((btn) =>
-    btn.addEventListener("click", () => (eventModal.style.display = "none"))
-  );
+  const clearModalFields = () => {
+    ["modalEventName","modalEventType","modalEventVenue","modalEventAttendees",
+     "modalEventProof","modalEventDesc"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("modalEventDate").value = "";
+    document.getElementById("modalStartTime").value = "";
+    document.getElementById("modalEndTime").value = "";
+    document.querySelectorAll('#eventModal input[type="checkbox"]').forEach(c => c.checked = false);
+    const modalInput = document.getElementById("modalFileInput");
+    modalInput.value = "";
+    const modalPrev = modalInput.closest(".drop-zone").querySelector(".file-preview-container");
+    if (modalPrev) modalPrev.innerHTML = "<p>No files selected.</p>";
+  };
 
-  saveEventBtn.addEventListener("click", () => {
-    const selectedSDGs = Array.from(inputs.sdgs)
-      .filter((cb) => cb.checked)
-      .map((cb) => cb.value);
+  /* -----------------------------------------------------------------
+   *  4. SAVE / UPDATE EVENT
+   * ----------------------------------------------------------------- */
+  saveBtn.onclick = () => {
+    const name      = document.getElementById("modalEventName").value.trim();
+    const type      = document.getElementById("modalEventType").value.trim();
+    const date      = document.getElementById("modalEventDate").value;
+    const start     = formatTime(document.getElementById("modalStartTime"), document.getElementById("modalStartPeriod"));
+    const end       = formatTime(document.getElementById("modalEndTime"),   document.getElementById("modalEndPeriod"));
+    const venue     = document.getElementById("modalEventVenue").value.trim();
+    const attendees = document.getElementById("modalEventAttendees").value;
+    const proof     = document.getElementById("modalEventProof").value.trim();
+    const sdgs      = getSDGs();
+    const desc      = document.getElementById("modalEventDesc").value.trim();
 
-    const eventData = {
-      name: inputs.name.value.trim(),
-      type: inputs.type.value.trim(),
-      date: inputs.date.value,
-      startTime: `${inputs.startTime.value} ${inputs.startPeriod.value}`,
-      endTime: `${inputs.endTime.value} ${inputs.endPeriod.value}`,
-      venue: inputs.venue.value.trim(),
-      attendees: inputs.attendees.value,
-      proof: inputs.proof.value.trim(),
-      sdgs: selectedSDGs
-    };
-
-    if (!eventData.name || !eventData.type || !eventData.date) {
-      alert("Please fill in the required fields.");
+    if (!name || !date || !start || !end) {
+      alert("Event Name, Date, Start Time and End Time are required.");
       return;
     }
 
-    if (editIndex !== null) {
-      events[editIndex] = eventData;
+    const eventData = { name, type, date, start, end, venue, attendees, proof, sdgs, desc };
+
+    let hiddenContainer = editingIndex !== null
+      ? document.querySelectorAll(".event-hidden-container")[editingIndex]
+      : document.createElement("div");
+
+    hiddenContainer.className = "event-hidden-container";
+    hiddenContainer.style.display = "none";
+    hiddenContainer.innerHTML = "";
+
+    const addHidden = (n, v) => {
+      const inp = document.createElement("input");
+      inp.type = "hidden";
+      inp.name = n;
+      inp.value = v;
+      hiddenContainer.appendChild(inp);
+    };
+
+    addHidden("events[][name]", name);
+    addHidden("events[][type]", type);
+    addHidden("events[][date]", date);
+    addHidden("events[][start]", start);
+    addHidden("events[][end]", end);
+    addHidden("events[][venue]", venue);
+    addHidden("events[][attendees]", attendees);
+    addHidden("events[][proof]", proof);
+    addHidden("events[][desc]", desc);
+    sdgs.forEach(s => addHidden("events[][sdgs][]", s));
+
+    const modalFileInput = document.getElementById("modalFileInput");
+    if (modalFileInput.files.length) {
+      const clone = modalFileInput.cloneNode(true);
+      clone.name = "events[][files][]";
+      hiddenContainer.appendChild(clone);
+    }
+
+    if (editingIndex === null) {
+      document.getElementById("submissionForm").appendChild(hiddenContainer);
+    }
+
+    const card = document.createElement("div");
+    card.className = "event-preview-entry";
+    card.style.cssText = `
+      cursor:pointer; border:1px solid #ddd; border-radius:8px; padding:12px; margin-bottom:10px;
+      background:#fafafa; font-size:0.95rem; position:relative;
+    `;
+
+    const title = `<strong>${name}</strong> (${type || "—"})`;
+    const when  = `${date} • ${start} – ${end}`;
+    const where = venue ? `Venue: ${venue}` : "";
+    const nums  = attendees ? `Attendees: ${attendees}` : "";
+    const sdg   = sdgs.length ? `SDGs: ${sdgs.join(", ")}` : "";
+    const note  = desc ? `<em>${desc}</em>` : "";
+
+    card.innerHTML = `
+      ${title}<br>${when}<br>${where}${nums ? " • " + nums : ""}<br>${sdg}<br>${note}
+      <span class="event-delete" style="position:absolute;top:8px;right:8px;color:#d32f2f;font-weight:bold;cursor:pointer;">×</span>
+    `;
+
+    card.addEventListener("click", e => {
+      if (e.target.classList.contains("event-delete")) return;
+      editEvent(card, hiddenContainer, eventData);
+    });
+
+    card.querySelector(".event-delete").addEventListener("click", e => {
+      e.stopPropagation();
+      if (confirm("Delete this event?")) {
+        previewList.removeChild(card);
+        hiddenContainer.remove();
+        if (!previewList.children.length) previewList.innerHTML = "<p><em>No events added yet.</em></p>";
+      }
+    });
+
+    if (editingIndex !== null) {
+      const oldCard = previewList.children[editingIndex];
+      previewList.replaceChild(card, oldCard);
     } else {
-      events.push(eventData);
+      if (previewList.querySelector("p")) previewList.innerHTML = "";
+      previewList.appendChild(card);
     }
 
-    saveToLocalStorage();
-    renderEvents();
-    eventModal.style.display = "none";
-    clearForm();
-  });
+    closeModal();
+    clearModalFields();
+  };
 
-  function renderEvents() {
-    eventList.innerHTML = "";
-    events.forEach((ev, i) => {
-      const card = document.createElement("div");
-      card.classList.add("event-card");
+  /* -----------------------------------------------------------------
+   *  5. EDIT EVENT
+   * ----------------------------------------------------------------- */
+  function editEvent(cardElement, hiddenContainer, data) {
+    editingIndex = Array.from(previewList.children).indexOf(cardElement);
 
-      card.innerHTML = `
-        <div class="event-info">
-          <strong>${ev.name}</strong><br>
-          ${ev.type} — ${ev.date}<br>
-          ${ev.startTime} to ${ev.endTime}<br>
-          Venue: ${ev.venue}<br>
-          SDGs: ${ev.sdgs.join(", ") || "None"}
-        </div>
-        <button class="removeEventBtn">Remove</button>
-      `;
+    document.getElementById("modalEventName").value      = data.name;
+    document.getElementById("modalEventType").value      = data.type;
+    document.getElementById("modalEventDate").value      = data.date;
+    document.getElementById("modalEventVenue").value     = data.venue;
+    document.getElementById("modalEventAttendees").value = data.attendees;
+    document.getElementById("modalEventProof").value     = data.proof;
+    document.getElementById("modalEventDesc").value      = data.desc;
 
-      card.querySelector(".removeEventBtn").addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (confirm(`Delete event "${ev.name}"?`)) {
-          events.splice(i, 1);
-          saveToLocalStorage();
-          renderEvents();
-        }
-      });
+    const [startTime, startPeriod] = data.start.split(" ");
+    const [endTime,   endPeriod]   = data.end.split(" ");
+    document.getElementById("modalStartTime").value = startTime || "";
+    document.getElementById("modalStartPeriod").value = startPeriod || "AM";
+    document.getElementById("modalEndTime").value = endTime || "";
+    document.getElementById("modalEndPeriod").value = endPeriod || "AM";
 
-      card.addEventListener("click", () => {
-        const evData = events[i];
-        inputs.name.value = evData.name;
-        inputs.type.value = evData.type;
-        inputs.date.value = evData.date;
-
-        const [st, sp] = evData.startTime.split(" ");
-        const [et, ep] = evData.endTime.split(" ");
-        inputs.startTime.value = st || "";
-        inputs.startPeriod.value = sp || "AM";
-        inputs.endTime.value = et || "";
-        inputs.endPeriod.value = ep || "AM";
-
-        inputs.venue.value = evData.venue;
-        inputs.attendees.value = evData.attendees;
-        inputs.proof.value = evData.proof;
-        inputs.sdgs.forEach((cb) => (cb.checked = evData.sdgs.includes(cb.value)));
-
-        editIndex = i;
-        eventModal.style.display = "flex";
-      });
-
-      eventList.appendChild(card);
+    document.querySelectorAll('#eventModal input[type="checkbox"]').forEach(c => c.checked = false);
+    data.sdgs.forEach(s => {
+      const cb = document.querySelector(`#eventModal input[value="${s}"]`);
+      if (cb) cb.checked = true;
     });
+
+    const modalInput = document.getElementById("modalFileInput");
+    modalInput.value = "";
+    const modalPrev = modalInput.closest(".drop-zone").querySelector(".file-preview-container");
+    if (modalPrev) modalPrev.innerHTML = "<p>No files selected.</p>";
+
+    modal.style.display = "flex";
   }
 
-  function clearForm() {
-    Object.values(inputs).forEach((input) => {
-      if (input instanceof NodeList) input.forEach((cb) => (cb.checked = false));
-      else input.value = "";
-    });
-  }
-
-  function saveToLocalStorage() {
-    localStorage.setItem("eventsData", JSON.stringify(events));
-  }
-});
-
-document.querySelectorAll(".event-sdg-options label").forEach((label, index) => {
-  label.setAttribute("data-number", index + 1);
-});
-
-
-// ===========================
-// 🚫 DUPLICATE SUBMISSION VALIDATION
-// ===========================
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("submissionForm");
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const email = form.querySelector("input[name='org_email']").value.trim();
-    const academicYear = document.getElementById("academicYear").value;
-    const semester = document.getElementById("semester").value;
-
-    if (!email || !academicYear || !semester) {
-      alert("Please fill in all required fields, including Academic Year and Semester.");
-      return;
-    }
-
-    const submissionKey = `${email}_${academicYear}_${semester}`;
-    const existingSubmissions = JSON.parse(localStorage.getItem("orgSubmissions")) || {};
-
-    if (existingSubmissions[submissionKey]) {
-      alert(
-        `You have already submitted a form for Academic Year ${academicYear}, ${semester}.\nPlease go to your History page to edit your previous submission instead.`
-      );
-      return;
-    }
-
-    existingSubmissions[submissionKey] = {
-      email,
-      academicYear,
-      semester,
-      timestamp: new Date().toISOString()
+  /* -----------------------------------------------------------------
+   *  6. INLINE CLEAR BUTTON
+   * ----------------------------------------------------------------- */
+  const clearInlineBtn = document.getElementById("clearEventBtn");
+  if (clearInlineBtn) {
+    clearInlineBtn.onclick = () => {
+      const container = document.getElementById("inlineEventForm");
+      container.querySelectorAll("input[type=text], input[type=date], input[type=number], input[type=url], textarea")
+              .forEach(el => el.value = "");
+      container.querySelectorAll("input[type=checkbox]").forEach(c => c.checked = false);
+      const inlineInput = container.querySelector(".drop-zone-input");
+      inlineInput.value = "";
+      const inlinePrev = inlineInput.closest(".drop-zone").querySelector(".file-preview-container");
+      if (inlinePrev) inlinePrev.innerHTML = "<p>No files selected.</p>";
     };
-
-    localStorage.setItem("orgSubmissions", JSON.stringify(existingSubmissions));
-    alert("✅ Submission successful!");
-    form.reset();
-    document.getElementById("academicYear").innerHTML = '<option value="" disabled selected>Select Academic Year</option>';
-  });
+  }
 });

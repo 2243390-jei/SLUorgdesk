@@ -81,5 +81,23 @@ export const Organization =
   mongoose.models.Organization ||
   mongoose.model("Organization", organizationSchema, "Organizations");
 
+// User Schema
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, required: true },
+  studentId: String,
+  school: String,
+  course: String,
+  yearLevel: Number,
+  isActive: { type: Boolean, default: true },
+  organizations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' }],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+export const User = mongoose.models.User || mongoose.model("User", userSchema, "User");
+
 connectDB();
 export default mongoose;

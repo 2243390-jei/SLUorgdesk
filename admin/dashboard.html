@@ -17,14 +17,21 @@
 <body>
   <div class="app"> 
     <!-- Left circular sidebar -->
-      <aside class="leftbar" aria-label="Main navigation">
+      <aside class="leftbar">
         <div class="brand">
-          <div class="logo">AD</div>
+            <div class="logo">AD</div>
         </div>
 
-        <nav class="left-nav" role="navigation" aria-label="Sidebar">
-          <a href="../admin/dashboard.html"><button class="circle-btn active" title="Home (Analytics)" aria-label="Home (Analytics)"><img src="/Images/statistics.png" alt="Home (Analytics)" class="nav-icon"></button></a>          
-          <a href="../admin/orgmanagement.html"><button class="circle-btn" title="Organization Management" aria-label="Organization Management"><img src="/Images/user_management.png" alt="Organization Management" class="nav-icon"></button></a>    
+        <nav class="left-nav">
+          <a href="../admin/dashboard.html" class="circle-btn">
+              <i class="fas fa-chart-pie"></i>
+          </a>
+          <a href="../admin/orgmanagement.html" class="circle-btn active">
+              <i class="fas fa-sitemap"></i>
+          </a>
+          <a href="../admin/usermanagement.html" class="circle-btn">
+              <i class="fas fa-users"></i>
+          </a>
         </nav>
       </aside>
 
