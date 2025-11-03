@@ -7,7 +7,7 @@ let organizationsData = [];
 
 async function loadOrganizations() {
   try {
-    const response = await fetch("../dataFetch/fetchOrganizations.php");
+    const response = await fetch("../dataFetch/fetchDatabase.php");
     const organizations = await response.json();
     organizationsData = organizations; // save for filtering
 
