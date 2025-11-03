@@ -19,11 +19,11 @@ const detailClose = document.getElementById('detailClose');
 document.getElementById('curYear').textContent = new Date().getFullYear();
 
 // Use current system date - no hardcoded dates
-let viewDate = new Date(); // Months are 0-based (0 = January, 10 = November)
+let viewDate = new Date();
 const today = new Date();
 
-// Base URL (adjust port if needed)
-const API_BASE_URL = "http://localhost:3000/api";
+// Organization to school mapping
+let orgToSchoolMap = {};
 
 // Make events list scrollable
 function makeEventsListScrollable() {
@@ -35,10 +35,34 @@ function makeEventsListScrollable() {
 }
 
 // ---------------- MongoDB Integration ----------------
+async function fetchOrganizationsFromMongoDB() {
+  try {
+    console.log("Fetching organizations from MongoDB...");
+    const response = await fetch(`../dataFetch/fetchDatabase.php`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const organizations = await response.json();
+    console.log(`Successfully fetched ${organizations.length} organizations from MongoDB`);
+
+    // Create organization to school mapping
+    organizations.forEach(org => {
+      orgToSchoolMap[org._id] = org.school;
+    });
+
+    return orgToSchoolMap;
+  } catch (error) {
+    console.error("Error fetching organizations from MongoDB:", error);
+    return {};
+  }
+}
+
 async function fetchSubmissionsFromMongoDB() {
   try {
     console.log("Fetching submissions from MongoDB...");
-    const response = await fetch(`${API_BASE_URL}/Submissions`);
+    const response = await fetch(`../dataFetch/fetchSubmissions.php`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -52,58 +76,37 @@ async function fetchSubmissionsFromMongoDB() {
       return [];
     }
 
-    // Transform submissions to events - handle multiple events per submission
+    // Transform submissions to events
     const transformedEvents = [];
     
     submissions.forEach((submission) => {
-      // Process each event in the submission
-      if (submission.events && submission.events.length > 0) {
-        submission.events.forEach((event, index) => {
-          let eventDate = new Date(event.eventDate || submission.submittedAt || Date.now());
-          if (isNaN(eventDate)) eventDate = new Date();
+      // Process the event from submission (single event object)
+      if (submission.event) {
+        let eventDate = new Date(submission.event.eventDate || submission.submittedAt || Date.now());
+        if (isNaN(eventDate)) eventDate = new Date();
 
-          const eventDateISO = toISO(eventDate);
-
-          transformedEvents.push({
-            id: `${submission._id?.$oid || submission._id}-${index}`,
-            title: `${submission.organizationInfo.org_acronym} - ${event.eventName}`,
-            date: eventDateISO,
-            start: event.startTime || "09:00",
-            end: event.endTime || "10:00",
-            category: getCategoryFromOrgType(submission.organizationInfo.org_type),
-            description: `${submission.organizationInfo.org_name} - ${event.eventName}`,
-            submissionData: submission,
-            eventData: event,
-            status: submission.status || "Unknown",
-            school: submission.organizationInfo.org_category || "Unknown School",
-            organizationType: submission.organizationInfo.org_type || "Unknown Type",
-            acronym: submission.organizationInfo.org_acronym || "No Acronym",
-            completeName: submission.organizationInfo.org_name || "Unknown Name",
-            SDGCategory: event.eventSDG ? event.eventSDG.join(', ') : "Not specified"
-          });
-        });
-      } else {
-        // If no events array, use submission date as a single event
-        let submissionDate = new Date(submission.submittedAt || Date.now());
-        if (isNaN(submissionDate)) submissionDate = new Date();
-
-        const submissionDateISO = toISO(submissionDate);
+        const eventDateISO = toISO(eventDate);
+        
+        // Get school from organization mapping
+        const orgId = submission.orgInfo?.orgId;
+        const school = orgToSchoolMap[orgId] || 'Unknown School';
 
         transformedEvents.push({
-          id: submission._id?.$oid || submission._id || `temp-${Math.random()}`,
-          title: `${submission.organizationInfo.org_acronym} - Submission`,
-          date: submissionDateISO,
-          start: "09:00",
-          end: "10:00",
-          category: getCategoryFromOrgType(submission.organizationInfo.org_type),
-          description: `${submission.organizationInfo.org_name} - Form Submission`,
+          id: submission._id?.$oid || submission._id,
+          title: `${submission.orgInfo?.acronym || 'ORG'} - ${submission.event.eventName}`,
+          date: eventDateISO,
+          start: submission.event.startTime || "09:00",
+          end: submission.event.endTime || "10:00",
+          category: getCategoryFromOrgType(submission.orgInfo?.acronym),
+          description: `${submission.orgInfo?.name || 'Unknown Organization'} - ${submission.event.eventName}`,
           submissionData: submission,
+          eventData: submission.event,
           status: submission.status || "Unknown",
-          school: submission.organizationInfo.org_category || "Unknown School",
-          organizationType: submission.organizationInfo.org_type || "Unknown Type",
-          acronym: submission.organizationInfo.org_acronym || "No Acronym",
-          completeName: submission.organizationInfo.org_name || "Unknown Name",
-          SDGCategory: "Form Submission"
+          school: school,
+          organizationType: submission.orgInfo?.acronym || "Unknown Type",
+          acronym: submission.orgInfo?.acronym || "No Acronym",
+          completeName: submission.orgInfo?.name || "Unknown Name",
+          SDGCategory: submission.event.eventSDG ? submission.event.eventSDG.join(', ') : "Not specified"
         });
       }
     });
@@ -118,12 +121,11 @@ async function fetchSubmissionsFromMongoDB() {
 // Helper function to categorize organizations
 function getCategoryFromOrgType(orgType) {
   const categories = {
-    'Co-Curricular': 'Academic',
-    'Extra-Curricular': 'Activities',
-    'Academic': 'Academic',
-    'Cultural': 'Cultural',
-    'Sports': 'Sports',
-    'Religious': 'Religious'
+    'ICON': 'Academic',
+    'SCO': 'Academic',
+    'JMA': 'Activities',
+    'CSS': 'Academic',
+    'ACT': 'Activities'
   };
   return categories[orgType] || 'General';
 }
@@ -243,7 +245,7 @@ function makeDayCell(dateObj, inactive=false){
         const containerRect = eventsListEl.getBoundingClientRect();
         
         if (cardRect.top < containerRect.top || cardRect.bottom > containerRect.bottom) {
-          card.scrollIntoView(false); // No animation
+          card.scrollIntoView(false);
         }
         
         // Also highlight the card
@@ -324,7 +326,7 @@ async function renderPastEvents(filterText = '') {
         ${sdgDisplay}
       </div>
       <div class="event-desc">${event.completeName}</div>
-      <div class="event-extra">Applicant: ${event.submissionData.applicantInfo.applicant_name}</div>
+      <div class="event-extra">Applicant: ${event.submissionData.applicationInfo?.applicantName || 'N/A'}</div>
     `;
 
     card.appendChild(head);
@@ -352,7 +354,7 @@ async function renderPastEvents(filterText = '') {
         const calendarRect = calendarGrid.getBoundingClientRect();
         
         if (dayRect.top < calendarRect.top || dayRect.bottom > calendarRect.bottom) {
-          dayEl.scrollIntoView(false); // No animation
+          dayEl.scrollIntoView(false);
         }
       }
     });
@@ -433,14 +435,14 @@ function openDetailPanel(event) {
   const eventData = event.eventData;
   
   detailTitle.textContent = event.title;
-  detailMeta.textContent = `${event.date} • ${submission.organizationInfo.org_category} • ${submission.organizationInfo.org_type}`;
+  detailMeta.textContent = `${event.date} • ${event.school} • ${event.organizationType}`;
   
   // Improved design for detail panel with event and submission details
   detailBody.innerHTML = `
     <div class="detail-section">
       <div class="detail-header">
-        <h3 class="detail-org-name">${submission.organizationInfo.org_name}</h3>
-        <p class="detail-email">${submission.organizationInfo.org_email}</p>
+        <h3 class="detail-org-name">${submission.orgInfo?.name || 'Unknown Organization'}</h3>
+        <p class="detail-email">${submission.orgInfo?.email || 'N/A'}</p>
       </div>
     </div>
 
@@ -465,8 +467,12 @@ function openDetailPanel(event) {
           <span class="detail-value">${eventData.eventVenue}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Attendees:</span>
-          <span class="detail-value">${eventData.eventAttendees || 'N/A'}</span>
+          <span class="detail-label">Attendance:</span>
+          <span class="detail-value">${eventData.attendance || 'N/A'}</span>
+        </div>
+        <div class="detail-item full-width">
+          <span class="detail-label">Description:</span>
+          <span class="detail-value">${eventData.eventDescription || 'No description available'}</span>
         </div>
       </div>
     </div>
@@ -476,16 +482,16 @@ function openDetailPanel(event) {
       <h4 class="detail-section-title">Organization Details</h4>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="detail-label">Category:</span>
-          <span class="detail-value">${submission.organizationInfo.org_category}</span>
+          <span class="detail-label">School:</span>
+          <span class="detail-value">${event.school}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Type:</span>
-          <span class="detail-value">${submission.organizationInfo.org_type}</span>
+          <span class="detail-label">Acronym:</span>
+          <span class="detail-value">${submission.orgInfo?.acronym || 'N/A'}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">CBL Status:</span>
-          <span class="detail-value status-${(submission.documentUploads?.cbl_status || '').toLowerCase().replace(' ', '-')}">${submission.documentUploads?.cbl_status || 'N/A'}</span>
+          <span class="detail-label">Organization:</span>
+          <span class="detail-value">${submission.orgInfo?.name || 'N/A'}</span>
         </div>
       </div>
     </div>
@@ -504,87 +510,46 @@ function openDetailPanel(event) {
       <div class="detail-grid">
         <div class="detail-item">
           <span class="detail-label">Applicant:</span>
-          <span class="detail-value">${submission.applicantInfo.applicant_name} (${submission.applicantInfo.applicant_position})</span>
+          <span class="detail-value">${submission.applicationInfo?.applicantName || 'N/A'} (${submission.applicationInfo?.position || 'N/A'})</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Applicant Email:</span>
-          <span class="detail-value">${submission.applicantInfo.applicant_email}</span>
-        </div>
-        <div class="detail-item full-width">
-          <span class="detail-label">Advisers:</span>
-          <span class="detail-value">${submission.adviserInfo.adviser_name.join(', ') || 'None specified'}</span>
+          <span class="detail-value">${submission.applicationInfo?.email || 'N/A'}</span>
         </div>
       </div>
     </div>
 
-    ${submission.organizationInfo.org_social && submission.organizationInfo.org_social.length > 0 ? `
+    ${eventData?.supportingDocuments && eventData.supportingDocuments.length > 0 ? `
     <div class="detail-section">
-      <h4 class="detail-section-title">Social Media Links</h4>
-      <div class="social-links">
-        ${submission.organizationInfo.org_social.map(link => 
-          `<a href="${link}" target="_blank" class="social-link">
-            <span class="link-icon"></span>
-            ${link}
-          </a>`
-        ).join('')}
+      <h4 class="detail-section-title">Supporting Documents</h4>
+      <div class="document-list">
+        ${eventData.supportingDocuments.map((doc, index) => `
+          <div class="document-item">
+            <span class="doc-icon"></span>
+            <div class="doc-info">
+              <span class="doc-name">Document ${index + 1}</span>
+              <a href="${doc}" target="_blank" class="doc-link">View</a>
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>
     ` : ''}
 
+    ${eventData?.eventProof ? `
     <div class="detail-section">
-      <h4 class="detail-section-title">Documents & Files</h4>
+      <h4 class="detail-section-title">Event Proof</h4>
       <div class="document-list">
-        ${submission.documentUploads?.strategic_plan ? `
         <div class="document-item">
           <span class="doc-icon"></span>
           <div class="doc-info">
-            <span class="doc-name">Strategic Plans</span>
-            <a href="${submission.documentUploads.strategic_plan.url}" target="_blank" class="doc-link">Download</a>
+            <span class="doc-name">Event Proof Document</span>
+            <a href="${eventData.eventProof}" target="_blank" class="doc-link">View</a>
           </div>
         </div>
-        ` : ''}
-        
-        ${submission.documentUploads?.annual_report ? `
-        <div class="document-item">
-          <span class="doc-icon"></span>
-          <div class="doc-info">
-            <span class="doc-name">Annual Report</span>
-            <a href="${submission.documentUploads.annual_report.url}" target="_blank" class="doc-link">Download</a>
-          </div>
-        </div>
-        ` : ''}
-        
-        ${submission.documentUploads?.cbl ? `
-        <div class="document-item">
-          <span class="doc-icon"></span>
-          <div class="doc-info">
-            <span class="doc-name">Constitution & Bylaws</span>
-            <a href="${submission.documentUploads.cbl.url}" target="_blank" class="doc-link">Download</a>
-          </div>
-        </div>
-        ` : ''}
-        
-        ${submission.documentUploads?.infographic ? `
-        <div class="document-item">
-          <span class="doc-icon"></span>
-          <div class="doc-info">
-            <span class="doc-name">Infographics</span>
-            <a href="${submission.documentUploads.infographic.url}" target="_blank" class="doc-link">Download</a>
-          </div>
-        </div>
-        ` : ''}
-        
-        ${submission.documentUploads?.video_link ? `
-        <div class="document-item">
-          <span class="doc-icon"></span>
-          <div class="doc-info">
-            <span class="doc-name">Presentation Video</span>
-            <a href="${submission.documentUploads.video_link}" target="_blank" class="doc-link">Watch Video</a>
-          </div>
-        </div>
-        ` : ''}
       </div>
     </div>
+    ` : ''}
 
     <div class="detail-section">
       <h4 class="detail-section-title">Submission Details</h4>
@@ -594,10 +559,6 @@ function openDetailPanel(event) {
           <span class="detail-value monospace">${event.id}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Status:</span>
-          <span class="detail-value status-badge status-${(submission.status || '').toLowerCase()}">${submission.status}</span>
-        </div>
-        <div class="detail-item">
           <span class="detail-label">Academic Year:</span>
           <span class="detail-value">${submission.academicYear || 'N/A'}</span>
         </div>
@@ -605,18 +566,6 @@ function openDetailPanel(event) {
           <span class="detail-label">Semester:</span>
           <span class="detail-value">${submission.semester || 'N/A'}</span>
         </div>
-        ${submission.remarks ? `
-        <div class="detail-item full-width">
-          <span class="detail-label">Remarks:</span>
-          <span class="detail-value">${submission.remarks}</span>
-        </div>
-        ` : ''}
-        ${submission.additional_note ? `
-        <div class="detail-item full-width">
-          <span class="detail-label">Additional Note:</span>
-          <span class="detail-value">${submission.additional_note}</span>
-        </div>
-        ` : ''}
       </div>
     </div>
   `;
@@ -628,17 +577,6 @@ function openDetailPanel(event) {
 
   // Focus for accessibility
   detailPanel.focus();
-}
-
-// Helper function for status colors
-function getStatusColor(status) {
-  const colors = {
-    'PENDING': '#f59e0b',
-    'APPROVED': '#10b981',
-    'REJECTED': '#ef4444',
-    'NEEDS REVISION': '#f97316'
-  };
-  return colors[status] || '#6b7280';
 }
 
 // Close detail panel
@@ -703,6 +641,11 @@ todayBtn.addEventListener('click', async () => {
 async function initializeCalendar() {
   try {
     makeEventsListScrollable(); // Make events list scrollable
+    
+    // First fetch organizations to build the mapping
+    await fetchOrganizationsFromMongoDB();
+    
+    // Then render calendar and events
     await renderCalendar();
     await renderPastEvents();
     console.log('Calendar initialized with submission data from MongoDB');

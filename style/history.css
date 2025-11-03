@@ -158,7 +158,8 @@
 .submission-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
+    gap: 2.5rem;
+    padding: 0.5rem;
 }
 
 .submission-card {
@@ -176,28 +177,34 @@
 
 .submission-details {
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .submission-header {
     margin-bottom: 1rem;
 }
 
-.org-info {
-    margin-bottom: 0.5rem;
-}
-
 .org-info h3 {
-    margin: 0;
+    margin: 0 0 0.5rem 0;
     font-size: 1.25rem;
     color: #1a202c;
 }
 
-.org-acronym {
+.academic-info {
     font-size: 0.875rem;
     color: #64748b;
+    display: block;
 }
 
-.academic-info {
+.submission-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    text-align: right;
+}
+
+.view-btn {
     font-size: 0.875rem;
     color: #3d348b;
     font-weight: 500;
@@ -578,7 +585,61 @@
     .submission-cards {
         grid-template-columns: 1fr;
     }
+}
 
+/* Updated Card Styles */
+.event-details h4 {
+    font-size: 1.125rem;
+    color: #1a202c;
+    margin: 0 0 0.75rem 0;
+}
+
+.event-meta {
+    font-size: 0.875rem;
+    color: #64748b;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.event-meta span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    background-color: #3d348b;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-btn:hover {
+    background-color: #2a2561;
+}
+
+.submission-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.submission-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.submission-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
     .modal-content {
         margin: 0;
         max-height: 100vh;

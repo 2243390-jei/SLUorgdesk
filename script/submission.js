@@ -31,18 +31,25 @@ document.addEventListener("DOMContentLoaded", function () {
         preview.innerHTML = '<p style="margin:0;color:#888;">No files selected.</p>';
         return;
       }
+      
       files.forEach((f, i) => {
         const item = document.createElement("div");
         item.className = "file-preview-item";
 
         const name = document.createElement("span");
+        name.className = "file-name";
         name.textContent = f.name.length > 20 ? f.name.slice(0,17)+"..." : f.name;
         name.title = f.name;
 
-        const rm = document.createElement("span");
+        const rm = document.createElement("button");
+        rm.type = "button";
         rm.textContent = "×";
         rm.className = "remove-file";
-        rm.onclick = e => {
+        rm.setAttribute("title", "Remove " + f.name);
+        
+        // Ensure we're working with the current index
+        rm.onclick = (e) => {
+          e.preventDefault();
           e.stopPropagation();
           files.splice(i, 1);
           render();

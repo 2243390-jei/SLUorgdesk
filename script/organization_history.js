@@ -134,23 +134,20 @@ function renderCards(subs) {
         <div class="submission-header">
           <div class="org-info">
             <h3>${org.name || "Unnamed Org"}</h3>
-            <span class="org-acronym">${org.acronym || ""}</span>
+            <span class="academic-info">${s.academicYear || "-"} | ${s.semester || "-"}</span>
           </div>
-          <span class="academic-info">${s.academicYear || "-"} | ${s.semester || "-"}</span>
         </div>
         <div class="event-details">
           <h4>${event.eventName || "Untitled Event"}</h4>
           <div class="event-meta">
             <span class="icon-calendar">${eventDate}</span>
             <span class="icon-location">${event.eventVenue || "-"}</span>
-          </div>
-          <div class="applicant-info">
             <span class="icon-user">${app.applicantName || "-"}</span>
           </div>
         </div>
-      </div>
-      <div class="submission-actions">
-        <button class="view-btn" data-id="${s._id}"><span class="icon-eye">View Details</span></button>
+        <div class="submission-footer">
+          <button class="view-btn" data-id="${s._id}"><span class="icon-eye">View Details</span></button>
+        </div>
       </div>
     `;
     submissionList.appendChild(card);
