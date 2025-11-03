@@ -6,9 +6,9 @@ const connectDB = async () => {
     await mongoose.connect(
       "mongodb+srv://root:root123360@software-engineering.vw1nyls.mongodb.net/Web-Tech?retryWrites=true&w=majority&appName=Software-Engineering"
     );
-    console.log("✅ Connected to MongoDB Atlas (Web-Tech database)");
+    console.log("Connected to MongoDB Atlas (Web-Tech database)");
   } catch (error) {
-    console.error("❌ Connection failed:", error.message);
+    console.error("Connection failed:", error.message);
     process.exit(1);
   }
 };

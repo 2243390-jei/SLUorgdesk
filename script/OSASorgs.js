@@ -1,9 +1,9 @@
-// OSASorgs.js
 const tableBody = document.getElementById("orgTableBody");
 const searchInput = document.getElementById("searchInput");
 const searchClear = document.getElementById("searchClear");
 
-let organizationsData = []; // store all orgs for filtering
+// Store all organizations for filtering
+let organizationsData = []; 
 
 async function loadOrganizations() {
   try {
@@ -36,7 +36,7 @@ function renderTable(orgs) {
       <td><button class="view-btn">View Submissions</button></td>
     `;
 
-    // ✅ When button is clicked, go to OSASsubmissions.html with org ID and orgName
+    // Redirection to go to OSASsubmissions.html using org ID and orgName when the button is clicked
     row.querySelector(".view-btn").addEventListener("click", () => {
       window.location.href = `../osas/OSASsubmissions.html?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
     });
@@ -45,7 +45,7 @@ function renderTable(orgs) {
   });
 }
 
-// Filter function (search bar)
+// Filter function using the Search Bar
 function filterOrganizations() {
   const query = searchInput.value.toLowerCase().trim();
 
@@ -68,10 +68,10 @@ searchClear.addEventListener("click", () => {
   renderTable(organizationsData);
 });
 
-// Search as you type
+// Searching
 searchInput.addEventListener("input", filterOrganizations);
 
-// Initial load
+// Initial load of Search
 loadOrganizations();
 
 // === Filter Dropdown ===
