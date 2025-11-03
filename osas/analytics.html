@@ -21,12 +21,12 @@
         </a>
         <a href="../osas/orgs.html">
           <button class="circle-btn" title="Organizations" aria-label="Organizations">
-            <img src="../Images/grid.png" alt="Organizations" class="nav-icon">
+            <img src="../Images/group.png" alt="Organizations" class="nav-icon">
           </button>
         </a>
         <a href="../osas/analytics.html">
           <button class="circle-btn active" title="Analytics" aria-label="Analytics">
-            <img src="../Images/analytics.png" alt="Analytics" class="nav-icon">
+            <img src="../Images/statistics.png" alt="Analytics" class="nav-icon">
           </button>
         </a>
       </nav>
@@ -53,7 +53,7 @@
       <div class="body">
         <!-- Stats Overview Cards - COMPLETELY REMOVED -->
 
-        <div class="stats-row">
+        <div class="charts-row">
           <div class="orgs-section">
             <div class="section-header">
               <h2>Top Active Organizations</h2>
@@ -64,11 +64,11 @@
           </div>
 
           <div class="charts-section">
-            <div class="chart-card large-chart">
+            <div class="chart-card">
               <div class="chart-header">
                 <h3>Monthly Submissions</h3>
               </div>
-              <div class="chart-container-large">
+              <div class="chart-container">
                 <canvas id="submissionsChart"></canvas>
                 <div class="chart-hover-info" id="submissionsHover"></div>
               </div>
@@ -76,27 +76,35 @@
           </div>
         </div>
 
-        <div class="sdg-section">
-          <div class="section-header">
-            <h2>SDG Submissions</h2>
-            <div class="sdg-stats">
-              <span class="sdg-count" id="sdgSubmissions">0 Submissions</span>
-              <span class="sdg-goals" id="sdgGoals">0 Goals</span>
+        <div class="charts-row">
+          <div class="chart-full">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h2>SDG Submissions</h2>
+                <div class="sdg-stats">
+                  <span class="sdg-count" id="sdgSubmissions">0 Events</span>
+                  <span class="sdg-goals" id="sdgGoals">0 Goals</span>
+                </div>
+              </div>
+              <div class="chart-container-large">
+                <canvas id="sdgChart"></canvas>
+                <div class="chart-hover-info" id="sdgHover"></div>
+              </div>
             </div>
-          </div>
-          <div class="chart-container-extra-large">
-            <canvas id="sdgChart"></canvas>
-            <div class="chart-hover-info" id="sdgHover"></div>
           </div>
         </div>
 
-        <div class="schools-section">
-          <div class="section-header">
-            <h2>Submissions by School</h2>
-          </div>
-          <div class="chart-container-large">
-            <canvas id="schoolsChart"></canvas>
-            <div class="chart-hover-info" id="schoolsHover"></div>
+        <div class="charts-row">
+          <div class="chart-full">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h2>Submissions by School</h2>
+              </div>
+              <div class="chart-container-large">
+                <canvas id="schoolsChart"></canvas>
+                <div class="chart-hover-info" id="schoolsHover"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
