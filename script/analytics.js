@@ -1,48 +1,56 @@
 // API Configuration
 const API_BASE_URL = "http://localhost:3000/api";
 
-// Enhanced SDG Category Mapping
+// Updated SDG Category Mapping for your format
 const SDG_CATEGORIES = {
-    "No Poverty (SDG 1)": "No Poverty (SDG 1)",
-    "Zero Hunger (SDG 2)": "Zero Hunger (SDG 2)",
-    "Good Health and Well-being (SDG 3)": "Good Health and Well-being (SDG 3)",
-    "Quality Education (SDG 4)": "Quality Education (SDG 4)",
-    "Gender Equality (SDG 5)": "Gender Equality (SDG 5)",
-    "Clean Water and Sanitation (SDG 6)": "Clean Water and Sanitation (SDG 6)",
-    "Affordable and Clean Energy (SDG 7)": "Affordable and Clean Energy (SDG 7)",
-    "Decent Work and Economic Growth (SDG 8)": "Decent Work and Economic Growth (SDG 8)",
-    "Industry, Innovation and Infrastructure (SDG 9)": "Industry, Innovation and Infrastructure (SDG 9)",
-    "Reduced Inequalities (SDG 10)": "Reduced Inequalities (SDG 10)",
-    "Sustainable Cities and Communities (SDG 11)": "Sustainable Cities and Communities (SDG 11)",
-    "Responsible Consumption and Production (SDG 12)": "Responsible Consumption and Production (SDG 12)",
-    "Climate Action (SDG 13)": "Climate Action (SDG 13)",
-    "Life Below Water (SDG 14)": "Life Below Water (SDG 14)",
-    "Life on Land (SDG 15)": "Life on Land (SDG 15)",
-    "Peace, Justice and Strong Institutions (SDG 16)": "Peace, Justice and Strong Institutions (SDG 16)",
-    "Peace, Justice, and Strong Institutions (SDG 16)": "Peace, Justice and Strong Institutions (SDG 16)",
-    "Partnerships for the Goals (SDG 17)": "Partnerships for the Goals (SDG 17)"
+    "1. No Poverty": "1. No Poverty",
+    "2. Zero Hunger": "2. Zero Hunger", 
+    "3. Good Health": "3. Good Health",
+    "4. Quality Education": "4. Quality Education",
+    "5. Gender Equality": "5. Gender Equality",
+    "6. Clean Water": "6. Clean Water",
+    "7. Affordable Energy": "7. Affordable Energy",
+    "8. Decent Work": "8. Decent Work",
+    "9. Innovation": "9. Innovation",
+    "10. Reduced Inequality": "10. Reduced Inequality",
+    "11. Sustainable Cities": "11. Sustainable Cities",
+    "12. Consumption": "12. Consumption",
+    "13. Climate Action": "13. Climate Action",
+    "14. Life Below Water": "14. Life Below Water",
+    "15. Life on Land": "15. Life on Land",
+    "16. Peace and Justice": "16. Peace and Justice",
+    "17. Partnerships": "17. Partnerships"
 };
 
-// SDG Color Mapping
+// SDG Color Mapping for your format
 const SDG_COLORS = {
-    "No Poverty (SDG 1)": "#E5243B",
-    "Zero Hunger (SDG 2)": "#DDA63A",
-    "Good Health and Well-being (SDG 3)": "#4C9F38",
-    "Quality Education (SDG 4)": "#C5192D",
-    "Gender Equality (SDG 5)": "#FF3A21",
-    "Clean Water and Sanitation (SDG 6)": "#26BDE2",
-    "Affordable and Clean Energy (SDG 7)": "#FCC30B",
-    "Decent Work and Economic Growth (SDG 8)": "#A21942",
-    "Industry, Innovation and Infrastructure (SDG 9)": "#FD6925",
-    "Reduced Inequalities (SDG 10)": "#DD1367",
-    "Sustainable Cities and Communities (SDG 11)": "#FD9D24",
-    "Responsible Consumption and Production (SDG 12)": "#BF8B2E",
-    "Climate Action (SDG 13)": "#3F7E44",
-    "Life Below Water (SDG 14)": "#0A97D9",
-    "Life on Land (SDG 15)": "#56C02B",
-    "Peace, Justice and Strong Institutions (SDG 16)": "#00689D",
-    "Peace, Justice, and Strong Institutions (SDG 16)": "#00689D",
-    "Partnerships for the Goals (SDG 17)": "#19486A"
+    "1. No Poverty": "#E5243B",
+    "2. Zero Hunger": "#DDA63A",
+    "3. Good Health": "#4C9F38",
+    "4. Quality Education": "#C5192D",
+    "5. Gender Equality": "#FF3A21",
+    "6. Clean Water": "#26BDE2",
+    "7. Affordable Energy": "#FCC30B",
+    "8. Decent Work": "#A21942",
+    "9. Innovation": "#FD6925",
+    "10. Reduced Inequality": "#DD1367",
+    "11. Sustainable Cities": "#FD9D24",
+    "12. Consumption": "#BF8B2E",
+    "13. Climate Action": "#3F7E44",
+    "14. Life Below Water": "#0A97D9",
+    "15. Life on Land": "#56C02B",
+    "16. Peace and Justice": "#00689D",
+    "17. Partnerships": "#19486A"
+};
+
+// School Color Mapping
+const SCHOOL_COLORS = {
+    "SEA": "#800000",      // Maroon
+    "SAMCIS": "#FFD700",   // Yellow
+    "SONAHBS": "#800080",  // Purple
+    "STELA": "#0000FF",    // Blue
+    "SOM": "#FFC0CB",      // Pink
+    "SOL": "#FF0000"       // Red
 };
 
 // Enhanced Chart implementation with animations and hover effects
@@ -146,12 +154,21 @@ class LargeChart {
                 label: label
             });
             
-            // Draw bar with animation
-            ctx.fillStyle = Array.isArray(backgroundColor) ? backgroundColor[i] : backgroundColor;
+            // Draw bar with animation - use color from dataset or fallback
+            let barColor;
+            if (Array.isArray(backgroundColor)) {
+                barColor = backgroundColor[i];
+            } else if (typeof backgroundColor === 'function') {
+                barColor = backgroundColor(label, i);
+            } else {
+                barColor = backgroundColor;
+            }
+            
+            ctx.fillStyle = barColor;
             ctx.fillRect(x, y, barWidth, animatedHeight);
         });
 
-        this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Submissions');
+        this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Events');
     }
 
     drawLineChart(labels, dataset) {
@@ -213,40 +230,40 @@ class LargeChart {
         this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Submissions');
     }
 
-   drawBottomLabels(labels) {
-    const ctx = this.ctx;
-    const canvas = this.ctx.canvas;
-    const padding = { top: 60, right: 60, bottom: 80, left: 80 };
-    const chartWidth = canvas.width - padding.left - padding.right;
-    const chartHeight = canvas.height - padding.top - padding.bottom;
+    drawBottomLabels(labels) {
+        const ctx = this.ctx;
+        const canvas = this.ctx.canvas;
+        const padding = { top: 60, right: 60, bottom: 80, left: 80 };
+        const chartWidth = canvas.width - padding.left - padding.right;
+        const chartHeight = canvas.height - padding.top - padding.bottom;
 
-    // Draw bottom labels
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#8f9aa3';
-    ctx.font = '12px Arial';
-    
-    if (this.type === 'bar') {
-        const barWidth = (chartWidth / labels.length) * 0.6;
+        // Draw bottom labels
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#8f9aa3';
+        ctx.font = '12px Arial';
         
-        labels.forEach((label, i) => {
-            const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
+        if (this.type === 'bar') {
+            const barWidth = (chartWidth / labels.length) * 0.6;
             
-            if (this.options.isSDG) {
-                // For SDG chart, show just the numbers "1", "2", etc.
-                ctx.fillText(`${i + 1}`, x + barWidth / 2, padding.top + chartHeight + 15);
-            } else {
-                // For schools chart, show school names
-                ctx.fillText(label, x + barWidth / 2, padding.top + chartHeight + 15);
-            }
-        });
-    } else if (this.type === 'line') {
-        // For line chart, show month names
-        labels.forEach((label, i) => {
-            const x = padding.left + (i * chartWidth / (labels.length - 1));
-            ctx.fillText(label, x, padding.top + chartHeight + 20);
-        });
+            labels.forEach((label, i) => {
+                const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
+                
+                if (this.options.isSDG) {
+                    // For SDG chart, show just the numbers "1", "2", etc.
+                    ctx.fillText(`${i + 1}`, x + barWidth / 2, padding.top + chartHeight + 15);
+                } else {
+                    // For schools chart, show school names
+                    ctx.fillText(label, x + barWidth / 2, padding.top + chartHeight + 15);
+                }
+            });
+        } else if (this.type === 'line') {
+            // For line chart, show month names
+            labels.forEach((label, i) => {
+                const x = padding.left + (i * chartWidth / (labels.length - 1));
+                ctx.fillText(label, x, padding.top + chartHeight + 20);
+            });
+        }
     }
-}
 
     drawAxes(padding, chartWidth, chartHeight, maxValue, yLabel) {
         const ctx = this.ctx;
@@ -351,7 +368,7 @@ class LargeChart {
                 displayLabel = this.data.fullLabels[this.hoveredIndex];
             }
 
-            this.hoverInfo.textContent = `${displayLabel}: ${hoverData.value} submissions`;
+            this.hoverInfo.textContent = `${displayLabel}: ${hoverData.value} events`;
             this.hoverInfo.style.left = (this.mouseX + 15) + 'px';
             this.hoverInfo.style.top = (this.mouseY - 40) + 'px';
             this.hoverInfo.classList.add('active');
@@ -361,32 +378,35 @@ class LargeChart {
     }
 
     handleClick(index) {
-        console.log(`Clicked on ${this.data.labels[index]}: ${this.data.datasets[0].data[index]} submissions`);
+        console.log(`Clicked on ${this.data.labels[index]}: ${this.data.datasets[0].data[index]} events`);
     }
 }
 
-// Data Processing Functions
+// Data Processing Functions - UPDATED FOR SUBMISSION SCHEMA
 class AnalyticsDataProcessor {
-    static processFormsData(forms) {
+    static processSubmissionsData(submissions) {
+        // Extract all events from submissions
+        const allEvents = this.extractAllEvents(submissions);
+        
         const stats = {
-            totalForms: forms.length,
-            pendingForms: forms.filter(form => form.status === 'Pending Review').length,
-            approvedForms: forms.filter(form => form.status === 'Approved').length,
-            rejectedForms: forms.filter(form => form.status === 'Rejected').length,
-            needsRevisionForms: forms.filter(form => form.status === 'Needs Revision').length
+            totalSubmissions: submissions.length,
+            totalEvents: allEvents.length,
+            pendingSubmissions: submissions.filter(sub => sub.status === 'PENDING').length,
+            approvedSubmissions: submissions.filter(sub => sub.status === 'APPROVED').length,
+            rejectedSubmissions: submissions.filter(sub => sub.status === 'REJECTED').length
         };
 
-        // Group by month
-        const monthlyData = this.groupByMonth(forms);
+        // Group by month using submission date
+        const monthlyData = this.groupByMonth(submissions);
         
-        // Group by SDG - INCLUDING ZERO VALUES
-        const sdgData = this.groupBySDG(forms);
+        // Group by SDG - USING EVENTS DATA
+        const sdgData = this.groupBySDG(allEvents);
         
-        // Group by school
-        const schoolData = this.groupBySchool(forms);
+        // Group by school - NOW WITH COLORS
+        const schoolData = this.groupBySchool(submissions);
         
         // Group by organization - TOP 5 ONLY
-        const orgData = this.groupByOrganization(forms);
+        const orgData = this.groupByOrganization(submissions);
 
         return {
             stats,
@@ -397,12 +417,31 @@ class AnalyticsDataProcessor {
         };
     }
 
-    static groupByMonth(forms) {
+    // Extract all events from all submissions
+    static extractAllEvents(submissions) {
+        const allEvents = [];
+        submissions.forEach(submission => {
+            if (submission.events && submission.events.length > 0) {
+                submission.events.forEach(event => {
+                    allEvents.push({
+                        ...event,
+                        submissionId: submission._id,
+                        organizationInfo: submission.organizationInfo,
+                        status: submission.status,
+                        submittedAt: submission.submittedAt
+                    });
+                });
+            }
+        });
+        return allEvents;
+    }
+
+    static groupByMonth(submissions) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthlyCounts = new Array(12).fill(0);
         
-        forms.forEach(form => {
-            const date = new Date(form.createdAt);
+        submissions.forEach(submission => {
+            const date = new Date(submission.submittedAt);
             const month = date.getMonth();
             monthlyCounts[month]++;
         });
@@ -413,39 +452,41 @@ class AnalyticsDataProcessor {
         };
     }
 
-    static groupBySDG(forms) {
+    static groupBySDG(events) {
         // Initialize all SDG categories with 0 - INCLUDING ALL SDGs
         const sdgMap = {};
         Object.keys(SDG_CATEGORIES).forEach(sdg => {
             sdgMap[sdg] = 0;
         });
 
-        // Count submissions per SDG
-        forms.forEach(form => {
-            if (form.SDGCategory && form.SDGCategory !== "Not specified") {
-                const sdgName = form.SDGCategory.trim();
-                
-                // Direct match
-                if (SDG_CATEGORIES[sdgName]) {
-                    sdgMap[sdgName]++;
-                } else {
-                    // Try to find closest match
-                    for (const validSDG in SDG_CATEGORIES) {
-                        if (sdgName.toLowerCase().includes(validSDG.toLowerCase()) || 
-                            validSDG.toLowerCase().includes(sdgName.toLowerCase())) {
-                            sdgMap[validSDG]++;
-                            break;
+        // Count events per SDG
+        events.forEach(event => {
+            if (event.eventSDG && Array.isArray(event.eventSDG)) {
+                event.eventSDG.forEach(sdg => {
+                    const sdgName = sdg.trim();
+                    
+                    // Direct match with your format
+                    if (SDG_CATEGORIES[sdgName]) {
+                        sdgMap[sdgName]++;
+                    } else {
+                        // Try to find closest match
+                        for (const validSDG in SDG_CATEGORIES) {
+                            if (sdgName.toLowerCase().includes(validSDG.toLowerCase()) || 
+                                validSDG.toLowerCase().includes(sdgName.toLowerCase())) {
+                                sdgMap[validSDG]++;
+                                break;
+                            }
                         }
                     }
-                }
+                });
             }
         });
 
         // Include ALL SDGs in ascending order (SDG 1 to SDG 17)
         const allSDGs = Object.entries(sdgMap)
             .sort(([a], [b]) => {
-                const numA = parseInt(a.match(/SDG (\d+)/)?.[1] || 0);
-                const numB = parseInt(b.match(/SDG (\d+)/)?.[1] || 0);
+                const numA = parseInt(a.match(/^(\d+)\./)?.[1] || 0);
+                const numB = parseInt(b.match(/^(\d+)\./)?.[1] || 0);
                 return numA - numB;
             });
 
@@ -459,36 +500,42 @@ class AnalyticsDataProcessor {
             data,
             colors,
             fullLabels: allSDGs.map(([sdg]) => sdg),
-            totalSubmissions: data.reduce((sum, count) => sum + count, 0),
+            totalEvents: data.reduce((sum, count) => sum + count, 0),
             activeGoals: data.filter(count => count > 0).length
         };
     }
 
-    static groupBySchool(forms) {
+    static groupBySchool(submissions) {
         const schoolMap = {};
         
-        forms.forEach(form => {
-            const school = form.school || 'Unknown School';
+        submissions.forEach(submission => {
+            const school = submission.organizationInfo?.org_category || 'Unknown School';
             schoolMap[school] = (schoolMap[school] || 0) + 1;
         });
 
         const labels = Object.keys(schoolMap);
         const data = Object.values(schoolMap);
+        // Generate colors based on school names
+        const colors = labels.map(school => SCHOOL_COLORS[school] || '#666666');
         
-        return { labels, data };
+        return { 
+            labels, 
+            data, 
+            colors 
+        };
     }
 
-    static groupByOrganization(forms) {
+    static groupByOrganization(submissions) {
         const orgMap = {};
         
-        forms.forEach(form => {
-            const orgName = form.acronym || form.completeName || 'Unknown Organization';
+        submissions.forEach(submission => {
+            const orgName = submission.organizationInfo?.org_acronym || submission.organizationInfo?.org_name || 'Unknown Organization';
             if (!orgMap[orgName]) {
                 orgMap[orgName] = {
                     name: orgName,
                     submissions: 0,
-                    school: form.school || 'Unknown',
-                    status: form.status || 'Unknown'
+                    school: submission.organizationInfo?.org_category || 'Unknown',
+                    status: submission.status || 'Unknown'
                 };
             }
             orgMap[orgName].submissions++;
@@ -497,14 +544,14 @@ class AnalyticsDataProcessor {
         // Convert to array and sort by submissions - TOP 5 ONLY
         return Object.values(orgMap)
             .sort((a, b) => b.submissions - a.submissions)
-            .slice(0, 5); // Top 5 organizations only
+            .slice(0, 5);
     }
 }
 
-// Main Analytics Dashboard
+// Main Analytics Dashboard - UPDATED FOR SUBMISSIONS
 class AnalyticsDashboard {
     constructor() {
-        this.forms = [];
+        this.submissions = [];
         this.processedData = null;
         this.init();
     }
@@ -524,16 +571,17 @@ class AnalyticsDashboard {
 
     async loadData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/forms`);
+            const response = await fetch(`${API_BASE_URL}/Submissions`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            this.forms = await response.json();
-            this.processedData = AnalyticsDataProcessor.processFormsData(this.forms);
-            console.log('✅ Loaded forms data:', this.forms.length, 'forms');
-            console.log('📊 SDG Data:', this.processedData.sdgData);
+            this.submissions = await response.json();
+            this.processedData = AnalyticsDataProcessor.processSubmissionsData(this.submissions);
+            console.log('Loaded submissions data:', this.submissions.length, 'submissions');
+            console.log('SDG Data:', this.processedData.sdgData);
+            console.log(' School Data with Colors:', this.processedData.schoolData);
         } catch (error) {
-            console.error('❌ Error loading forms:', error);
+            console.error(' Error loading submissions:', error);
             throw error;
         }
     }
@@ -543,19 +591,18 @@ class AnalyticsDashboard {
 
         const { stats, sdgData } = this.processedData;
         
-        // Removed total organizations from stats
-        document.getElementById('totalForms').textContent = stats.totalForms;
-        document.getElementById('pendingForms').textContent = stats.pendingForms;
-        document.getElementById('approvedForms').textContent = stats.approvedForms;
+        document.getElementById('totalForms').textContent = stats.totalSubmissions;
+        document.getElementById('pendingForms').textContent = stats.pendingSubmissions;
+        document.getElementById('approvedForms').textContent = stats.approvedSubmissions;
         
-        document.getElementById('sdgSubmissions').textContent = `${sdgData.totalSubmissions} Submissions`;
+        document.getElementById('sdgSubmissions').textContent = `${sdgData.totalEvents} Events`;
         document.getElementById('sdgGoals').textContent = `${sdgData.activeGoals} Goals`;
     }
 
     renderCharts() {
         if (!this.processedData) return;
 
-        // Monthly Submissions Chart - With month labels at bottom
+        // Monthly Submissions Chart
         const submissionsCtx = document.getElementById('submissionsChart').getContext('2d');
         const submissionsData = {
             labels: this.processedData.monthlyData.labels,
@@ -584,13 +631,13 @@ class AnalyticsDashboard {
             hoverId: 'sdgHover'
         });
 
-        // Schools Chart - With school names at bottom
+        // Schools Chart - NOW WITH COLOR CODING
         const schoolsCtx = document.getElementById('schoolsChart').getContext('2d');
         const schoolsData = {
             labels: this.processedData.schoolData.labels,
             datasets: [{
                 data: this.processedData.schoolData.data,
-                backgroundColor: '#3498db'
+                backgroundColor: this.processedData.schoolData.colors
             }]
         };
         new LargeChart(schoolsCtx, 'bar', schoolsData, { 
@@ -610,9 +657,13 @@ class AnalyticsDashboard {
         this.processedData.orgData.forEach((org, index) => {
             const orgItem = document.createElement('div');
             orgItem.className = 'org-item';
+            
+            // Get school color for the organization
+            const schoolColor = SCHOOL_COLORS[org.school] || '#666666';
+            
             orgItem.innerHTML = `
                 <div class="org-header">
-                    <div class="rank-badge">${index + 1}</div>
+                    <div class="rank-badge" style="background-color: ${schoolColor}">${index + 1}</div>
                     <div class="org-name">${org.name}</div>
                 </div>
                 <div class="org-stats">
@@ -621,7 +672,7 @@ class AnalyticsDashboard {
                         <div class="org-stat-label">Submissions</div>
                     </div>
                     <div class="org-stat">
-                        <div class="org-stat-value">${org.school}</div>
+                        <div class="org-stat-value" style="color: ${schoolColor}">${org.school}</div>
                         <div class="org-stat-label">School</div>
                     </div>
                 </div>
