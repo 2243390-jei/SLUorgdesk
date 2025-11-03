@@ -1,10 +1,7 @@
-// OSASsubmissions.js
 const submissionsContainer = document.getElementById("submissionsContainer");
 let allSubmissions = [];
 
-// -------------------------------
-// ✅ Load submissions once
-// -------------------------------
+// Load All Submissions
 async function loadSubmissions() {
   const params = new URLSearchParams(window.location.search);
   const orgId = params.get("orgId");
@@ -24,7 +21,7 @@ async function loadSubmissions() {
     const response = await fetch(`http://localhost:3000/api/Submissions/${orgId}`);
     const submissions = await response.json();
 
-    allSubmissions = submissions; // ✅ store globally for filtering
+    allSubmissions = submissions; // Storage for Filtering
 
     if (submissions.length === 0) {
       submissionsContainer.innerHTML = `<p>No submissions found for this organization.</p>`;
@@ -38,9 +35,7 @@ async function loadSubmissions() {
   }
 }
 
-// -------------------------------
-// ✅ Rendering logic
-// -------------------------------
+// ✅ Updated Rendering of Filter
 function renderFilteredSubmissions(submissions) {
   if (!submissions || submissions.length === 0) {
     submissionsContainer.innerHTML = `<p>No submissions match your filter.</p>`;
@@ -49,43 +44,48 @@ function renderFilteredSubmissions(submissions) {
 
   submissionsContainer.innerHTML = "";
 
-  submissions.forEach((s, index) => {
+  submissions.forEach((submission, subIndex) => {
     const wrapper = document.createElement("div");
     wrapper.classList.add("submission-wrapper");
 
+    // Build table rows for all events in the submission
+    let rowsHTML = "";
+    if (submission.events && submission.events.length > 0) {
+      submission.events.forEach(event => {
+        rowsHTML += `
+          <tr>
+            <td>${event.eventName || "-"}</td>
+            <td>${event.eventType || "-"}</td>
+            <td>${event.eventDate ? new Date(event.eventDate).toLocaleDateString() : "-"}</td>
+            <td>${event.eventVenue || "-"}</td>
+            <td>${Array.isArray(event.eventSDG)
+              ? event.eventSDG.map(sdg => sdg.sdgName || sdg).join(", ")
+              : (event.eventSDG || "-")}</td>
+          </tr>
+        `;
+      });
+    } else {
+      rowsHTML = `<tr><td colspan="5">No events found for this submission.</td></tr>`;
+    }
+
     wrapper.innerHTML = `
-      <div class="submission-header" data-index="${index}">
+      <div class="submission-header" data-index="${subIndex}">
         <span class="dropdown-arrow">▶</span>
-        <span class="submission-title">${s.title || s.eventName || "-"}</span>
+        <span class="submission-title">Submission #${subIndex + 1}</span>
+        <span class="submission-status">Status: ${submission.status || "-"}</span>
       </div>
       <div class="submission-details hidden">
         <table class="submission-table">
           <thead>
             <tr>
               <th>Event Name</th>
+              <th>Event Type</th>
               <th>Event Date</th>
-              <th>Category</th>
-              <th>Event Description</th>
-              <th>Location</th>
-              <th>SDG Category</th>
-              <th>Budget</th>
-              <th>Status</th>
-              <th></th>
+              <th>Event Venue</th>
+              <th>Event SDG</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>${s.eventName || "-"}</td>
-              <td>${s.eventDate ? new Date(s.eventDate).toLocaleDateString() : "-"}</td>
-              <td>${s.category || "-"}</td>
-              <td>${s.EventDescription || "-"}</td>
-              <td>${s.Location || "-"}</td>
-              <td>${s.SDGCategory || "-"}</td>
-              <td>${s.AllottedBudget || "-"}</td>
-              <td>${s.status || "-"}</td>
-              <td><button class="view-details-btn" data-id="${s._id}">View Details</button></td>
-            </tr>
-          </tbody>
+          <tbody>${rowsHTML}</tbody>
         </table>
       </div>
     `;
@@ -93,7 +93,7 @@ function renderFilteredSubmissions(submissions) {
     submissionsContainer.appendChild(wrapper);
   });
 
-  // dropdown toggles
+  // Dropdown Functionality
   document.querySelectorAll(".submission-header").forEach(header => {
     header.addEventListener("click", () => {
       const index = header.dataset.index;
@@ -103,22 +103,10 @@ function renderFilteredSubmissions(submissions) {
       arrow.textContent = details.classList.contains("hidden") ? "▶" : "▼";
     });
   });
-
-  // view details buttons
-  document.querySelectorAll(".view-details-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const submissionId = btn.dataset.id;
-      const params = new URLSearchParams(window.location.search);
-      const orgId = params.get("orgId");
-      const orgName = params.get("orgName");
-      window.location.href = `submissionFullDetails.html?submissionId=${submissionId}&orgId=${encodeURIComponent(orgId)}&orgName=${encodeURIComponent(orgName)}`;
-    });
-  });
 }
 
-// -------------------------------
-// ✅ Filtering logic
-// -------------------------------
+
+// Filter Functionality
 function applyFilter(filterValue) {
   if (!filterValue || !Array.isArray(allSubmissions)) return;
 
@@ -141,9 +129,7 @@ function applyFilter(filterValue) {
   document.querySelector(".filter-dropdown").classList.add("hidden");
 }
 
-// -------------------------------
-// ✅ Dropdown + filter button setup
-// -------------------------------
+// Filter Dropdown
 document.addEventListener("DOMContentLoaded", () => {
   const filterToggle = document.getElementById("filterToggle");
   const filterDropdown = document.querySelector(".filter-dropdown");
@@ -186,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // finally, load data
+  // load data
   loadSubmissions();
 });
 
@@ -200,12 +186,12 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.style.display = "block";
       });
 
-      // Optional: close dropdown after clearing
+      // Close dropdown after clearing
       const filterDropdown = document.querySelector(".filter-dropdown");
       if (filterDropdown) filterDropdown.classList.add("hidden");
 
-      // Optional: show confirmation text
-      console.log("✅ Filters cleared — all submissions visible.");
+      // Show confirmation text
+      console.log("Filters cleared — all submissions visible.");
     });
   }
 });

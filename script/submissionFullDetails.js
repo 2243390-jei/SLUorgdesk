@@ -17,7 +17,7 @@ async function loadSubmissionDetails() {
       return;
     }
 
-    // 🔹 Use formDetails if it exists, otherwise use data directly
+    // Use formDetails 
     const form = data.formDetails || {};
 
     document.getElementById("completeName").textContent = form.completeName || "-";
@@ -82,24 +82,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // Stop errors if elements are missing
   if (!commentBtn || !modal) return;
 
-  // ✅ Open modal when button is clicked
+  // Open modal 
   commentBtn.addEventListener("click", () => {
     modal.style.display = "block";
   });
 
-  // ❌ Close modal when X is clicked
+  // Close modal 
   closeModal.addEventListener("click", () => {
     modal.style.display = "none";
   });
 
-  // ❌ Close modal when clicking outside the box
+  // Close modal when clicking outside the box
   window.addEventListener("click", (e) => {
     if (e.target === modal) {
       modal.style.display = "none";
     }
   });
 
-  // ✅ Handle comment submission
+  // Comment submission warning
   submitComment.addEventListener("click", async () => {
     const comment = commentBox.value.trim();
     if (!comment) {
@@ -107,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Show success alert for now (later you can send to backend)
-    alert("✅ Comment submitted:\n\n" + comment);
+   
+    alert("Comment submitted:\n\n" + comment);
 
     // Clear the box and close modal
     commentBox.value = "";
