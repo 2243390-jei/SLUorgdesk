@@ -3,7 +3,8 @@
    Works with /api/Submissions | No logo
    ======================================================== */
 
-const API_URL = "http://localhost:3000/api/Submissions";
+// Use PHP endpoint that returns submissions JSON
+const API_URL = "../dataFetch/fetchSubmissions.php";
 let allSubmissions = [];
 let currentEditingId = null;
 const modal = document.getElementById("submissionModal");
