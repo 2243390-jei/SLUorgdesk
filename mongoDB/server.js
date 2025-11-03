@@ -26,15 +26,25 @@ app.get("/api/Organizations", async (req, res) => {
   }
 });
 
-// Get all submissions
+// Get all submissions with optional academic year and semester filters
 app.get("/api/Submissions", async (req, res) => {
   try {
-    const submissions = await Submission.find().sort({ submittedAt: -1 });
-    console.log(`Found ${submissions.length} total submissions`);
+    const { academicYear, semester } = req.query;
+    const query = {};
+    
+    if (academicYear) {
+      query.academicYear = academicYear;
+    }
+    if (semester) {
+      query.semester = semester;
+    }
+
+    const submissions = await Submission.find(query).sort({ "event.eventDate": -1 });
+    console.log(`Found ${submissions.length} submissions matching filters:`, query);
     res.json(submissions);
   } catch (error) {
-    console.error("Error fetching all submissions:", error);
-    res.status(500).json({ message: "Error fetching all submissions" });
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ message: "Error fetching submissions" });
   }
 });
 
