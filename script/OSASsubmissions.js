@@ -32,13 +32,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
-  // --- FILTER TOGGLE FUNCTIONALITY ---
+  // ==================== FILTER SYSTEM ====================
+
   const filterToggle = document.getElementById("filterToggle");
   const filterDropdown = document.getElementById("filterDropdown");
 
+  // Toggle dropdown visibility
   if (filterToggle && filterDropdown) {
     filterToggle.addEventListener("click", (e) => {
-      e.stopPropagation(); // avoid immediate document click
+      e.stopPropagation();
       filterDropdown.classList.toggle("hidden");
     });
   }
@@ -47,13 +49,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.addEventListener("click", (e) => {
     if (!filterDropdown) return;
     if (!filterDropdown.classList.contains("hidden")) {
-      // If click is outside the dropdown and not the toggle, close it
-      const isClickInside = filterDropdown.contains(e.target) || (filterToggle && filterToggle.contains(e.target));
+      const isClickInside =
+        filterDropdown.contains(e.target) ||
+        (filterToggle && filterToggle.contains(e.target));
       if (!isClickInside) filterDropdown.classList.add("hidden");
     }
   });
 
-  // --- HANDLE SUBFILTER DROPDOWNS (first-level) ---
+  // --- Expand/collapse main categories ---
   document.querySelectorAll(".filter-category").forEach((categoryBtn) => {
     categoryBtn.addEventListener("click", () => {
       const nextEl = categoryBtn.nextElementSibling;
@@ -63,59 +66,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // --- Handle nested submenus (data-sub -> data-parent mapping) ---
-  document.querySelectorAll(".filter-sub [data-sub]").forEach((subBtn) => {
-    subBtn.addEventListener("click", () => {
-      const parentValue = subBtn.getAttribute("data-sub");
-      const subMenu = document.querySelector(`.filter-sub2[data-parent="${parentValue}"]`);
-      if (subMenu) {
+  // --- Handle nested submenus (like Maryheights ▸) ---
+  document.querySelectorAll('.filter-sub[data-type="location"] [data-sub]').forEach((subBtn) => {
+    subBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subMenu = subBtn.nextElementSibling;
+      if (subMenu && subMenu.classList.contains("filter-sub2")) {
         subMenu.classList.toggle("hidden");
       }
     });
   });
 
-  // --- SDG FILTER BUTTONS FUNCTIONALITY ---
-  // Correct selector: SDG buttons are inside .filter-sub[data-type="sdg"]
+  // --- SDG FILTER FUNCTIONALITY ---
   const sdgContainer = document.querySelector('.filter-sub[data-type="sdg"]');
-
   if (sdgContainer) {
-    // attach click listener to each SDG button currently present
-    sdgContainer.querySelectorAll('button').forEach((sdgBtn) => {
-      sdgBtn.addEventListener('click', () => {
-        const selectedFilter = sdgBtn.textContent.trim();
+    sdgContainer.addEventListener("click", (ev) => {
+      if (ev.target.tagName === "BUTTON") {
+        const selectedFilter = ev.target.textContent.trim();
         applySDGFilter(selectedFilter);
-        // close dropdown after selection for better UX
-        if (filterDropdown) filterDropdown.classList.add('hidden');
-      });
-    });
-
-    // Also use event delegation in case buttons are changed/added later
-    sdgContainer.addEventListener('click', (ev) => {
-      const target = ev.target;
-      if (target.tagName === 'BUTTON') {
-        const selectedFilter = target.textContent.trim();
-        applySDGFilter(selectedFilter);
-        if (filterDropdown) filterDropdown.classList.add('hidden');
+        filterDropdown.classList.add("hidden");
       }
     });
-  } else {
-    // If the sdg container is not found, log to console for debugging
-    console.warn('SDG filter container not found: .filter-sub[data-type="sdg"]');
   }
+
+  // --- LOCATION FILTER FUNCTIONALITY ---
+  document.querySelectorAll('.filter-sub[data-type="location"] button, .filter-sub2 button')
+    .forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const hasSub = btn.nextElementSibling && btn.nextElementSibling.classList.contains("filter-sub2");
+
+        // Only apply the filter if it's a final venue (no submenu)
+        if (!hasSub) {
+          const selectedVenue = btn.textContent.trim();
+          applyVenueFilter(selectedVenue);
+          filterDropdown.classList.add("hidden");
+        }
+      });
+    });
 
   // --- CLEAR FILTER BUTTON ---
   const clearFilterBtn = document.getElementById("clearFilterBtn");
   if (clearFilterBtn) {
     clearFilterBtn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".filter-sub, .filter-sub2")
-        .forEach((el) => el.classList.add("hidden"));
-      renderSubmissions(submissions); // reset table
-      if (filterDropdown) filterDropdown.classList.add('hidden');
+      document.querySelectorAll(".filter-sub, .filter-sub2").forEach((el) => el.classList.add("hidden"));
+      renderSubmissions(submissions);
+      filterDropdown.classList.add("hidden");
     });
   }
 
-  // --- SEARCH FUNCTIONALITY ---
+  // ==================== SEARCH FUNCTIONALITY ====================
+
   const searchInput = document.getElementById("searchInput");
   const clearSearchBtn = document.getElementById("clearSearchBtn");
 
@@ -131,7 +132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // --- CLEAR SEARCH BUTTON ---
   if (clearSearchBtn) {
     clearSearchBtn.addEventListener("click", () => {
       searchInput.value = "";
@@ -140,25 +140,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // helper used above
+  // ==================== FILTER LOGIC ====================
+
+  // ✅ Fix SDG comparison between “SDG 1 - No Poverty” and “1. No Poverty”
   function applySDGFilter(selectedFilter) {
-    console.log('Applying SDG filter:', selectedFilter);
+    const normalizedFilter = normalizeText(selectedFilter);
+
     const filtered = submissions.filter((sub) => {
       const sdgs = (sub.event && sub.event.eventSDG) || [];
-      return sdgs.some((sdg) => normalizeSDGText(sdg) === normalizeSDGText(selectedFilter));
+      return sdgs.some((sdg) => normalizeText(sdg) === normalizedFilter);
+    });
+
+    renderSubmissions(filtered);
+  }
+
+  function applyVenueFilter(selectedVenue) {
+    const filtered = submissions.filter((sub) => {
+      const venue = (sub.event && sub.event.eventVenue) || "";
+      return venue.toLowerCase().includes(selectedVenue.toLowerCase());
     });
     renderSubmissions(filtered);
   }
 });
 
-// --- NORMALIZE SDG TEXT FOR COMPARISON ---
-function normalizeSDGText(text) {
+// --- NORMALIZE TEXT FOR COMPARISON ---
+function normalizeText(text) {
   if (!text) return "";
   return text
     .toLowerCase()
-    .replace(/sdg\s*/g, "") // remove 'SDG'
-    .replace(/[-.]/g, "")   // remove dash and dot
-    .replace(/\s+/g, " ")   // normalize spaces
+    .replace(/sdg\s*/g, "")   // remove "SDG "
+    .replace(/[-.]/g, "")     // remove "-" and "."
+    .replace(/\s+/g, " ")     // normalize spaces
     .trim();
 }
 
@@ -192,10 +204,7 @@ function renderSubmissions(submissions) {
 
   submissions.forEach((sub) => {
     const e = sub.event || {};
-    const sdgs = (e.eventSDG && e.eventSDG.length > 0)
-      ? e.eventSDG.join(", ")
-      : "None";
-
+    const sdgs = e.eventSDG && e.eventSDG.length > 0 ? e.eventSDG.join(", ") : "None";
     const docs = (e.supportingDocuments || [])
       .map((d, i) => `<a href="${d}" target="_blank">File ${i + 1}</a>`)
       .join(", ");

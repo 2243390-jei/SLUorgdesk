@@ -80,11 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="org-email">${org.email || "N/A"}</td>
         <td>${org.isWhitelisted ? "Organization" : "Pending"}</td>
         <td class="org-school">${org.school || "N/A"}</td>
-        <td>${org.programs ? org.programs.join(", ") : "N/A"}</td>
         <td>${org.updatedAt ? new Date(org.updatedAt).toLocaleDateString() : "—"}</td>
         <td class="action-buttons">
-          <img src="/Images/write.png" alt="Edit" class="action-icon edit-btn" title="Edit" data-id="${org._id}">
-          <img src="/Images/delete.png" alt="Delete" class="action-icon delete-btn" title="Delete" data-id="${org._id}">
+          <button class="action-icon edit-btn" data-id="${org._id}">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="action-icon delete-btn" data-id="${org._id}">
+            <i class="fas fa-trash"></i>
+          </button>
         </td>
       `;
       orgTableBody.appendChild(row);
@@ -222,30 +225,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const editBtn = e.target.closest(".edit-btn");
     const deleteBtn = e.target.closest(".delete-btn");
 
-    if (deleteBtn) {
-      // Show delete confirmation modal
-      if (confirmModal && confirmTitle) {
-        confirmTitle.textContent = "Are you sure you want to delete this organization?";
-        confirmModal.style.display = "flex";
-
-        // Setup confirmation handlers
-        if (confirmYes) {
-          confirmYes.onclick = () => {
-            alert("Organization deleted.");
-            confirmModal.style.display = "none";
-          };
-        }
-
-        if (confirmCancel) {
-          confirmCancel.onclick = () => {
-            confirmModal.style.display = "none";
-          };
-        }
-      }
-    }
-
     if (editBtn) {
-      // Show edit confirmation modal
+      const orgId = editBtn.dataset.id;
+      const org = organizations.find(o => o._id === orgId);
+      if (!org) return;
+
       if (editConfirmModal) {
         editConfirmModal.style.display = "flex";
 
@@ -260,17 +244,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 titleElement.textContent = "Edit Organization";
               }
 
-              // Get the row data
-              const row = editBtn.closest("tr");
-              if (row) {
-                const nameField = document.getElementById("orgName");
-                const emailField = document.getElementById("orgEmail");
-                const schoolField = document.getElementById("orgSchool");
+              // Fill in the form with organization data
+              const nameField = document.getElementById("orgName");
+              const emailField = document.getElementById("orgEmail");
+              const schoolField = document.getElementById("orgSchool");
 
-                if (nameField) nameField.value = row.querySelector(".org-name")?.textContent || "";
-                if (emailField) emailField.value = row.querySelector(".org-email")?.textContent || "";
-                if (schoolField) schoolField.value = row.querySelector(".org-school")?.textContent || "";
-              }
+              if (nameField) nameField.value = org.name || "";
+              if (emailField) emailField.value = org.email || "";
+              if (schoolField) schoolField.value = org.school || "";
             }
           };
         }
@@ -278,6 +259,32 @@ document.addEventListener("DOMContentLoaded", () => {
         if (confirmEditCancel) {
           confirmEditCancel.onclick = () => {
             editConfirmModal.style.display = "none";
+          };
+        }
+      }
+    }
+
+    if (deleteBtn) {
+      const orgId = deleteBtn.dataset.id;
+      const org = organizations.find(o => o._id === orgId);
+      if (!org) return;
+
+      if (confirmModal && confirmTitle) {
+        confirmTitle.textContent = "Are you sure you want to delete this organization?";
+        confirmModal.style.display = "flex";
+
+        // Setup confirmation handlers
+        if (confirmYes) {
+          confirmYes.onclick = () => {
+            // TODO: Add actual delete logic here
+            alert("Organization deleted.");
+            confirmModal.style.display = "none";
+          };
+        }
+
+        if (confirmCancel) {
+          confirmCancel.onclick = () => {
+            confirmModal.style.display = "none";
           };
         }
       }
