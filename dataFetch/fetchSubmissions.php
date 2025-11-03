@@ -36,8 +36,19 @@ try {
 
     $manager = new MongoDB\Driver\Manager($uri);
 
-    // Fetch all submissions
-    $query = new MongoDB\Driver\Query([]);
+ $filter = [];
+if (isset($_GET['orgId']) && !empty($_GET['orgId'])) {
+    try {
+        $orgId = new MongoDB\BSON\ObjectId($_GET['orgId']);
+        $filter = ['orgInfo.orgId' => $orgId];
+    } catch (Exception $e) {
+        // fallback in case of invalid ObjectId format
+        $filter = ['orgInfo.orgId' => $_GET['orgId']];
+    }
+}
+
+    // Fetch all submissions (or filtered if orgId is provided)
+    $query = new MongoDB\Driver\Query($filter);
     $cursor = $manager->executeQuery("Web-Tech.Submissions", $query);
 
     $submissions = [];
