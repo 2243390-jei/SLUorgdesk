@@ -2,7 +2,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Organization, Form } from "./mongodb.js";
+import { Organization} from "./mongodb.js";
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +26,21 @@ app.get("/api/organizations", async (req, res) => {
   }
 });
 
+// ✅ Route: Get all submissions
+app.get("/api/Submissions", async (req, res) => {
+  try {
+    const submissions = await mongoose.connection.db
+      .collection("Submissions")
+      .find({})
+      .toArray();
+
+    console.log(`✅ Found ${submissions.length} total submissions`);
+    res.json(submissions);
+  } catch (error) {
+    console.error("❌ Error fetching all submissions:", error);
+    res.status(500).json({ message: "Error fetching all submissions" });
+  }
+});
 // Fetch all forms
 app.get("/api/forms", async (req, res) => {
   try {

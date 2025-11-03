@@ -52,69 +52,77 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render submissions
     // ---------------------------
     function renderSubmissions(list) {
-        submissionList.innerHTML = '';
-        if (!list || list.length === 0) {
-            submissionList.innerHTML = '<p style="text-align:center; opacity:0.7;">No submissions found.</p>';
-            return;
-        }
+    submissionList.innerHTML = '';
+    if (!list || list.length === 0) {
+        submissionList.innerHTML = '<p style="text-align:center; opacity:0.7;">No submissions found.</p>';
+        return;
+    }
 
-        const grouped = groupBySemester(list);
+    const grouped = groupBySemester(list);
 
-        Object.keys(grouped).forEach(group => {
-            submissionList.innerHTML += `
-                <div class="semester-group">
-                    <h2 class="semester-title">${escapeHtml(group)}</h2>
-                    <div class="semester-submissions" id="group-${group.replace(/\s+/g,'')}"></div>
-                </div>
-            `;
+    Object.keys(grouped).forEach(group => {
+        submissionList.innerHTML += `
+            <div class="semester-group">
+                <h2 class="semester-title">${escapeHtml(group)}</h2>
+                <div class="semester-submissions" id="group-${group.replace(/\s+/g,'')}"></div>
+            </div>
+        `;
 
-            const groupContainer = document.getElementById(`group-${group.replace(/\s+/g,'')}`);
-            grouped[group].forEach(item => {
-                const id = item._id;
-                const status = item.status || 'PENDING';
-                const submittedOn = shortDate(item.submittedAt) || '';
-                const orgName = item.organizationInfo?.org_name || 'Untitled Org';
-                const applicant = item.applicantInfo?.applicant_name || '';
-                const school = item.organizationInfo?.org_category || '';
-                const academicYear = item.academicYear || 'Unknown';
-                const semester = item.semester || 'Unknown';
+        const groupContainer = document.getElementById(`group-${group.replace(/\s+/g,'')}`);
+        grouped[group].forEach(item => {
+            // Normalized submission id string
+            const submissionIdStr = normalizeId(item._id);
 
-                const st = status.toLowerCase();
-                const editDisabled = st === 'accepted';
-                const editBtn = editDisabled
-                    ? '<button class="btn-disabled" disabled>Edit</button>'
-                    : `<button class="btn-edit" onclick="editSubmission('${id}')">Edit</button>`;
+            const status = item.status || 'PENDING';
+            const submittedOn = shortDate(item.submittedAt) || '';
+            const orgName = item.organizationInfo?.org_name || 'Untitled Org';
+            const applicant = item.applicantInfo?.applicant_name || '';
+            const school = item.organizationInfo?.org_category || '';
+            const academicYear = item.academicYear || 'Unknown';
+            const semester = item.semester || 'Unknown';
 
-                const eventList = item.events?.map(e => `<li>${escapeHtml(e.eventName)} 
-                    <button class="btn-small" onclick="viewActivity('${id}','${e._id}')">View/Edit</button>
-                </li>`).join('') || '<li>No activities submitted</li>';
+            const st = status.toLowerCase();
+            const editDisabled = st === 'accepted';
+            const editBtn = editDisabled
+                ? '<button class="btn-disabled" disabled>Edit</button>'
+                : `<button class="btn-edit" onclick="editSubmission('${submissionIdStr}')">Edit</button>`;
 
-                groupContainer.innerHTML += `
-                    <div class="submission-card" data-status="${status}">
-                        <div class="submission-details">
-                            <div class="submission-header">
-                                <span class="submitted-on">${submittedOn}</span>
-                                <span class="status-badge status-${st}">${status}</span>
-                            </div>
-                            <div class="details-body">
-                                <h3>${escapeHtml(orgName)}</h3>
-                                <p class="sd-small">
-                                    ${escapeHtml(applicant)}${school ? ' • ' + escapeHtml(school) : ''}<br>
-                                    <strong>Academic Year:</strong> ${escapeHtml(academicYear)} • 
-                                    <strong>Semester:</strong> ${escapeHtml(semester)}
-                                </p>
-                                <ul class="events-list">${eventList}</ul>
-                            </div>
-                            <div class="manage-dropdown">
-                                ${editBtn}
-                                <button class="btn-view" onclick="viewDetails('${id}')">View Submission</button>
-                            </div>
+            // Build event list HTML, use either e.id or e._id (normalized)
+            const eventList = (item.events || []).map(e => {
+                const eventIdRaw = e.id ?? e._id ?? '';
+                const eventId = normalizeId(eventIdRaw); // ensure string
+                return `<li>${escapeHtml(e.eventName || 'Untitled Event')} 
+                    <button class="btn-small" onclick="viewActivity('${submissionIdStr}','${escapeHtml(eventId)}')">View/Edit</button>
+                </li>`;
+            }).join('') || '<li>No activities submitted</li>';
+
+            groupContainer.innerHTML += `
+                <div class="submission-card" data-status="${escapeHtml(status)}">
+                    <div class="submission-details">
+                        <div class="submission-header">
+                            <span class="submitted-on">${submittedOn}</span>
+                            <span class="status-badge status-${st}">${escapeHtml(status)}</span>
+                        </div>
+                        <div class="details-body">
+                            <h3>${escapeHtml(orgName)}</h3>
+                            <p class="sd-small">
+                                ${escapeHtml(applicant)}${school ? ' • ' + escapeHtml(school) : ''}<br>
+                                <strong>Academic Year:</strong> ${escapeHtml(academicYear)} • 
+                                <strong>Semester:</strong> ${escapeHtml(semester)}
+                            </p>
+                            <ul class="events-list">${eventList}</ul>
+                        </div>
+                        <div class="manage-dropdown">
+                            ${editBtn}
+                            <button class="btn-view" onclick="viewDetails('${submissionIdStr}')">View Submission</button>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
         });
-    }
+    });
+}
+
 
     // ---------------------------
     // Filter buttons
@@ -230,6 +238,20 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSubmissions();
 });
 
+// normalize any id-like value to a string for safe comparisons
+function normalizeId(id) {
+    if (id === null || id === undefined) return '';
+    // If it's an object like { $oid: "..." }
+    if (typeof id === 'object') {
+        if (id.$oid) return String(id.$oid);
+        // if driver returned ObjectId-like with toString
+        if (typeof id.toString === 'function') return id.toString();
+        return JSON.stringify(id);
+    }
+    return String(id);
+}
+
+
 // ---------------------------
 // Activity modal
 // ---------------------------
@@ -237,11 +259,26 @@ function openActivityModal(mode, submissionId, activityId) {
     const modal = document.getElementById('activityModal');
     const titleEl = document.getElementById('activityModalTitle');
 
-    // Find submission and activity
-    const submission = submissions.find(s => s._id === submissionId);
-    if (!submission) return alert('Submission not found');
-    const activity = submission.events?.find(e => e._id === activityId);
-    if (!activity) return alert('Activity not found');
+    // DEBUG: show incoming values
+    console.log('openActivityModal called with:', { submissionId, activityId });
+
+    // Find submission by normalized ID
+    const submission = submissions.find(s => normalizeId(s._id) === normalizeId(submissionId));
+    if (!submission) {
+        console.warn('Submission not found for id:', submissionId);
+        return alert('Submission not found');
+    }
+
+    // Find activity: check either e.id or e._id (normalize both sides)
+    const activity = (submission.events || []).find(e => {
+        const evId = e.id ?? e._id ?? '';
+        return normalizeId(evId) === normalizeId(activityId);
+    });
+
+    if (!activity) {
+        console.warn('Activity not found. submission.events:', submission.events, 'searchedId:', activityId);
+        return alert('Activity not found');
+    }
 
     const fields = {
         name: document.getElementById('activityName'),
@@ -258,49 +295,47 @@ function openActivityModal(mode, submissionId, activityId) {
         sdg: document.getElementById('activitySDG'),
     };
 
-   fields.name.value = activity.eventName || '';
-fields.description.value = ''; // if you have no separate description, leave blank or use eventType
-fields.type.value = activity.eventType || '';
-fields.date.value = activity.eventDate || '';
+    fields.name.value = activity.eventName || '';
+    fields.description.value = activity.description || '';
+    fields.type.value = activity.eventType || '';
+    // If your eventDate is stored as a string e.g. "2025-11-15", assign it; if it's Date object, convert to yyyy-mm-dd
+    fields.date.value = activity.eventDate ? (new Date(activity.eventDate)).toISOString().slice(0,10) : '';
 
-// Split startTime like "1:00 PM" into time and period
-if (activity.startTime) {
-    const parts = activity.startTime.split(' ');
-    fields.startTime.value = parts[0] || '';
-    fields.startPeriod.value = parts[1] || 'AM';
-} else {
-    fields.startTime.value = '';
-    fields.startPeriod.value = 'AM';
-}
-
-// Split endTime like "3:00 PM"
-if (activity.endTime) {
-    const parts = activity.endTime.split(' ');
-    fields.endTime.value = parts[0] || '';
-    fields.endPeriod.value = parts[1] || 'PM';
-} else {
-    fields.endTime.value = '';
-    fields.endPeriod.value = 'AM';
-}
-
-// Venue
-fields.venue.value = activity.eventVenue || '';
-
-// Attendees: handle MongoDB $numberInt wrapper
-if (activity.eventAttendees) {
-    if (typeof activity.eventAttendees === 'object' && activity.eventAttendees.$numberInt) {
-        fields.attendees.value = activity.eventAttendees.$numberInt;
+    // start / end time split (support both "1:00 PM" string or already-split)
+    if (activity.startTime) {
+        const parts = String(activity.startTime).split(' ');
+        fields.startTime.value = parts[0] || '';
+        fields.startPeriod.value = parts[1] || 'AM';
     } else {
-        fields.attendees.value = activity.eventAttendees;
+        fields.startTime.value = '';
+        fields.startPeriod.value = 'AM';
     }
-} else fields.attendees.value = '';
 
-// Proof
-fields.proof.value = activity.eventProof || '';
+    if (activity.endTime) {
+        const parts = String(activity.endTime).split(' ');
+        fields.endTime.value = parts[0] || '';
+        fields.endPeriod.value = parts[1] || 'PM';
+    } else {
+        fields.endTime.value = '';
+        fields.endPeriod.value = 'AM';
+    }
 
-// SDGs: join array into comma-separated string
-fields.sdg.value = Array.isArray(activity.eventSDG) ? activity.eventSDG.join(', ') : '';
+    fields.venue.value = activity.eventVenue || '';
 
+    // attendees: handle nested $numberInt object or plain number/string
+    if (activity.eventAttendees) {
+        if (typeof activity.eventAttendees === 'object' && activity.eventAttendees.$numberInt) {
+            fields.attendees.value = activity.eventAttendees.$numberInt;
+        } else {
+            fields.attendees.value = activity.eventAttendees;
+        }
+    } else fields.attendees.value = '';
+
+    fields.proof.value = activity.eventProof || '';
+
+    // SDGs: join array into comma-separated string
+    if (Array.isArray(activity.eventSDG)) fields.sdg.value = activity.eventSDG.join(', ');
+    else fields.sdg.value = activity.eventSDG || '';
 
     const saveBtn = document.getElementById('activitySave');
     saveBtn.onclick = null;
@@ -314,9 +349,18 @@ fields.sdg.value = Array.isArray(activity.eventSDG) ? activity.eventSDG.join(', 
         Object.values(fields).forEach(f => f.removeAttribute('disabled'));
         saveBtn.style.display = 'inline-block';
         saveBtn.onclick = () => {
+            // basic mock update in memory
             activity.eventName = fields.name.value;
             activity.description = fields.description.value;
-            alert('Activity updated (mock)');
+            activity.eventType = fields.type.value;
+            activity.eventDate = fields.date.value;
+            activity.startTime = fields.startTime.value + ' ' + fields.startPeriod.value;
+            activity.endTime = fields.endTime.value + ' ' + fields.endPeriod.value;
+            activity.eventVenue = fields.venue.value;
+            activity.eventAttendees = Number(fields.attendees.value) || fields.attendees.value;
+            activity.eventProof = fields.proof.value;
+            // note: eventSDG editing not implemented here
+            alert('Activity updated (mock) — in-memory only');
             closeActivityModal();
         };
     }
@@ -326,6 +370,7 @@ fields.sdg.value = Array.isArray(activity.eventSDG) ? activity.eventSDG.join(', 
     document.getElementById('activityClose').onclick = closeActivityModal;
     document.getElementById('activityCloseBtn').onclick = closeActivityModal;
 }
+
 
 function closeActivityModal() {
     const modal = document.getElementById('activityModal');
