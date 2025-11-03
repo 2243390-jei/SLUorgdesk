@@ -1,10 +1,7 @@
-// OSASsubmissions.js
 const submissionsContainer = document.getElementById("submissionsContainer");
 let allSubmissions = [];
 
-// -------------------------------
-// ✅ Load submissions once
-// -------------------------------
+// Load All Submissions
 async function loadSubmissions() {
   const params = new URLSearchParams(window.location.search);
   const orgId = params.get("orgId");
@@ -24,7 +21,7 @@ async function loadSubmissions() {
     const response = await fetch(`http://localhost:3000/api/Submissions/${orgId}`);
     const submissions = await response.json();
 
-    allSubmissions = submissions; // ✅ store globally for filtering
+    allSubmissions = submissions; // Storage for Filtering
 
     if (submissions.length === 0) {
       submissionsContainer.innerHTML = `<p>No submissions found for this organization.</p>`;
@@ -38,9 +35,7 @@ async function loadSubmissions() {
   }
 }
 
-// -------------------------------
-// ✅ Rendering logic
-// -------------------------------
+// Rendering of Filter
 function renderFilteredSubmissions(submissions) {
   if (!submissions || submissions.length === 0) {
     submissionsContainer.innerHTML = `<p>No submissions match your filter.</p>`;
@@ -93,7 +88,7 @@ function renderFilteredSubmissions(submissions) {
     submissionsContainer.appendChild(wrapper);
   });
 
-  // dropdown toggles
+  // Dropdown Functionality
   document.querySelectorAll(".submission-header").forEach(header => {
     header.addEventListener("click", () => {
       const index = header.dataset.index;
@@ -104,7 +99,7 @@ function renderFilteredSubmissions(submissions) {
     });
   });
 
-  // view details buttons
+  // View Details Button Functionality
   document.querySelectorAll(".view-details-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const submissionId = btn.dataset.id;
@@ -116,9 +111,8 @@ function renderFilteredSubmissions(submissions) {
   });
 }
 
-// -------------------------------
-// ✅ Filtering logic
-// -------------------------------
+
+// Filter Functionality
 function applyFilter(filterValue) {
   if (!filterValue || !Array.isArray(allSubmissions)) return;
 
@@ -141,9 +135,7 @@ function applyFilter(filterValue) {
   document.querySelector(".filter-dropdown").classList.add("hidden");
 }
 
-// -------------------------------
-// ✅ Dropdown + filter button setup
-// -------------------------------
+// Filter Dropdown
 document.addEventListener("DOMContentLoaded", () => {
   const filterToggle = document.getElementById("filterToggle");
   const filterDropdown = document.querySelector(".filter-dropdown");
@@ -186,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // finally, load data
+  // load data
   loadSubmissions();
 });
 
@@ -200,12 +192,12 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.style.display = "block";
       });
 
-      // Optional: close dropdown after clearing
+      // Close dropdown after clearing
       const filterDropdown = document.querySelector(".filter-dropdown");
       if (filterDropdown) filterDropdown.classList.add("hidden");
 
-      // Optional: show confirmation text
-      console.log("✅ Filters cleared — all submissions visible.");
+      // Show confirmation text
+      console.log("Filters cleared — all submissions visible.");
     });
   }
 });
