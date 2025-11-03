@@ -1,5 +1,4 @@
-// API Configuration
-const API_BASE_URL = "http://localhost:3000/api";
+
 
 // Updated SDG Category Mapping for your format
 const SDG_CATEGORIES = {
@@ -382,18 +381,18 @@ class LargeChart {
     }
 }
 
-// Data Processing Functions - UPDATED FOR SUBMISSION SCHEMA
+// Data Processing Functions - FIXED FOR CORRECT DATA STRUCTURE
 class AnalyticsDataProcessor {
-    static processSubmissionsData(submissions) {
-        // Extract all events from submissions
-        const allEvents = this.extractAllEvents(submissions);
+    static processSubmissionsData(submissions, organizations) {
+        // Create a mapping from organization ID to school
+        const orgToSchoolMap = this.createOrgToSchoolMap(organizations);
+        
+        // Extract all events from submissions and map organizations to schools
+        const allEvents = this.extractAllEvents(submissions, orgToSchoolMap);
         
         const stats = {
             totalSubmissions: submissions.length,
-            totalEvents: allEvents.length,
-            pendingSubmissions: submissions.filter(sub => sub.status === 'PENDING').length,
-            approvedSubmissions: submissions.filter(sub => sub.status === 'APPROVED').length,
-            rejectedSubmissions: submissions.filter(sub => sub.status === 'REJECTED').length
+            totalEvents: allEvents.length
         };
 
         // Group by month using submission date
@@ -402,11 +401,11 @@ class AnalyticsDataProcessor {
         // Group by SDG - USING EVENTS DATA
         const sdgData = this.groupBySDG(allEvents);
         
-        // Group by school - NOW WITH COLORS
-        const schoolData = this.groupBySchool(submissions);
+        // Group by school - NOW USING THE MAPPED SCHOOL DATA
+        const schoolData = this.groupBySchool(submissions, orgToSchoolMap);
         
         // Group by organization - TOP 5 ONLY
-        const orgData = this.groupByOrganization(submissions);
+        const orgData = this.groupByOrganization(submissions, orgToSchoolMap);
 
         return {
             stats,
@@ -417,19 +416,31 @@ class AnalyticsDataProcessor {
         };
     }
 
-    // Extract all events from all submissions
-    static extractAllEvents(submissions) {
+    // Create mapping from organization ID to school
+    static createOrgToSchoolMap(organizations) {
+        const orgMap = {};
+        organizations.forEach(org => {
+            orgMap[org._id] = org.school;
+        });
+        return orgMap;
+    }
+
+    // Extract all events from all submissions and add school information
+    static extractAllEvents(submissions, orgToSchoolMap) {
         const allEvents = [];
         submissions.forEach(submission => {
-            if (submission.events && submission.events.length > 0) {
-                submission.events.forEach(event => {
-                    allEvents.push({
-                        ...event,
-                        submissionId: submission._id,
-                        organizationInfo: submission.organizationInfo,
-                        status: submission.status,
-                        submittedAt: submission.submittedAt
-                    });
+            // Each submission has a single event object, not an array
+            if (submission.event) {
+                // Get the school from the organization mapping
+                const orgId = submission.orgInfo?.orgId;
+                const school = orgToSchoolMap[orgId] || 'Unknown School';
+                
+                allEvents.push({
+                    ...submission.event,
+                    submissionId: submission._id,
+                    orgInfo: submission.orgInfo,
+                    school: school,
+                    submittedAt: submission.submittedAt
                 });
             }
         });
@@ -441,7 +452,16 @@ class AnalyticsDataProcessor {
         const monthlyCounts = new Array(12).fill(0);
         
         submissions.forEach(submission => {
-            const date = new Date(submission.submittedAt);
+            // Use event date if available, otherwise fallback to submission date or current date
+            let date;
+            if (submission.event?.eventDate) {
+                date = new Date(submission.event.eventDate);
+            } else if (submission.submittedAt) {
+                date = new Date(submission.submittedAt);
+            } else {
+                date = new Date(); // fallback to current date
+            }
+            
             const month = date.getMonth();
             monthlyCounts[month]++;
         });
@@ -505,11 +525,12 @@ class AnalyticsDataProcessor {
         };
     }
 
-    static groupBySchool(submissions) {
+    static groupBySchool(submissions, orgToSchoolMap) {
         const schoolMap = {};
         
         submissions.forEach(submission => {
-            const school = submission.organizationInfo?.org_category || 'Unknown School';
+            const orgId = submission.orgInfo?.orgId;
+            const school = orgToSchoolMap[orgId] || 'Unknown School';
             schoolMap[school] = (schoolMap[school] || 0) + 1;
         });
 
@@ -525,17 +546,19 @@ class AnalyticsDataProcessor {
         };
     }
 
-    static groupByOrganization(submissions) {
+    static groupByOrganization(submissions, orgToSchoolMap) {
         const orgMap = {};
         
         submissions.forEach(submission => {
-            const orgName = submission.organizationInfo?.org_acronym || submission.organizationInfo?.org_name || 'Unknown Organization';
+            const orgName = submission.orgInfo?.acronym || submission.orgInfo?.name || 'Unknown Organization';
+            const orgId = submission.orgInfo?.orgId;
+            const school = orgToSchoolMap[orgId] || 'Unknown School';
+            
             if (!orgMap[orgName]) {
                 orgMap[orgName] = {
                     name: orgName,
                     submissions: 0,
-                    school: submission.organizationInfo?.org_category || 'Unknown',
-                    status: submission.status || 'Unknown'
+                    school: school
                 };
             }
             orgMap[orgName].submissions++;
@@ -548,10 +571,11 @@ class AnalyticsDataProcessor {
     }
 }
 
-// Main Analytics Dashboard - UPDATED FOR SUBMISSIONS
+// Main Analytics Dashboard - FIXED DATA PROCESSING
 class AnalyticsDashboard {
     constructor() {
         this.submissions = [];
+        this.organizations = [];
         this.processedData = null;
         this.init();
     }
@@ -571,17 +595,31 @@ class AnalyticsDashboard {
 
     async loadData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/Submissions`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Load both submissions and organizations in parallel
+            const [submissionsResponse, organizationsResponse] = await Promise.all([
+                fetch(`../dataFetch/fetchSubmissions.php`),
+                fetch(`../dataFetch/fetchDatabase.php`)
+            ]);
+
+            if (!submissionsResponse.ok) {
+                throw new Error(`HTTP error! status: ${submissionsResponse.status}`);
             }
-            this.submissions = await response.json();
-            this.processedData = AnalyticsDataProcessor.processSubmissionsData(this.submissions);
-            console.log('Loaded submissions data:', this.submissions.length, 'submissions');
-            console.log('SDG Data:', this.processedData.sdgData);
-            console.log(' School Data with Colors:', this.processedData.schoolData);
+            if (!organizationsResponse.ok) {
+                throw new Error(`HTTP error! status: ${organizationsResponse.status}`);
+            }
+
+            this.submissions = await submissionsResponse.json();
+            this.organizations = await organizationsResponse.json();
+            
+            console.log('Loaded submissions:', this.submissions);
+            console.log('Loaded organizations:', this.organizations);
+            
+            // Process data by combining both datasets
+            this.processedData = AnalyticsDataProcessor.processSubmissionsData(this.submissions, this.organizations);
+            
+            console.log('Processed data:', this.processedData);
         } catch (error) {
-            console.error(' Error loading submissions:', error);
+            console.error('Error loading data:', error);
             throw error;
         }
     }
@@ -590,17 +628,15 @@ class AnalyticsDashboard {
         if (!this.processedData) return;
 
         const { stats, sdgData } = this.processedData;
-        
-        document.getElementById('totalForms').textContent = stats.totalSubmissions;
-        document.getElementById('pendingForms').textContent = stats.pendingSubmissions;
-        document.getElementById('approvedForms').textContent = stats.approvedSubmissions;
-        
+
         document.getElementById('sdgSubmissions').textContent = `${sdgData.totalEvents} Events`;
         document.getElementById('sdgGoals').textContent = `${sdgData.activeGoals} Goals`;
     }
 
     renderCharts() {
         if (!this.processedData) return;
+
+        console.log('Rendering charts with data:', this.processedData);
 
         // Monthly Submissions Chart
         const submissionsCtx = document.getElementById('submissionsChart').getContext('2d');
@@ -631,7 +667,7 @@ class AnalyticsDashboard {
             hoverId: 'sdgHover'
         });
 
-        // Schools Chart - NOW WITH COLOR CODING
+        // Schools Chart - WITH COLOR CODING FROM ORGANIZATIONS DATA
         const schoolsCtx = document.getElementById('schoolsChart').getContext('2d');
         const schoolsData = {
             labels: this.processedData.schoolData.labels,

@@ -89,3 +89,16 @@ function renderSubmissions(submissions) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
+
+// Filter toggle functionality
+document.addEventListener("DOMContentLoaded", () => {
+  const filterToggle = document.getElementById("filterToggle");
+  const filterDropdown = document.getElementById("filterDropdown");
+
+  if (filterToggle && filterDropdown) {
+    filterToggle.addEventListener("click", () => {
+      filterDropdown.classList.toggle("hidden");
+    });
+  }
+});
+

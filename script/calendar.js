@@ -22,8 +22,7 @@ document.getElementById('curYear').textContent = new Date().getFullYear();
 let viewDate = new Date(); // Months are 0-based (0 = January, 10 = November)
 const today = new Date();
 
-// Base URL (adjust port if needed)
-const API_BASE_URL = "http://localhost:3000/api";
+
 
 // Make events list scrollable
 function makeEventsListScrollable() {
@@ -38,7 +37,7 @@ function makeEventsListScrollable() {
 async function fetchSubmissionsFromMongoDB() {
   try {
     console.log("Fetching submissions from MongoDB...");
-    const response = await fetch(`${API_BASE_URL}/Submissions`);
+    const response = await fetch(`../dataFetch/fetchSubmissions.php`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
