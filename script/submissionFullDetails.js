@@ -1,116 +1,138 @@
-// Load Submission Details
+// ✅ Load event details from localStorage (if redirected from OSASsubmissions)
+const storedEvent = localStorage.getItem("selectedEvent");
+if (storedEvent) {
+  const e = JSON.parse(storedEvent);
+
+  document.getElementById("eventName").textContent = e.eventName || "N/A";
+  document.getElementById("eventType").textContent = e.eventType || "N/A";
+  document.getElementById("eventDate").textContent = e.eventDate || "N/A";
+  document.getElementById("startTime").textContent = e.startTime || "N/A";
+  document.getElementById("endTime").textContent = e.endTime || "N/A";
+  document.getElementById("eventVenue").textContent = e.eventVenue || "N/A";
+  document.getElementById("attendance").textContent = e.attendance || "N/A";
+  document.getElementById("eventSDG").textContent = Array.isArray(e.eventSDG)
+    ? e.eventSDG.join(", ")
+    : e.eventSDG || "None";
+  document.getElementById("eventProof").href = e.eventProof || "#";
+
+  const docsList = document.getElementById("supportingDocumentsList");
+  if (Array.isArray(e.supportingDocuments) && e.supportingDocuments.length > 0) {
+    docsList.innerHTML = e.supportingDocuments
+      .map(doc => `<li><a href="${doc}" target="_blank">${doc}</a></li>`)
+      .join("");
+  } else {
+    docsList.innerHTML = "<li>No additional documents</li>";
+  }
+
+  // ✅ Save the event_id temporarily to query PHP
+  if (e.id) localStorage.setItem("selectedEventId", e.id);
+
+  localStorage.removeItem("selectedEvent");
+}
+
+// ✅ Fetch submission details from PHP backend
 async function loadSubmissionDetails() {
   const params = new URLSearchParams(window.location.search);
-  const submissionId = params.get("submissionId");
+  let eventId = params.get("event_id");
 
-  if (!submissionId) {
+  // Fallback: use stored event_id if URL param missing
+  if (!eventId) eventId = localStorage.getItem("selectedEventId");
+
+  console.log("🔍 Event ID from URL or localStorage:", eventId);
+
+  if (!eventId) {
     document.body.innerHTML = "<p>No submission selected.</p>";
     return;
   }
 
   try {
-    const res = await fetch(`http://localhost:3000/api/Submission/${submissionId}`);
+    const res = await fetch(`../dataFetch/fetchSubmissions.php?event_id=${eventId}`);
     const data = await res.json();
 
-    if (!res.ok) {
-      document.body.innerHTML = `<p>${data.message || "Error fetching submission."}</p>`;
+    console.log("📦 Received data from PHP:", data);
+
+    if (!res.ok || !data) {
+      document.body.innerHTML = `<p>${data?.error || "Error fetching submission."}</p>`;
       return;
     }
 
-    // Use formDetails 
-    const form = data.formDetails || {};
+    const submission = Array.isArray(data) ? data[0] : data;
+    if (!submission) {
+      document.body.innerHTML = "<p>No matching submission found.</p>";
+      return;
+    }
 
-    document.getElementById("completeName").textContent = form.completeName || "-";
-    document.getElementById("acronym").textContent = form.acronym || "-";
-    document.getElementById("officialEmail").textContent = form.officialEmail || "-";
-    document.getElementById("applicantName").textContent = form.applicantName || "-";
-    document.getElementById("applicantEmail").textContent = form.applicantEmail || "-";
-    document.getElementById("category").textContent = form.category || "-";
-    document.getElementById("organizationType").textContent = form.organizationType || "-";
-    document.getElementById("applicantPosition").textContent = form.applicantPosition || "-";
-    document.getElementById("school").textContent = form.school || "-";
-    document.getElementById("cblStatus").textContent = form.cblStatus || "-";
-    document.getElementById("status").textContent = data.status || "-";
-    document.getElementById("remarks").textContent = data.remarks || "—";
-    document.getElementById("submittedBy").textContent = data.submittedBy || "-";
-    document.getElementById("createdAt").textContent = new Date(data.createdAt).toLocaleString();
-    document.getElementById("updatedAt").textContent = new Date(data.updatedAt).toLocaleString();
+    const org = submission.orgInfo || {};
+    const app = submission.applicationInfo || {};
+    const event = submission.event || {};
 
-    // Lists
-    const socialMediaList = document.getElementById("socialMediaLinks");
-    if (Array.isArray(form.socialMediaLinks)) {
-      socialMediaList.innerHTML = form.socialMediaLinks
-        .map(link => `<li><a href="${link}" target="_blank">${link}</a></li>`)
+    // --- Organization Info ---
+    document.getElementById("orgName").textContent = org.name || "-";
+    document.getElementById("orgAcronym").textContent = org.acronym || "-";
+    document.getElementById("orgEmail").textContent = org.email || "-";
+    document.getElementById("academicYear").textContent = submission.academicYear || "-";
+    document.getElementById("semester").textContent = submission.semester || "-";
+
+    // --- Applicant Info ---
+    // document.getElementById("applicantName").textContent = app.applicantName || "-";
+    // document.getElementById("applicantEmail").textContent = app.email || "-";
+    // document.getElementById("applicantPosition").textContent = app.position || "-";
+
+    // --- Event Info ---
+    document.getElementById("eventName").textContent = event.eventName || "-";
+    document.getElementById("eventType").textContent = event.eventType || "-";
+    document.getElementById("eventDate").textContent = event.eventDate || "-";
+    document.getElementById("startTime").textContent = event.startTime || "-";
+    document.getElementById("endTime").textContent = event.endTime || "-";
+    document.getElementById("eventVenue").textContent = event.eventVenue || "-";
+    document.getElementById("attendance").textContent = event.attendance || "-";
+    document.getElementById("eventDescription").textContent = event.eventDescription || "-";
+
+    document.getElementById("eventSDG").textContent = Array.isArray(event.eventSDG)
+      ? event.eventSDG.join(", ")
+      : event.eventSDG || "None";
+
+    // --- Event Documents ---
+    document.getElementById("eventProof").href = event.eventProof || "#";
+
+    const docsList = document.getElementById("supportingDocumentsList");
+    if (Array.isArray(event.supportingDocuments) && event.supportingDocuments.length > 0) {
+      docsList.innerHTML = event.supportingDocuments
+        .map(doc => `<li><a href="${doc}" target="_blank">${doc}</a></li>`)
         .join("");
+    } else {
+      docsList.innerHTML = "<li>No additional documents</li>";
     }
 
-    const adviserEmailsList = document.getElementById("adviserEmails");
-    if (Array.isArray(form.adviserEmails)) {
-      adviserEmailsList.innerHTML = form.adviserEmails.map(email => `<li>${email}</li>`).join("");
-    }
-
-    const adviserNamesList = document.getElementById("adviserNames");
-    if (Array.isArray(form.adviserNames)) {
-      adviserNamesList.innerHTML = form.adviserNames.map(name => `<li>${name}</li>`).join("");
-    }
-
-    // File links
-    document.getElementById("strategicPlans").href = form.strategicPlans?.url || "#";
-    document.getElementById("annualReport").href = form.annualReport?.url || "#";
-    document.getElementById("constitutionByLaws").href = form.constitutionByLaws?.url || "#";
-    document.getElementById("infographics").href = form.infographics?.url || "#";
-    document.getElementById("videoLink").href = form.videoLink || "#";
   } catch (error) {
-    console.error("Error:", error);
+    console.error("❌ Error loading submission:", error);
     document.body.innerHTML = "<p>Failed to load submission details.</p>";
   }
 }
 
 loadSubmissionDetails();
 
-
-
-// Comment Revisions Modal
+// ✅ Comment Revisions Modal Logic
 document.addEventListener("DOMContentLoaded", () => {
-  // Use your correct button ID from the HTML file
   const commentBtn = document.getElementById("commentRevisionsBtn");
   const modal = document.getElementById("commentModal");
   const closeModal = document.getElementById("closeModal");
   const submitComment = document.getElementById("submitComment");
   const commentBox = document.getElementById("revisionComment");
 
-  // Stop errors if elements are missing
   if (!commentBtn || !modal) return;
 
-  // Open modal 
-  commentBtn.addEventListener("click", () => {
-    modal.style.display = "block";
+  commentBtn.addEventListener("click", () => (modal.style.display = "block"));
+  closeModal.addEventListener("click", () => (modal.style.display = "none"));
+  window.addEventListener("click", e => {
+    if (e.target === modal) modal.style.display = "none";
   });
 
-  // Close modal 
-  closeModal.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
-
-  // Close modal when clicking outside the box
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.style.display = "none";
-    }
-  });
-
-  // Comment submission warning
   submitComment.addEventListener("click", async () => {
     const comment = commentBox.value.trim();
-    if (!comment) {
-      alert("⚠️ Please write a comment before submitting.");
-      return;
-    }
+    if (!comment) return alert("⚠️ Please write a comment before submitting.");
 
-   
     alert("Comment submitted:\n\n" + comment);
-
-    // Clear the box and close modal
     commentBox.value = "";
     modal.style.display = "none";
   });

@@ -61,48 +61,48 @@
 
     <main class="main-area" role="main">
       <div class="container">
-        <h1>Submission of Organization Documents</h1>
-        <p>Below are the details of the selected organization’s document submission.</p>
+        <h1>Event Submission Details</h1>
+        <p>Below are the details of the selected organization's event submission.</p>
 
+        <!-- Organization Info -->
         <section class="form-section">
-          <h2>Document Forms</h2>
+          <h2>Organization Information</h2>
           <div class="details-grid">
-            <div><label>Complete Name of Organization or Publication:</label><p id="completeName"></p></div>
-            <div><label>Acronym or Short Name:</label><p id="acronym"></p></div>
-            <div><label>Official SLU Institutional Email:</label><p id="officialEmail"></p></div>
-            <div><label>URL Links to Official Social Media Pages:</label><ul id="socialMediaLinks"></ul></div>
-            <div><label>Name of Applicant Representing the Organization:</label><p id="applicantName"></p></div>
-            <div><label>SLU Institutional Email of Applicant:</label><p id="applicantEmail"></p></div>
-            <div><label>Category the Organization Belongs To:</label><p id="category"></p></div>
-            <div><label>Type of Organization:</label><p id="organizationType"></p></div>
-            <div><label>Position of Applicant:</label><p id="applicantPosition"></p></div>
-            <div><label>SLU Institutional Email of Adviser/s:</label><ul id="adviserEmails"></ul></div>
-            <div><label>Name of Adviser/s:</label><ul id="adviserNames"></ul></div>
-            <div><label>School:</label><p id="school"></p></div>
+            <div><label>Organization Name:</label><p id="orgName"></p></div>
+            <div><label>Acronym:</label><p id="orgAcronym"></p></div>
+            <div><label>Email:</label><p id="orgEmail"></p></div>
+            <div><label>Academic Year:</label><p id="academicYear"></p></div>
+            <div><label>Semester:</label><p id="semester"></p></div>
           </div>
         </section>
 
+        <!-- Event Info -->
         <section class="form-section">
-          <h2>Document Uploads</h2>
+          <h2>Event Information</h2>
           <div class="details-grid">
-            <div><label>Strategic Plans for 2025–2026 (PDF):</label><a id="strategicPlans" target="_blank">View File</a></div>
-            <div><label>Annual Report 2025–2026 (PDF):</label><a id="annualReport" target="_blank">View File</a></div>
-            <div><label>Constitution & By-Laws (PDF):</label><a id="constitutionByLaws" target="_blank">View File</a></div>
-            <div><label>CBL Status:</label><p id="cblStatus"></p></div>
-            <div><label>Updated Infographic for SLU Website:</label><a id="infographics" target="_blank">View File</a></div>
-            <div><label>Video Link:</label><a id="videoLink" target="_blank">Watch Video</a></div>
+            <div><label>Event Name:</label><p id="eventName"></p></div>
+            <div><label>Event Type:</label><p id="eventType"></p></div>
+            <div><label>Date:</label><p id="eventDate"></p></div>
+            <div><label>Start Time:</label><p id="startTime"></p></div>
+            <div><label>End Time:</label><p id="endTime"></p></div>
+            <div><label>Venue:</label><p id="eventVenue"></p></div>
+            <div><label>Attendance:</label><p id="attendance"></p></div>
+            <div><label>SDG Goals:</label><p id="eventSDG"></p></div>
+          </div>
+          <div class="description">
+            <label>Description:</label>
+            <p id="eventDescription"></p>
           </div>
         </section>
 
+        <!-- Documents -->
         <section class="form-section">
-          <h2>Submission Status</h2>
+          <h2>Documents</h2>
           <div class="details-grid">
-            <div><label>Status:</label><p id="status"></p></div>
-            <div><label>Remarks:</label><p id="remarks"></p></div>
-            <div><label>Submitted By (User ID):</label><p id="submittedBy"></p></div>
-            <div><label>Created At:</label><p id="createdAt"></p></div>
-            <div><label>Updated At:</label><p id="updatedAt"></p></div>
+            <div><label>Event Proof:</label><a id="eventProof" target="_blank">View File</a></div>
           </div>
+          <label>Supporting Documents:</label>
+          <ul id="supportingDocumentsList"></ul>
         </section>
 
         <!-- Buttons -->

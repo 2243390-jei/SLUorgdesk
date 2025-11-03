@@ -33,11 +33,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ==================== FILTER SYSTEM ====================
-
   const filterToggle = document.getElementById("filterToggle");
   const filterDropdown = document.getElementById("filterDropdown");
 
-  // Toggle dropdown visibility
   if (filterToggle && filterDropdown) {
     filterToggle.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -45,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!filterDropdown) return;
     if (!filterDropdown.classList.contains("hidden")) {
@@ -56,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // --- Expand/collapse main categories ---
+  // Expand / Collapse
   document.querySelectorAll(".filter-category").forEach((categoryBtn) => {
     categoryBtn.addEventListener("click", () => {
       const nextEl = categoryBtn.nextElementSibling;
@@ -66,18 +63,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // --- Handle nested submenus (like Maryheights ▸) ---
+  // Nested submenus (locations)
   document.querySelectorAll('.filter-sub[data-type="location"] [data-sub]').forEach((subBtn) => {
     subBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      const parentValue = subBtn.getAttribute("data-sub");
       const subMenu = subBtn.nextElementSibling;
-      if (subMenu && subMenu.classList.contains("filter-sub2")) {
+      if (subMenu && subMenu.dataset.parent === parentValue) {
         subMenu.classList.toggle("hidden");
       }
     });
   });
 
-  // --- SDG FILTER FUNCTIONALITY ---
+  // --- SDG Filter ---
   const sdgContainer = document.querySelector('.filter-sub[data-type="sdg"]');
   if (sdgContainer) {
     sdgContainer.addEventListener("click", (ev) => {
@@ -89,14 +87,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // --- LOCATION FILTER FUNCTIONALITY ---
+  // --- Location Filter ---
   document.querySelectorAll('.filter-sub[data-type="location"] button, .filter-sub2 button')
     .forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const hasSub = btn.nextElementSibling && btn.nextElementSibling.classList.contains("filter-sub2");
-
-        // Only apply the filter if it's a final venue (no submenu)
         if (!hasSub) {
           const selectedVenue = btn.textContent.trim();
           applyVenueFilter(selectedVenue);
@@ -105,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
-  // --- CLEAR FILTER BUTTON ---
+  // --- Clear Filter ---
   const clearFilterBtn = document.getElementById("clearFilterBtn");
   if (clearFilterBtn) {
     clearFilterBtn.addEventListener("click", () => {
@@ -115,8 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // ==================== SEARCH FUNCTIONALITY ====================
-
+  // --- Search ---
   const searchInput = document.getElementById("searchInput");
   const clearSearchBtn = document.getElementById("clearSearchBtn");
 
@@ -124,7 +119,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase();
       const rows = document.querySelectorAll(".submissions-table tbody tr");
-
       rows.forEach((row) => {
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(query) ? "" : "none";
@@ -141,16 +135,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ==================== FILTER LOGIC ====================
-
-  // ✅ Fix SDG comparison between “SDG 1 - No Poverty” and “1. No Poverty”
   function applySDGFilter(selectedFilter) {
     const normalizedFilter = normalizeText(selectedFilter);
-
     const filtered = submissions.filter((sub) => {
       const sdgs = (sub.event && sub.event.eventSDG) || [];
       return sdgs.some((sdg) => normalizeText(sdg) === normalizedFilter);
     });
-
     renderSubmissions(filtered);
   }
 
@@ -161,70 +151,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     renderSubmissions(filtered);
   }
+
+  // --- RENDER SUBMISSIONS FUNCTION ---
+  function renderSubmissions(submissions) {
+    const container = document.getElementById("submissionsContainer");
+
+    if (!submissions || submissions.length === 0) {
+      container.innerHTML = `<p>No submissions found for this organization.</p>`;
+      return;
+    }
+
+    let html = `
+      <table class="submissions-table">
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Venue</th>
+            <th>Attendance</th>
+            <th>SDG Goals</th>
+            <th>Proof</th>
+            <th>Supporting Documents</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    submissions.forEach((sub) => {
+      const e = sub.event || {};
+      const sdgs = e.eventSDG && e.eventSDG.length > 0 ? e.eventSDG.join(", ") : "None";
+      const docs = (e.supportingDocuments || [])
+        .map((d, i) => `<a href="${d}" target="_blank">File ${i + 1}</a>`)
+        .join(", ");
+
+      html += `
+        <tr>
+          <td>${e.eventName || "N/A"}</td>
+          <td>${e.eventType || "N/A"}</td>
+          <td>${e.eventDate || "N/A"}</td>
+          <td>${e.startTime || "N/A"}</td>
+          <td>${e.endTime || "N/A"}</td>
+          <td>${e.eventVenue || "N/A"}</td>
+          <td>${e.attendance || "N/A"}</td>
+          <td>${sdgs}</td>
+          <td>${e.eventProof ? `<a href="${e.eventProof}" target="_blank">View Proof</a>` : "N/A"}</td>
+          <td>${docs || "None"}</td>
+          <td><button class="view-details-btn" data-event='${JSON.stringify(e)}'>View Full Details</button></td>
+        </tr>
+      `;
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+
+    // Add event listeners to buttons
+    document.querySelectorAll(".view-details-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const eventData = JSON.parse(e.target.getAttribute("data-event"));
+        localStorage.setItem("selectedEvent", JSON.stringify(eventData));
+        window.location.href = "../osas/submissionFullDetails.html";
+      });
+    });
+  }
 });
 
-// --- NORMALIZE TEXT FOR COMPARISON ---
+// --- NORMALIZE TEXT ---
 function normalizeText(text) {
   if (!text) return "";
   return text
     .toLowerCase()
-    .replace(/sdg\s*/g, "")   // remove "SDG "
-    .replace(/[-.]/g, "")     // remove "-" and "."
-    .replace(/\s+/g, " ")     // normalize spaces
+    .replace(/sdg\s*/g, "")
+    .replace(/[-.]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
-}
-
-// --- RENDER SUBMISSIONS FUNCTION ---
-function renderSubmissions(submissions) {
-  const container = document.getElementById("submissionsContainer");
-
-  if (!submissions || submissions.length === 0) {
-    container.innerHTML = `<p>No submissions found for this organization.</p>`;
-    return;
-  }
-
-  let html = `
-    <table class="submissions-table">
-      <thead>
-        <tr>
-          <th>Event Name</th>
-          <th>Type</th>
-          <th>Date</th>
-          <th>Start Time</th>
-          <th>End Time</th>
-          <th>Venue</th>
-          <th>Attendance</th>
-          <th>SDG Goals</th>
-          <th>Proof</th>
-          <th>Supporting Documents</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  submissions.forEach((sub) => {
-    const e = sub.event || {};
-    const sdgs = e.eventSDG && e.eventSDG.length > 0 ? e.eventSDG.join(", ") : "None";
-    const docs = (e.supportingDocuments || [])
-      .map((d, i) => `<a href="${d}" target="_blank">File ${i + 1}</a>`)
-      .join(", ");
-
-    html += `
-      <tr>
-        <td>${e.eventName || "N/A"}</td>
-        <td>${e.eventType || "N/A"}</td>
-        <td>${e.eventDate || "N/A"}</td>
-        <td>${e.startTime || "N/A"}</td>
-        <td>${e.endTime || "N/A"}</td>
-        <td>${e.eventVenue || "N/A"}</td>
-        <td>${e.attendance || "N/A"}</td>
-        <td>${sdgs}</td>
-        <td>${e.eventProof ? `<a href="${e.eventProof}" target="_blank">View Proof</a>` : "N/A"}</td>
-        <td>${docs || "None"}</td>
-      </tr>
-    `;
-  });
-
-  html += "</tbody></table>";
-  container.innerHTML = html;
 }
