@@ -935,7 +935,10 @@ textarea {
   background-color: #fafafa;
   transition: all 0.3s ease;
   position: relative;
-  cursor: default; /* changed from pointer */
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .drop-zone:hover,
@@ -951,7 +954,7 @@ textarea {
   pointer-events: none;
 }
 
-.drop-zone span {
+.drop-zone > span {
   font-size: 0.9rem;
   color: #666;
   display: block;
@@ -965,6 +968,7 @@ textarea {
   opacity: 0;
   left: 0;
   top: 0;
+  pointer-events: none;
 }
 
 /* BROWSE BUTTON */
@@ -999,46 +1003,64 @@ textarea {
   width: 100%;
 }
 
-/* FILE PREVIEW ITEM */
+  /* FILE PREVIEW ITEM */
+.file-preview-container {
+  width: 100%;
+  margin-top: 12px;
+}
+
 .file-preview-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: #e6f7ff;
   border: 1px solid #91d5ff;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 0.85rem;
   color: #1e1362;
-  gap: 6px;
-  cursor: default;
+  margin-bottom: 8px;
+  position: relative;
 }
 
-.file-preview-item span {
-  max-width: 120px;
+.file-preview-item span:first-child {
+  flex: 1;
+  min-width: 0;
+  margin-right: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
+  pointer-events: none;
 }
 
 .file-preview-item .remove-file {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   font-weight: bold;
   color: #d32f2f;
-  font-size: 1.1rem;
-  margin-left: 4px;
+  font-size: 1.4rem;
+  width: 24px;
+  height: 24px;
   user-select: none;
+  background: transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 2;
+  position: relative;
+  border: 1px solid transparent;
 }
 
 .file-preview-item:hover {
-  background-color: #d0ebff !important;
-}
-.remove-file:hover {
-  color: #b71c1c !important;
-  transform: scale(1.2);
+  background-color: #d0ebff;
 }
 
-/* SDG GRID */
+.remove-file:hover {
+  color: #b71c1c;
+  background-color: rgba(211, 47, 47, 0.1);
+  border-color: rgba(211, 47, 47, 0.2);
+}/* SDG GRID */
 .event-sdg-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
