@@ -39,54 +39,35 @@ rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
 
 // Initialize the page
 async function initialize() {
-    await fetchUsers();
-    updateTable();
+    try {
+        users = await fetchUsers();
+        if (users && users.length > 0) {
+            updateTable();
+        } else {
+            userTableBody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
+        }
+    } catch (error) {
+        console.error('Error initializing:', error);
+        userTableBody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
+    }
 }
 
-// Initialize with sample users (no API call)
+// Fetch users from MongoDB
 async function fetchUsers() {
-    // Sample data for frontend development matching MongoDB structure
-    users = [
-        {
-            _id: '67189c51b4c79f7a2a3e9d01',
-            name: 'Juan Dela Cruz',
-            email: 'juan.delacruz@slu.edu.ph',
-            role: 'Student Leader',
-            studentId: '2023-00001',
-            school: 'SAMCIS',
-            course: 'BS Information Technology',
-            yearLevel: 3,
-            isActive: true
-        },
-        {
-            _id: '67189c51b4c79f7a2a3e9d02',
-            name: 'Maria C. Santos',
-            email: 'maria.santos@slu.edu.ph',
-            role: 'OSAS',
-            employeeId: 'EMP-1023',
-            school: 'SAMCIS',
-            department: 'Information Technology',
-            isActive: true
-        },
-        {
-            _id: '67189c51b4c79f7a2a3e9d03',
-            name: 'Jose T. Torres',
-            email: 'jose.torres@slu.edu.ph',
-            role: 'OSAS',
-            employeeId: 'EMP-1089',
-            school: 'SAMCIS',
-            department: 'Computer Science',
-            isActive: true
-        },
-        {
-            _id: '69084f36d7d9e21af42a510c',
-            name: 'Admin User',
-            email: 'admin@slu.edu.ph',
-            role: 'Admin',
-            school: 'SAMCIS',
-            isActive: true
-        }
-    ];
+    try {
+        const apiBase = "http://localhost:3000/api/users";  // Update this URL to match your MongoDB API endpoint
+        console.log('Fetching users from:', apiBase);
+        const response = await fetch(apiBase);
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        users = data;
+        return users;
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        userTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the server is running at ${apiBase}</td></tr>`;
+        return [];
+    }
 }
 
 // Filter users based on current filters
