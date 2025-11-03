@@ -36,14 +36,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   width: 52px; 
   height: 52px; 
   border-radius: 12px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  background: linear-gradient(135deg, #3498db, #2980b9); 
-  color: white; 
-  font-weight: 700; 
-  box-shadow: 0 4px 12px rgba(52,152,219,0.3); 
-  font-size: 16px; 
+  object-fit: cover;
   margin-bottom: 8px;
 }
 
@@ -89,6 +82,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 .nav-icon {
   width: 20px;
   height: 20px;
+  object-fit: contain;
 }
 
 /* MAIN AREA */
