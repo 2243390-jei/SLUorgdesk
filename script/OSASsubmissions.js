@@ -35,7 +35,7 @@ async function loadSubmissions() {
   }
 }
 
-// Rendering of Filter
+// ✅ Updated Rendering of Filter
 function renderFilteredSubmissions(submissions) {
   if (!submissions || submissions.length === 0) {
     submissionsContainer.innerHTML = `<p>No submissions match your filter.</p>`;
@@ -44,43 +44,48 @@ function renderFilteredSubmissions(submissions) {
 
   submissionsContainer.innerHTML = "";
 
-  submissions.forEach((s, index) => {
+  submissions.forEach((submission, subIndex) => {
     const wrapper = document.createElement("div");
     wrapper.classList.add("submission-wrapper");
 
+    // Build table rows for all events in the submission
+    let rowsHTML = "";
+    if (submission.events && submission.events.length > 0) {
+      submission.events.forEach(event => {
+        rowsHTML += `
+          <tr>
+            <td>${event.eventName || "-"}</td>
+            <td>${event.eventType || "-"}</td>
+            <td>${event.eventDate ? new Date(event.eventDate).toLocaleDateString() : "-"}</td>
+            <td>${event.eventVenue || "-"}</td>
+            <td>${Array.isArray(event.eventSDG)
+              ? event.eventSDG.map(sdg => sdg.sdgName || sdg).join(", ")
+              : (event.eventSDG || "-")}</td>
+          </tr>
+        `;
+      });
+    } else {
+      rowsHTML = `<tr><td colspan="5">No events found for this submission.</td></tr>`;
+    }
+
     wrapper.innerHTML = `
-      <div class="submission-header" data-index="${index}">
+      <div class="submission-header" data-index="${subIndex}">
         <span class="dropdown-arrow">▶</span>
-        <span class="submission-title">${s.title || s.eventName || "-"}</span>
+        <span class="submission-title">Submission #${subIndex + 1}</span>
+        <span class="submission-status">Status: ${submission.status || "-"}</span>
       </div>
       <div class="submission-details hidden">
         <table class="submission-table">
           <thead>
             <tr>
               <th>Event Name</th>
+              <th>Event Type</th>
               <th>Event Date</th>
-              <th>Category</th>
-              <th>Event Description</th>
-              <th>Location</th>
-              <th>SDG Category</th>
-              <th>Budget</th>
-              <th>Status</th>
-              <th></th>
+              <th>Event Venue</th>
+              <th>Event SDG</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>${s.eventName || "-"}</td>
-              <td>${s.eventDate ? new Date(s.eventDate).toLocaleDateString() : "-"}</td>
-              <td>${s.category || "-"}</td>
-              <td>${s.EventDescription || "-"}</td>
-              <td>${s.Location || "-"}</td>
-              <td>${s.SDGCategory || "-"}</td>
-              <td>${s.AllottedBudget || "-"}</td>
-              <td>${s.status || "-"}</td>
-              <td><button class="view-details-btn" data-id="${s._id}">View Details</button></td>
-            </tr>
-          </tbody>
+          <tbody>${rowsHTML}</tbody>
         </table>
       </div>
     `;
@@ -96,17 +101,6 @@ function renderFilteredSubmissions(submissions) {
       const arrow = header.querySelector(".dropdown-arrow");
       details.classList.toggle("hidden");
       arrow.textContent = details.classList.contains("hidden") ? "▶" : "▼";
-    });
-  });
-
-  // View Details Button Functionality
-  document.querySelectorAll(".view-details-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const submissionId = btn.dataset.id;
-      const params = new URLSearchParams(window.location.search);
-      const orgId = params.get("orgId");
-      const orgName = params.get("orgName");
-      window.location.href = `submissionFullDetails.html?submissionId=${submissionId}&orgId=${encodeURIComponent(orgId)}&orgName=${encodeURIComponent(orgName)}`;
     });
   });
 }

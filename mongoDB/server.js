@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Organization} from "./mongodb.js";
+import { Organization, Submission } from "./mongodb.js";
+
+
 
 const app = express();
 const PORT = 3000;
@@ -14,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // Fetch all organizations
-app.get("/api/organizations", async (req, res) => {
+app.get("/api/Organizations", async (req, res) => {
   try {
     const organizations = await Organization.find();
     res.json(organizations);
@@ -24,14 +26,10 @@ app.get("/api/organizations", async (req, res) => {
   }
 });
 
-// Get all submissions from the mongoDB database
+// Get all submissions
 app.get("/api/Submissions", async (req, res) => {
   try {
-    const submissions = await mongoose.connection.db
-      .collection("Submissions")
-      .find({})
-      .toArray();
-
+    const submissions = await Submission.find().sort({ submittedAt: -1 });
     console.log(`Found ${submissions.length} total submissions`);
     res.json(submissions);
   } catch (error) {
@@ -39,6 +37,7 @@ app.get("/api/Submissions", async (req, res) => {
     res.status(500).json({ message: "Error fetching all submissions" });
   }
 });
+
 // Fetch all forms
 app.get("/api/forms", async (req, res) => {
   try {
@@ -60,18 +59,16 @@ app.get("/api/Submissions/:organizationId", async (req, res) => {
       return res.status(400).json({ message: "Invalid organization ID" });
     }
 
-    const Submissions = await mongoose.connection.db
-      .collection("Submissions")
-      .find({ organizationId: new mongoose.Types.ObjectId(organizationId) })
-      .toArray();
+    const submissions = await Submission.find({ organizationId }).sort({ submittedAt: -1 });
 
-    console.log(`Found ${Submissions.length} submissions for org ${organizationId}`);
-    res.json(Submissions);
+    console.log(`Found ${submissions.length} submissions for org ${organizationId}`);
+    res.json(submissions);
   } catch (error) {
     console.error("Error fetching submissions:", error);
     res.status(500).json({ message: "Error fetching submissions" });
   }
 });
+
 
 // Logic to get a submission using the ID
 app.get("/api/Submission/:submissionId", async (req, res) => {
