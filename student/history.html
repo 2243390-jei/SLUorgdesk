@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLU OrgDesk | History</title>
     <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="../style/history.css" />
 </head>
 <body class="home-body">
     <!-- NAVIGATION BAR -->
@@ -29,169 +30,23 @@
         <div class="history-controls">
             <input type="text" id="searchInput" placeholder="Search by Organization or Event..." />
 
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-status="all">All Submissions</button>
-                <button class="filter-btn" data-status="APPROVED">Accepted</button>
-                <button class="filter-btn" data-status="PENDING">Pending</button>
-                <button class="filter-btn" data-status="NEEDS REVISION">Needs Revision</button>
+            <div class="filter-container" id="filterContainer">
+                <select id="academicYearFilter" class="filter-select">
+                    <option value="">All Academic Years</option>
+                </select>
+                <select id="semesterFilter" class="filter-select">
+                    <option value="">All Semesters</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                </select>
             </div>
-
-            <select id="timeFilter" class="time-filter">
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-                <option value="all" selected>All Time</option>
-            </select>
         </div>
 
         <!-- SUBMISSION CARDS -->
         <div id="submissionList" class="submission-cards"></div>
 
-        <!-- MODAL: View / Edit Submission -->
-        <div id="submissionModal" class="modal" aria-hidden="true">
-            <div class="modal-content wide-modal">
-                <button class="modal-close" id="modalClose">×</button>
-                <h2 class="modal-section-title">Submission Details</h2>
-
-                <form id="modalForm">
-                    <!-- 1. Document Forms -->
-                    <h3 class="form-section-title">Document Forms</h3>
-
-                    <div class="form-group">
-                        <label>Complete Name of Organization</label>
-                        <input id="modalCompleteName" type="text" readonly>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Acronym</label>
-                            <input id="modalAcronym" type="text" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Official Email</label>
-                            <input id="modalOfficialEmail" type="email" readonly>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Social Media Links</label>
-                        <input id="modalSocialLinks" type="text" readonly>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Applicant Name</label>
-                            <input id="modalApplicantName" type="text" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Applicant Email</label>
-                            <input id="modalApplicantEmail" type="email" readonly>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>School / Category</label>
-                            <input id="modalSchool" type="text" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Org Type</label>
-                            <input id="modalOrganizationType" type="text" readonly>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Applicant Position</label>
-                            <input id="modalApplicantPosition" type="text" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Adviser(s)</label>
-                            <input id="modalAdviserNames" type="text" readonly>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Adviser Email(s)</label>
-                        <input id="modalAdviserEmail" type="email" readonly>
-                    </div>
-
-                    <!-- 2. Academic Year -->
-                    <h3 class="form-section-title">Academic Year Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Start Year</label>
-                            <input id="modalStartYear" type="number" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>End Year</label>
-                            <input id="modalEndYear" type="number" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Semester</label>
-                            <input id="modalSemester" type="text" readonly>
-                        </div>
-                    </div>
-
-                    <!-- 3. Events -->
-                    <h3 class="form-section-title">Event Details</h3>
-                    <div id="modalEventList"></div>
-
-                    <!-- 4. Uploads -->
-                    <h3 class="form-section-title">Document Uploads</h3>
-
-                    <div class="form-group">
-                        <label>Strategic Plan</label>
-                        <input id="modalStrategicPlan" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Annual Report</label>
-                        <input id="modalAnnualReport" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>CBL</label>
-                        <input id="modalCBL" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>CBL Status</label>
-                        <input id="modalCBLStatus" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Officers List</label>
-                        <input id="modalOfficersList" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Infographic</label>
-                        <input id="modalInfographic" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Financial Statement</label>
-                        <input id="modalFinancialStatement" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Video Link</label>
-                        <input id="modalVideoLink" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Additional Note</label>
-                        <input id="modalNote" type="text" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Submitted At</label>
-                        <input id="modalCreatedAt" type="text" readonly>
-                    </div>
-
-                    <!-- MODAL ACTIONS -->
-                    <div class="modal-actions">
-                        <button type="button" id="modalEditBtn" class="edit-btn-modal" style="display: none;">
-                            Save Changes
-                        </button>
-                        <button type="button" id="modalCloseBtn" class="reset-btn">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <!-- MODAL: View Submission -->
+        <div id="submissionModal" class="modal" aria-hidden="true"></div>
     </section>
 
     <script src="../script/organization_history.js"></script>
