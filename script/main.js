@@ -94,12 +94,14 @@ console.log("Exact equality test:", dbPass === password);
 
     localStorage.setItem("localUser", JSON.stringify(normalized));
 
-    // auto-set currentOrgId
-    if (normalized.role === "Organization" && normalized.organization) {
-      const orgId = (typeof normalized.organization === "object" && normalized.organization.$oid)
-        ? normalized.organization.$oid
-        : String(normalized.organization);
-      if (orgId) localStorage.setItem("currentOrgId", orgId);
+   localStorage.removeItem("currentOrgId");
+
+// then, set based on the logged-in organization
+if (normalized.role === "Organization" && normalized.organization) {
+  const orgId = (typeof normalized.organization === "object" && normalized.organization.$oid)
+    ? normalized.organization.$oid
+    : String(normalized.organization);
+  if (orgId) localStorage.setItem("currentOrgId", orgId);
     } else if (Array.isArray(normalized.organizations) && normalized.organizations.length > 0) {
       const first = normalized.organizations[0];
       const firstId = (typeof first === "object" && first.$oid) ? first.$oid : String(first);

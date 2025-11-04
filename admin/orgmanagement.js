@@ -61,17 +61,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Utility: detect mobile screen
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+
+  // Render organization cards for mobile
+  function renderCards() {
+    const cardList = document.getElementById("orgCardList");
+    if (!cardList) return;
+    cardList.innerHTML = "";
+    if (!filteredData.length) {
+      cardList.innerHTML = `<div style='text-align:center;color:#888;'>No organizations found.</div>`;
+      return;
+    }
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = filteredData.slice(start, end);
+    pageData.forEach(org => {
+      const card = document.createElement("div");
+      card.className = "card-item";
+      card.innerHTML = `
+        <div class="card-header">
+          <img src="${org.logoUrl || '../Images/default-logo.png'}" alt="${org.name}" class="card-logo" />
+          <div>
+            <div class="card-title">${org.name || 'N/A'}</div>
+            <div class="card-email">${org.email || 'N/A'}</div>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span>${org.isWhitelisted ? 'Organization' : 'Pending'}</span>
+          <span>${org.school || 'N/A'}</span>
+        </div>
+        <div class="card-actions">
+          <button class="action-icon edit-btn" data-id="${org._id}" title="Edit"><i class="fas fa-edit"></i></button>
+          <button class="action-icon delete-btn" data-id="${org._id}" title="Delete"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      cardList.appendChild(card);
+    });
+  }
+
+  // Patch renderTable to also call renderCards on mobile
   function renderTable() {
     orgTableBody.innerHTML = "";
     if (!filteredData.length) {
       orgTableBody.innerHTML = `<tr><td colspan="6">No organizations found.</td></tr>`;
-      return;
     }
-
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const pageData = filteredData.slice(start, end);
-
     pageData.forEach((org) => {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -79,18 +118,20 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="org-name">${org.name || "N/A"}</td>
         <td class="org-email">${org.email || "N/A"}</td>
         <td>${org.isWhitelisted ? "Organization" : "Pending"}</td>
-  <td class="org-school">${org.school || "N/A"}</td>
+        <td class="org-school">${org.school || "N/A"}</td>
         <td class="action-buttons">
-          <button class="action-icon edit-btn" data-id="${org._id}">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="action-icon delete-btn" data-id="${org._id}">
-            <i class="fas fa-trash"></i>
-          </button>
+          <button class="action-icon edit-btn" data-id="${org._id}"><i class="fas fa-edit"></i></button>
+          <button class="action-icon delete-btn" data-id="${org._id}"><i class="fas fa-trash"></i></button>
         </td>
       `;
       orgTableBody.appendChild(row);
     });
+    // Render cards if mobile
+    if (isMobile()) renderCards();
+    else {
+      const cardList = document.getElementById("orgCardList");
+      if (cardList) cardList.innerHTML = "";
+    }
   }
 
   function renderPagination() {
