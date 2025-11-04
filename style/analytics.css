@@ -1,4 +1,4 @@
-/* Font face declarations for all the weights you need */
+
 @font-face {
   font-family: "Inter";
   src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
@@ -27,7 +27,6 @@
   font-style: normal;
 }
 
-/* Reset & base */
 * { 
   box-sizing: border-box; 
   margin:0; 
@@ -49,14 +48,12 @@
   --danger-hover: #c0392b;
 }
 
-/* App layout */
 body { 
   background: var(--bg); 
   color: #0f1720; 
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
-  font-weight: 400; /* Regular weight for body text */
-}
+  font-weight: 400; 
 
 .app { 
   display:flex; 
@@ -64,7 +61,6 @@ body {
   gap:0;
 }
 
-/* LEFT BAR - STATIC NAVIGATION */
 .leftbar { 
   width: 92px; 
   display: flex; 
@@ -111,7 +107,7 @@ body {
   justify-content: center; 
   color: #bdc3c7;
   transition: all 0.2s ease;
-  font-weight: 400; /* Regular weight for icons */
+  font-weight: 400; 
 }
 
 .circle-btn:hover { 
@@ -146,7 +142,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* MAIN AREA */
 .main-area { 
   flex: 1; 
   display: flex; 
@@ -158,7 +153,6 @@ body {
   margin-left: 92px;
 }
 
-/* HEADER */
 .header { 
   display: flex; 
   justify-content: space-between; 
@@ -170,17 +164,16 @@ body {
 .greeting h1 { 
   font-size: 28px; 
   letter-spacing: 0.3px; 
-  font-weight: 600; /* SemiBold weight for main headings */
+  font-weight: 600; 
   margin-bottom: 8px;
 }
 
 .muted { 
   color: var(--muted); 
   font-size: 14px; 
-  font-weight: 400; /* Regular weight for muted text */
+  font-weight: 400; 
 }
 
-/* TOP ACTIONS WITH PROFILE */
 .top-actions { 
   display: flex; 
   gap: 16px; 
@@ -200,7 +193,7 @@ body {
   background: white; 
   box-shadow: 0 2px 8px rgba(10,20,30,0.04);
   font-size: 14px;
-  font-weight: 400; /* Regular weight for input text */
+  font-weight: 400; 
 }
 
 #searchClear { 
@@ -231,7 +224,7 @@ body {
   align-items: center; 
   justify-content: center; 
   color: white; 
-  font-weight: 700; /* Bold weight for profile initials */
+  font-weight: 700; 
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -244,7 +237,6 @@ body {
   box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
 }
 
-/* BODY LAYOUT */
 .body {
   display: flex;
   flex-direction: column;
@@ -252,7 +244,6 @@ body {
   flex: 1;
 }
 
-/* Charts Row Layout */
 .charts-row {
   display: flex;
   gap: 30px;
@@ -260,7 +251,6 @@ body {
   min-height: 400px;
 }
 
-/* Organizations Section */
 .orgs-section {
   flex: 0 0 400px;
   background: var(--card);
@@ -281,7 +271,7 @@ body {
 
 .section-header h2 {
   font-size: 20px;
-  font-weight: 600; /* SemiBold weight for section headers */
+  font-weight: 600; 
   color: var(--deep-blue);
 }
 
@@ -325,7 +315,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-weight: 700; /* Bold weight for rank numbers */
+  font-weight: 700; 
   transition: all 0.3s ease;
 }
 
@@ -334,7 +324,7 @@ body {
 }
 
 .org-name {
-  font-weight: 600; /* SemiBold weight for organization names */
+  font-weight: 600; 
   font-size: 16px;
   color: var(--deep-blue);
   transition: color 0.3s ease;
@@ -357,7 +347,7 @@ body {
 }
 
 .org-stat-value {
-  font-weight: 700; /* Bold weight for stat values */
+  font-weight: 700; 
   color: var(--accent);
   font-size: 18px;
   transition: all 0.3s ease;
@@ -372,10 +362,9 @@ body {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500; /* Medium weight for stat labels */
+  font-weight: 500;
 }
 
-/* Charts Section */
 .charts-section {
   flex: 1;
   display: flex;
@@ -411,12 +400,11 @@ body {
 .chart-header h2,
 .chart-header h3 {
   font-size: 20px;
-  font-weight: 600; /* SemiBold weight for chart headers */
+  font-weight: 600; 
   color: var(--deep-blue);
   margin: 0;
 }
 
-/* Chart Containers */
 .chart-container {
   flex: 1;
   position: relative;
@@ -431,7 +419,6 @@ body {
   min-height: 350px;
 }
 
-/* SDG Stats */
 .sdg-stats {
   display: flex;
   gap: 20px;
@@ -442,19 +429,17 @@ body {
   background: var(--soft);
   padding: 8px 16px;
   border-radius: 8px;
-  font-weight: 600; /* SemiBold weight for SDG stats */
+  font-weight: 600; 
   color: var(--accent);
   font-size: 14px;
 }
 
-/* Ensure canvas elements take full size */
 canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
-/* Chart Hover Info */
 .chart-hover-info {
   position: absolute;
   background: rgba(0, 0, 0, 0.9);
@@ -462,7 +447,7 @@ canvas {
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 500; /* Medium weight for hover info */
+  font-weight: 500; 
   pointer-events: none;
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -476,7 +461,6 @@ canvas {
   transform: translateY(0);
 }
 
-/* ========== MODAL STYLES ========== */
 .modal {
   position: fixed;
   top: 0;
@@ -524,7 +508,7 @@ canvas {
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 600; /* SemiBold weight for modal headers */
+  font-weight: 600; 
   color: #1f2937;
 }
 
@@ -541,7 +525,7 @@ canvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -568,7 +552,7 @@ canvas {
   border-radius: 8px;
   font-weight: 600; /* SemiBold weight for buttons */
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -581,16 +565,15 @@ canvas {
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 600; /* SemiBold weight for buttons */
+  font-weight: 600; 
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-secondary:hover {
   background: #e2e8f0;
 }
 
-/* Profile modal specific styles */
 .profile-modal .modal-content {
   max-width: 350px;
 }
@@ -611,7 +594,7 @@ canvas {
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 700; /* Bold weight for large profile initials */
+  font-weight: 700;
   font-size: 20px;
   box-shadow: 0 4px 12px rgba(231,76,60,0.3);
 }
@@ -619,7 +602,7 @@ canvas {
 .profile-details h4 {
   margin: 0 0 4px 0;
   font-size: 1.1rem;
-  font-weight: 600; /* SemiBold weight for profile name */
+  font-weight: 600; 
   color: #1f2937;
 }
 
@@ -633,7 +616,7 @@ canvas {
   border: 1px solid rgba(231, 76, 60, 0.2);
   padding: 12px 16px;
   border-radius: 8px;
-  font-weight: 600; /* SemiBold weight for logout button */
+  font-weight: 600; 
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -643,7 +626,6 @@ canvas {
   transform: translateY(-1px);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -664,7 +646,6 @@ canvas {
   }
 }
 
-/* ========== MOBILE RESPONSIVE DESIGN ========== */
 @media (max-width: 1024px) {
   .charts-row {
     flex-direction: column;
@@ -684,9 +665,7 @@ canvas {
   }
 }
 
-/* MOBILE BOTTOM NAVIGATION - 768px and below */
 @media (max-width: 768px) {
-  /* Mobile Sidebar - Convert to bottom navigation */
   .leftbar {
     position: fixed;
     bottom: 0;
@@ -720,12 +699,10 @@ canvas {
     border-radius: 10px;
   }
 
-  /* Hide logout button in mobile bottom nav */
   .circle-btn.logout-btn {
     display: none;
   }
 
-  /* Main area adjustment for mobile bottom nav */
   .main-area {
     margin-left: 0;
     margin-bottom: 70px;
@@ -734,7 +711,6 @@ canvas {
     width: 100%;
   }
 
-  /* Header mobile adjustments - CENTERED GREETING */
   .header {
     flex-direction: column;
     gap: 16px;
@@ -772,19 +748,16 @@ canvas {
     width: 100%;
   }
 
-  /* Body mobile adjustments */
   .body {
     gap: 20px;
   }
 
-  /* Chart containers mobile */
   .chart-container,
   .chart-container-large {
     height: 250px;
     min-height: 250px;
   }
 
-  /* Chart cards mobile */
   .chart-card {
     padding: 16px;
   }
@@ -801,7 +774,6 @@ canvas {
     justify-content: space-between;
   }
 
-  /* Organizations section mobile */
   .orgs-section {
     padding: 16px;
     height: 280px;
@@ -820,7 +792,6 @@ canvas {
     font-size: 16px;
   }
 
-  /* Text sizing for mobile */
   .section-header h2,
   .chart-header h2,
   .chart-header h3 {
@@ -832,7 +803,6 @@ canvas {
     padding: 6px 12px;
   }
 
-  /* Profile mobile */
   .profile-circle {
     width: 40px;
     height: 40px;
@@ -845,7 +815,6 @@ canvas {
   }
 }
 
-/* Small Mobile Styles - 480px and below */
 @media (max-width: 480px) {
   .main-area {
     padding: 12px;
@@ -889,7 +858,6 @@ canvas {
     font-size: 13px;
   }
 
-  /* Bottom navigation smaller on very small screens */
   .leftbar {
     height: 65px;
     padding: 6px 2px;
@@ -905,7 +873,6 @@ canvas {
   }
 }
 
-/* Very Small Mobile Styles - 360px and below */
 @media (max-width: 360px) {
   .circle-btn {
     width: 42px;
@@ -925,7 +892,6 @@ canvas {
   }
 }
 
-/* Loading animation */
 .loading {
   opacity: 0.7;
   pointer-events: none;
@@ -947,4 +913,5 @@ canvas {
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
 }
