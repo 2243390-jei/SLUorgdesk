@@ -280,50 +280,309 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   background-color: #d32f2f;
 }
 
-/* responsive */
-@media (max-width: 1200px){
-  .events-list { height: 46vh; }
-  .detail-panel { width: 360px; }
-}
+/* ========== DESKTOP DEFAULT (no media query) ========== */
+/* Your existing desktop layout remains as-is */
 
-@media (max-width: 980px){
-  .body { flex-direction: column; }
-  .right-panel { width: 100%; order: 2; }
-  .leftbar { display: none; }
-  .events-list { height: 36vh; }
-  .detail-panel { width: 100%; }
-  .calendar-grid { 
-    padding: 16px; 
-    gap: 8px;
-    min-height: 500px;
+/* ========== TABLET (≤1024px) ========== */
+@media (max-width: 1024px) {
+  /* Optional minor spacing tweaks if desired */
+  .main-area {
+    margin-left: 0;
+    padding: 20px;
   }
-  .day { min-height: 90px; }
 }
 
-@media (max-width: 768px){
-  .calendar-head {
+/* ========== TABLET (≤1024px) ========== */
+@media (max-width: 1024px) {
+  .app {
     flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
   }
-  .nav-controls {
-    align-self: center;
+  
+  .leftbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: 70px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 1000;
+    border-radius: 0;
   }
+
+  .logo {
+    display: none;
+  }
+
+  .left-nav {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin: 0;
+    gap: 0;
+  }
+
+  .circle-btn {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+  }
+
+  .main-area {
+    margin-bottom: 80px;
+    padding: 16px;
+    width: 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 8px 0 20px 0;
+  }
+
   .top-actions {
     width: 100%;
     justify-content: space-between;
   }
+
   .search-wrap {
-    width: 100%;
-    max-width: 300px;
+    width: 280px;
   }
+}
+
+/* ========== MOBILE (≤768px) ========== */
+@media (max-width: 768px) {
   .header {
     flex-direction: column;
+    align-items: flex-start;
     gap: 16px;
-    align-items: stretch;
   }
-  .month-block {
-    min-width: auto;
+
+  .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-wrap {
+    width: 240px;
+  }
+
+  /* Improved mobile table layout */
+  .org-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .org-table thead,
+  .org-table tbody,
+  .org-table th,
+  .org-table td,
+  .org-table tr {
+    display: block;
+  }
+
+  .org-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .org-table tr {
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .org-table td {
+    border: none;
+    padding: 0;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    min-height: auto;
+    white-space: normal;
+  }
+
+  /* Organization image and info row */
+  .org-table td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .org-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .org-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .org-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f1720;
+    line-height: 1.2;
+  }
+
+  .org-school {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  /* Remove data labels for the new layout */
+  .org-table td:before {
+    display: none;
+  }
+
+  /* Action button */
+  .org-table td:last-child {
     justify-content: center;
+    margin-top: 8px;
+  }
+
+  .view-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+}
+
+/* ========== SMALL MOBILE (≤480px) ========== */
+@media (max-width: 480px) {
+  .main-area {
+    padding: 12px;
+    margin-bottom: 72px;
+  }
+
+  .search-wrap {
+    width: 200px;
+  }
+
+  .greeting h1 {
+    font-size: 18px;
+  }
+
+  .muted {
+    font-size: 12px;
+  }
+
+  .circle-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .profile-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  /* Adjust mobile table for smaller screens */
+  .org-table tr {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .org-logo {
+    width: 55px;
+    height: 55px;
+  }
+
+  .org-name {
+    font-size: 17px;
+  }
+
+  .org-school {
+    font-size: 15px;
+  }
+
+  .view-btn {
+    padding: 10px;
+    font-size: 15px;
+  }
+}
+
+/* Add to your mobile media query in CSS */
+@media (max-width: 768px) {
+  .org-table tr {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .org-table td:first-child {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 12px !important;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .org-logo {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 10px !important;
+    flex-shrink: 0;
+  }
+
+  .org-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .org-name {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #0f1720 !important;
+    line-height: 1.2;
+  }
+
+  .org-school {
+    font-size: 16px !important;
+    color: var(--muted) !important;
+    font-weight: 500 !important;
+    line-height: 1.2;
+  }
+
+  .org-table td:not(:first-child) {
+    padding: 12px !important;
+  }
+
+  .view-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
   }
 }
