@@ -1,9 +1,7 @@
 <?php
-// Prevent any unwanted output
+// --- Prevent unwanted output ---
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
-
-// Ensure clean output
 ob_start();
 
 header('Content-Type: application/json');
@@ -18,53 +16,80 @@ try {
     // Create MongoDB Manager instance
     $manager = new MongoDB\Driver\Manager($uri);
 
-    // Query all users (you can add filters inside the [])
+    // Query all users
     $query = new MongoDB\Driver\Query([]);
-
-    // Execute query on the "Users" collection
     $cursor = $manager->executeQuery("Web-Tech.User", $query);
 
-    // Convert cursor to array of users
     $users = [];
+
     foreach ($cursor as $document) {
         $doc = (array)$document;
 
-        // Handle nested / MongoDB-specific objects
+        // Normalize ObjectId
+        $id = isset($doc['_id']) && $doc['_id'] instanceof MongoDB\BSON\ObjectId
+            ? (string)$doc['_id']
+            : (string)($doc['_id'] ?? '');
+
+        // Handle organizations (array of ObjectIds)
+        $orgs = [];
+        if (isset($doc['organizations']) && is_array($doc['organizations'])) {
+            foreach ($doc['organizations'] as $org) {
+                if ($org instanceof MongoDB\BSON\ObjectId) {
+                    $orgs[] = (string)$org;
+                } elseif (is_object($org) && property_exists($org, '$oid')) {
+                    $orgs[] = (string)$org->{'$oid'};
+                } else {
+                    $orgs[] = (string)$org;
+                }
+            }
+        }
+
+        // Handle date fields
+        $createdAt = isset($doc['createdAt']) && $doc['createdAt'] instanceof MongoDB\BSON\UTCDateTime
+            ? $doc['createdAt']->toDateTime()->format('Y-m-d H:i:s')
+            : null;
+        $updatedAt = isset($doc['updatedAt']) && $doc['updatedAt'] instanceof MongoDB\BSON\UTCDateTime
+            ? $doc['updatedAt']->toDateTime()->format('Y-m-d H:i:s')
+            : null;
+
+        // --- ✅ Add password field properly ---
+        $password = $doc['password'] ?? "";
+
+        // Build clean user array
         $users[] = [
-            "_id" => (string)$doc['_id'],
+            "_id" => $id,
             "name" => $doc['name'] ?? "",
             "email" => $doc['email'] ?? "",
+            "password" => $password, // <-- include this
             "role" => $doc['role'] ?? "",
             "studentId" => $doc['studentId'] ?? "",
+            "employeeId" => $doc['employeeId'] ?? "",
             "school" => $doc['school'] ?? "",
+            "department" => $doc['department'] ?? "",
             "course" => $doc['course'] ?? "",
             "yearLevel" => isset($doc['yearLevel']) ? (int)$doc['yearLevel'] : null,
             "isActive" => $doc['isActive'] ?? false,
-            "organizations" => isset($doc['organizations']) ? array_map(fn($org) => (string)$org->{'$oid'}, $doc['organizations']) : [],
-            "createdAt" => isset($doc['createdAt']) ? date('Y-m-d H:i:s', $doc['createdAt']->toDateTime()->getTimestamp()) : null,
-            "updatedAt" => isset($doc['updatedAt']) ? date('Y-m-d H:i:s', $doc['updatedAt']->toDateTime()->getTimestamp()) : null
+            "organizations" => $orgs,
+            "handledOrganizations" => isset($doc['handledOrganizations'])
+                ? array_map(fn($o) => (string)$o->{'$oid'}, (array)$doc['handledOrganizations'])
+                : [],
+            "createdAt" => $createdAt,
+            "updatedAt" => $updatedAt
         ];
     }
 
-    // Clean any output buffers before sending JSON
     ob_clean();
-    
-    // Return JSON with proper headers
     http_response_code(200);
     echo json_encode($users, JSON_PRETTY_PRINT);
 
 } catch (Exception $e) {
-    // Clean any output buffers before sending error
     ob_clean();
-    
-    // Return error with proper status code
     http_response_code(500);
     echo json_encode([
         "error" => true,
         "message" => $e->getMessage()
     ]);
 } finally {
-    // Ensure all buffered content is sent
     ob_end_flush();
 }
 ?>

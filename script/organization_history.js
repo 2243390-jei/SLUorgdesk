@@ -36,12 +36,119 @@ async function fetchWithTimeout(resource, options = {}) {
 // ======================================================
 // Initialize
 // ======================================================
+/* ---------- Helpers to resolve logged-in user and org ---------- */
+// returns google user object stored by your SSO (or null)
+function getLoggedInGoogleUser() {
+  try {
+    return JSON.parse(localStorage.getItem("googleUser"));
+  } catch (e) {
+    return null;
+  }
+}
+
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+// Normalize orgId from different shapes a submission might use
+function extractOrgIdFromSubmission(sub) {
+  const raw = sub?.orgInfo?.orgId;
+  if (!raw) return null;
+  if (typeof raw === "string") return raw;
+  if (raw && typeof raw === "object") {
+    if (raw.$oid) return raw.$oid;
+    // some drivers may return {"$id": ... } or nested object; fallback:
+    const keys = Object.keys(raw);
+    for (const k of keys) {
+      if (typeof raw[k] === "string" && /^[a-f0-9]{24}$/i.test(raw[k])) return raw[k];
+    }
+  }
+  return null;
+}
+
+// Resolve an array of orgId strings for the logged-in user (best-effort)
+async function resolveUserOrgIds() {
+  // 1) localStorage override (single id or comma-separated)
+  const local = localStorage.getItem("currentOrgId");
+  if (local) {
+    return local.split(",").map(s => s.trim()).filter(Boolean);
+  }
+
+  // 2) URL ?orgId=
+  const urlOrg = getQueryParam("orgId");
+  if (urlOrg) return [urlOrg];
+
+  // 3) Best-effort using list from fetchDatabase.php
+  const user = getLoggedInGoogleUser();
+  if (!user || !user.email) return [];
+
+  try {
+    const resp = await fetch("../dataFetch/fetchDatabase.php");
+    if (!resp.ok) return [];
+    const orgs = await resp.json(); // orgs is array of { _id, name, acronym, email, ... }
+
+    const email = (user.email || "").toLowerCase();
+
+    // matches by exact org email
+    const byEmail = orgs.filter(o => (o.email || "").toLowerCase() === email).map(o => o._id);
+    if (byEmail.length) return byEmail;
+
+    // matches where user's email contains acronym or acronym contains user local-part
+    const byAcronym = orgs.filter(o => {
+      const acr = (o.acronym || "").toLowerCase();
+      if (!acr) return false;
+      return email.includes(acr);
+    }).map(o => o._id);
+    if (byAcronym.length) return byAcronym;
+
+    // fallback: try partial name match using local-part of email (e.g. john.r@ -> 'john' might match org)
+    const localPart = email.split("@")[0];
+    const byName = orgs.filter(o => (o.name || "").toLowerCase().includes(localPart)).map(o => o._id);
+    if (byName.length) return byName;
+
+    return []; // nothing found
+  } catch (err) {
+    console.warn("resolveUserOrgIds error:", err);
+    return [];
+  }
+}
+
+/* ---------- Updated initialize() — fetch submissions then filter by orgId(s) ---------- */
 async function initialize() {
   try {
+    // get org ids associated with current user (may be empty)
+    const userOrgIds = await resolveUserOrgIds(); // array of strings, possibly []
+
+    // fetch all submissions (same API you already use)
     const response = await fetchWithTimeout(API_URL);
     const data = await response.json();
-    allSubmissions = data;
+    // if fetchSubmissions.php already returns only org-specific results (rare), userOrgIds won't matter.
+    let submissions = Array.isArray(data) ? data : [];
 
+    // If we resolved userOrgIds, filter locally
+    if (userOrgIds && userOrgIds.length > 0) {
+      const allowed = new Set(userOrgIds.map(id => id.toString()));
+      submissions = submissions.filter(s => {
+        const oid = extractOrgIdFromSubmission(s);
+        return oid && allowed.has(oid.toString());
+      });
+    } else {
+      // If no user org found, you have three choices. I default to showing none and show message.
+      // If you prefer to show all instead, change `submissions = []` to `/* keep submissions as-is */`.
+      // For now show only submissions if we matched an org; otherwise keep all hidden and show helpful message.
+      submissions = []; // hide all when no org match — safer default
+      // Optionally display a helpful message:
+      submissionList.innerHTML = `
+        <div class="no-data">
+          <img src="../Images/student_img/no-data.png" alt="No Data" style="width:120px;margin-bottom:1rem;">
+          <p>No organization detected for the logged-in user. Please select an organization or set <code>localStorage.currentOrgId</code>.</p>
+        </div>`;
+    }
+
+    allSubmissions = submissions;
+
+    // populate filters only when we have submissions
     const uniqueAY = [...new Set(allSubmissions.map(s => s.academicYear))].filter(Boolean).sort().reverse();
 
     if (academicYearFilter) {
@@ -68,6 +175,7 @@ async function initialize() {
     submissionList.innerHTML = `<div class="error-message"><p>Error loading submissions: ${error.message}</p></div>`;
   }
 }
+
 document.addEventListener("DOMContentLoaded", initialize);
 
 // ======================================================
