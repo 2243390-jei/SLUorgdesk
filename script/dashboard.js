@@ -1,3 +1,62 @@
+// Canvas drawing helper function
+function drawChart(canvas, data, labels, title, type = 'bar') {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const barWidth = width / data.length * 0.8;
+    const maxValue = Math.max(...data);
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw bars/pie segments
+    if (type === 'bar') {
+        data.forEach((value, index) => {
+            const barHeight = (value / maxValue) * (height - 60);
+            const x = (width / data.length) * index + (barWidth * 0.1);
+            const y = height - barHeight - 30;
+            
+            // Draw bar
+            ctx.fillStyle = `hsl(${index * (360 / data.length)}, 70%, 60%)`;
+            ctx.fillRect(x, y, barWidth, barHeight);
+            
+            // Draw label
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(labels[index], x + barWidth/2, height - 10);
+            
+            // Draw value
+            ctx.fillText(value, x + barWidth/2, y - 5);
+        });
+    } else if (type === 'pie') {
+        const total = data.reduce((a, b) => a + b, 0);
+        let startAngle = 0;
+        
+        data.forEach((value, index) => {
+            const sliceAngle = (2 * Math.PI * value) / total;
+            
+            ctx.beginPath();
+            ctx.fillStyle = `hsl(${index * (360 / data.length)}, 70%, 60%)`;
+            ctx.moveTo(width/2, height/2);
+            ctx.arc(width/2, height/2, Math.min(width, height)/2 - 30, startAngle, startAngle + sliceAngle);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw legend
+            const legendX = 10;
+            const legendY = 20 + (index * 20);
+            ctx.fillRect(legendX, legendY, 15, 15);
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${labels[index]}: ${value}`, legendX + 20, legendY + 12);
+            
+            startAngle += sliceAngle;
+        });
+    }
+}
+
 // School colors mapping - Match analytics colors
 const SCHOOL_COLORS = {
     "SEA": "#800000",      // Maroon
@@ -403,8 +462,73 @@ class DashboardAnalytics {
     }
 }
 
-// Initialize dashboard when DOM is loaded
+// Initialize charts when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const dashboard = new DashboardAnalytics();
-    dashboard.init();
+    // Set current year in footer
+    document.getElementById('curYear').textContent = new Date().getFullYear();
+    
+    // Sample data - replace with your actual data
+    const orgsBySchool = {
+        data: [12, 8, 15, 10],
+        labels: ['SOM', 'SOE', 'SAS', 'SAMCIS']
+    };
+    
+    const usersByRole = {
+        data: [50, 10, 5],
+        labels: ['Students', 'Faculty', 'Admin']
+    };
+    
+    const usersBySchool = {
+        data: [120, 80, 150, 100],
+        labels: ['SOM', 'SOE', 'SAS', 'SAMCIS']
+    };
+    
+    // Initialize charts
+    const orgChart = document.getElementById('orgsBySchoolChart');
+    const roleChart = document.getElementById('usersByRoleChart');
+    const schoolChart = document.getElementById('usersBySchoolChart');
+    
+    // Set canvas sizes
+    [orgChart, roleChart, schoolChart].forEach(canvas => {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    });
+    
+    // Draw charts
+    drawChart(orgChart, orgsBySchool.data, orgsBySchool.labels, 'Organizations by School', 'bar');
+    drawChart(roleChart, usersByRole.data, usersByRole.labels, 'Users by Role', 'pie');
+    drawChart(schoolChart, usersBySchool.data, usersBySchool.labels, 'Users by School', 'bar');
+    
+    // Logout functionality
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutConfirm = document.getElementById('logoutConfirm');
+    const logoutCancel = document.getElementById('logoutCancel');
+    const logoutModalClose = document.getElementById('logoutModalClose');
+    
+    logoutBtn.addEventListener('click', () => logoutModal.style.display = 'flex');
+    logoutCancel.addEventListener('click', () => logoutModal.style.display = 'none');
+    logoutModalClose.addEventListener('click', () => logoutModal.style.display = 'none');
+    logoutConfirm.addEventListener('click', () => {
+        // Add your logout logic here
+        window.location.href = '../index.html';
+    });
+    
+    // Profile modal functionality
+    const profileBtn = document.getElementById('mobileProfileBtn');
+    const profileModal = document.getElementById('profileModal');
+    const profileModalClose = document.getElementById('profileModalClose');
+    
+    profileBtn.addEventListener('click', () => profileModal.style.display = 'flex');
+    profileModalClose.addEventListener('click', () => profileModal.style.display = 'none');
+});
+
+// Close modals when clicking outside
+window.addEventListener('click', (event) => {
+    const modals = document.getElementsByClassName('modal');
+    Array.from(modals).forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 });
