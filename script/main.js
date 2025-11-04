@@ -115,7 +115,7 @@ if (normalized.role === "Organization" && normalized.organization) {
       case "osas": window.location.href = "osas/calendar.html"; break;
       case "admin": window.location.href = "admin/dashboard.html"; break;
       case "organization": window.location.href = "student/submission.html"; break;
-      default: window.location.href = "student/home.html"; break;
+      default: window.location.href = "student/submission.html"; break;
     }
   });
 }
