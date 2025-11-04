@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../style/history.css" />
     <script src="../script/mobile-drawer.js" defer></script>
 </head>
+
 <body class="home-body">
     <!-- NAVIGATION BAR -->
     <header class="navbar">
@@ -20,8 +22,17 @@
                 <li><a href="history.html" class="active">History</a></li>
             </ul>
         </nav>
-        <div class="profile-icon">
+        <!-- PROFILE ICON + MODAL -->
+        <div id="profileContainer" class="profile-icon">
             <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile" />
+
+            <!-- Profile Modal -->
+            <div class="profile-modal" id="profileModal" style="display: none;">
+                <div class="profile-modal-content">
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
+                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -52,4 +63,5 @@
     <script src="../script/organization_history.js"></script>
     <script src="../script/main.js"></script>
 </body>
+
 </html>
