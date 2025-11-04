@@ -5,6 +5,17 @@ const searchClear = document.getElementById("searchClear");
 // Store all organizations for filtering
 let organizationsData = []; 
 
+// Modal Elements
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutModal = document.getElementById('logoutModal');
+const logoutModalClose = document.getElementById('logoutModalClose');
+const logoutCancel = document.getElementById('logoutCancel');
+const logoutConfirm = document.getElementById('logoutConfirm');
+
+const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+const profileModal = document.getElementById('profileModal');
+const profileModalClose = document.getElementById('profileModalClose');
+
 async function loadOrganizations() {
   try {
     const response = await fetch("../dataFetch/fetchDatabase.php");
@@ -140,9 +151,6 @@ searchClear.addEventListener("click", () => {
 // Searching
 searchInput.addEventListener("input", filterOrganizations);
 
-// Initial load of Search
-loadOrganizations();
-
 // === Filter Dropdown ===
 const filterToggle = document.getElementById("filterToggle");
 const filterMenu = document.getElementById("filterMenu");
@@ -173,3 +181,84 @@ document.addEventListener("click", (e) => {
     filterMenu.classList.add("hidden");
   }
 });
+
+// ========== LOGOUT AND PROFILE MODAL FUNCTIONALITY ==========
+
+// Show logout confirmation modal
+function showLogoutModal() {
+  logoutModal.classList.add('show');
+  logoutModal.setAttribute('aria-hidden', 'false');
+}
+
+// Hide logout confirmation modal
+function hideLogoutModal() {
+  logoutModal.classList.remove('show');
+  logoutModal.setAttribute('aria-hidden', 'true');
+}
+
+// Show profile modal (mobile)
+function showProfileModal() {
+  profileModal.classList.add('show');
+  profileModal.setAttribute('aria-hidden', 'false');
+  
+  // Update modal content with direct logout button
+  const modalContent = `
+    <div class="profile-info">
+      <div class="profile-large">O</div>
+      <div class="profile-details">
+        <h4>Hello, OSAS</h4>
+        <div class="profile-logout">
+          <button id="profileLogoutBtn" class="btn-logout">
+            <img src="../Images/logout.png" alt="Logout" class="nav-icon">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  profileModal.querySelector('.modal-body').innerHTML = modalContent;
+  
+  // Add direct logout event listener
+  document.getElementById('profileLogoutBtn').addEventListener('click', () => {
+    window.location.href = "../index.html";
+  });
+}
+
+// Hide profile modal (mobile)
+function hideProfileModal() {
+  profileModal.classList.remove('show');
+  profileModal.setAttribute('aria-hidden', 'true');
+}
+
+// Logout function
+function performLogout() {
+  // Redirect to index.html instead of login.html
+  window.location.href = "../index.html";
+}
+
+// Event listeners for logout functionality
+logoutBtn.addEventListener('click', showLogoutModal);
+logoutModalClose.addEventListener('click', hideLogoutModal);
+logoutCancel.addEventListener('click', hideLogoutModal);
+logoutConfirm.addEventListener('click', performLogout);
+
+// Event listeners for mobile profile modal
+mobileProfileBtn.addEventListener('click', showProfileModal);
+profileModalClose.addEventListener('click', hideProfileModal);
+
+// Close modals when clicking on overlay
+logoutModal.addEventListener('click', (e) => {
+  if (e.target === logoutModal) {
+    hideLogoutModal();
+  }
+});
+
+profileModal.addEventListener('click', (e) => {
+  if (e.target === profileModal) {
+    hideProfileModal();
+  }
+});
+
+// Initial load of organizations
+loadOrganizations();

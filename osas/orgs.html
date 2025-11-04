@@ -32,6 +32,11 @@
             <img src="../Images/statistics.png" alt="Analytics" class="nav-icon">
           </button>
         </a>
+        
+        <!-- Logout button for desktop -->
+        <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
+          <img src="../Images/logout.png" alt="Logout" class="nav-icon">
+        </button>
       </nav>
     </aside>
     <main class="main-area" role="main">
@@ -66,7 +71,7 @@
           </div>
          
           <div class="profile-header">
-            <div class="profile-circle">M</div>
+            <button class="profile-circle" id="mobileProfileBtn">O</button>
           </div>
         </div>
       </header>
@@ -83,6 +88,40 @@
         <tbody id="orgTableBody"></tbody>
       </table>
     </main>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="logoutModalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="logoutModalTitle">Confirm Logout</h3>
+          <button id="logoutModalClose" class="modal-close" aria-label="Close">
+            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to log out?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="logoutCancel" class="btn-secondary">Cancel</button>
+          <button id="logoutConfirm" class="btn-primary">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Profile Modal -->
+    <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true" aria-labelledby="profileModalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="profileModalTitle">Profile</h3>
+          <button id="profileModalClose" class="modal-close" aria-label="Close">
+            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Content will be populated by JS -->
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
