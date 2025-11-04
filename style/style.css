@@ -632,11 +632,11 @@ body.submission-body {
 }
 
 /* INPUTS */
-.submission .input[type="text"],
-.submission .input[type="email"],
-.submission .input[type="number"],
-.submission .input[type="url"],
-.submission .input[type="date"],
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
 textarea,
 select {
   width: 100%;
@@ -1287,6 +1287,3 @@ textarea {
   /* keep header layout tidy on mobile */
   header.navbar { display:flex; align-items:center; padding:8px 12px; }
 }
-
-
-
