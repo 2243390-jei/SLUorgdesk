@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Navbar Mobile Drawer Test</title>
+  <style>
+    /* ====== Your original desktop CSS (kept intact) ====== */
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background:#f7f7f7; }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 10px 30px;
+      box-shadow: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+
+    .navbar .logo img {
+      height: 70px;
+      width: auto;
+    }
+
+    .navbar nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .navbar nav ul {
+      display: flex;
+      list-style: none;
+      gap: 65px;
+      margin: 0;
+      padding: 15px 40px;
+      background-color: #1e1362;
+      border-radius: 50px;
+    }
+
+    .navbar nav a {
+      text-decoration: none;
+      font-family: "Inter", sans-serif;
+      color: #ffffff;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .navbar nav a:hover {
+      color: #ffce00;
+    }
+
+    .navbar .profile-icon img {
+      height: 40px;
+      cursor: pointer;
+    }
+
+    /* simple page content so you can test drawer scroll */
+    main { padding: 110px 20px 40px; max-width:900px; margin: 0 auto; }
+    .card { background:#fff; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); margin-bottom:18px; }
+    h1 { color:#333; }
+
+    /* ========== MOBILE-ONLY BLOCK (drop this into your existing stylesheet) ========== */
+    @media (max-width: 767px) {
+
+      /* hide desktop nav on mobile */
+      header.navbar nav { display: none !important; }
+
+      /* center the existing logo without changing markup structure */
+      header.navbar .logo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none; /* let left/right elements receive clicks */
+        margin: 0;
+      }
+      header.navbar .logo img { height: 44px; width: auto; pointer-events: none; }
+
+      /* profile icon keep small and left */
+      header.navbar .profile-icon { order: 0; flex: 0 0 auto; margin-left:6px; }
+      header.navbar .profile-icon img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
+        display: block;
+        border: 2px solid rgba(30,19,98,0.05);
+      }
+
+      /* The hamburger will be injected by JS and gets this class */
+      .mobile-hamburger {
+        --bar-h: 3px;
+        width: 44px;
+        height: 40px;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        align-items: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        z-index: 1300;
+      }
+      .mobile-hamburger span {
+        display: block;
+        width: 22px;
+        height: var(--bar-h);
+        background: #1e1362;
+        border-radius: 2px;
+      }
+
+      /* overlay */
+      .mobile-drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.25);
+        z-index: 1290;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .22s ease;
+      }
+      .mobile-drawer-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* right drawer */
+      :root { --mobile-drawer-width: 340px; }
+      .mobile-drawer {
+        position: fixed;
+        top: 12px;
+        right: calc(-1 * var(--mobile-drawer-width));
+        width: var(--mobile-drawer-width);
+        height: calc(100vh - 24px);
+        background: #fff;
+        box-shadow: -10px 20px 40px rgba(0,0,0,0.12);
+        border-radius: 8px 0 0 8px;
+        z-index: 1300;
+        transition: right .32s cubic-bezier(.2,.9,.2,1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .mobile-drawer.open { right: 12px; }
+
+      /* drawer header */
+      .mobile-drawer .drawer-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+      }
+      .mobile-drawer .drawer-header img {
+        width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+      }
+      .mobile-drawer .drawer-title {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        color: #222;
+        flex: 1;
+      }
+      .mobile-drawer .drawer-close {
+        background: transparent;
+        border: none;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      /* drawer nav area (scrollable) */
+      .mobile-drawer .drawer-nav {
+        padding: 18px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+      }
+      .mobile-drawer .drawer-nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .mobile-drawer .drawer-nav li {
+        padding: 12px 4px;
+      }
+      .mobile-drawer .drawer-nav a {
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        color: #222;
+        font-weight: 500;
+        padding: 10px 16px;
+        border-radius: 8px;
+        width: 100%;
+      }
+      .mobile-drawer .drawer-nav a.active {
+        background: #1e1362;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      /* keep header layout tidy */
+      header.navbar { display:flex; align-items:center; padding:8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======= Header (your original markup) ======= -->
+  <header class="navbar">
+    <div class="logo">
+      <!-- logo is an image (placeholder svg embedded as data URI) -->
+      <img src="../Images/student_img/SLU_orgdesk_logo.png" />
+    </div>
+
+    <nav>
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="submission.html">Submission</a></li>
+        <li><a href="history.html" class="active">History</a></li>
+      </ul>
+    </nav>
+
+    <div class="profile-icon">
+      <!-- profile image (placeholder svg) -->
+      <img id="nav-profile-pic" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><circle cx='40' cy='28' r='16' fill='%23ffd27f'/><rect x='16' y='46' width='48' height='18' rx='9' fill='%232E86C1'/></svg>" alt="Profile" />
+    </div>
+  </header>
+
+  <!-- ======= Main content for testing ======= -->
+  <main>
+    <h1>Test page — resize to mobile width</h1>
+    <div class="card">
+      <p>This demo keeps your original desktop navbar untouched. When window width ≤ 767px a hamburger will be injected on the right and opening it reveals a right-side drawer cloned from the nav links.</p>
+      <p>Try clicking the hamburger, tapping overlay, Esc key, or any link in the drawer to close it.</p>
+    </div>
+
+    <!-- lots of cards to allow scrolling inside drawer -->
+    <div class="card"><strong>Item A</strong><p>Details...</p></div>
+    <div class="card"><strong>Item B</strong><p>Details...</p></div>
+    <div class="card"><strong>Item C</strong><p>Details...</p></div>
+    <div class="card"><strong>Item D</strong><p>Details...</p></div>
+    <div class="card"><strong>Item E</strong><p>Details...</p></div>
+    <div class="card"><strong>Item F</strong><p>Details...</p></div>
+  </main>
+
+  <!-- JS injects hamburger, overlay, and drawer at runtime (no change to original HTML required) -->
+  <script>
+  (function () {
+    const BREAKPOINT = 767;
+
+    function createIfMissing() {
+      const header = document.querySelector('header.navbar');
+      if (!header) return;
+
+      // hamburger (append as last child -> appears on the right)
+      if (!header.querySelector('#mobile-hamburger')) {
+        const btn = document.createElement('button');
+        btn.id = 'mobile-hamburger';
+        btn.className = 'mobile-hamburger';
+        btn.setAttribute('aria-label', 'Open menu');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.type = 'button';
+
+        for (let i = 0; i < 3; i++) {
+          const s = document.createElement('span');
+          btn.appendChild(s);
+        }
+        header.appendChild(btn);
+      }
+
+      // overlay
+      if (!document.body.querySelector('#mobile-drawer-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.id = 'mobile-drawer-overlay';
+        overlay.className = 'mobile-drawer-overlay';
+        overlay.setAttribute('tabindex', '-1');
+        document.body.appendChild(overlay);
+      }
+
+      // drawer
+      if (!document.body.querySelector('#mobile-drawer')) {
+        const drawer = document.createElement('aside');
+        drawer.id = 'mobile-drawer';
+        drawer.className = 'mobile-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.setAttribute('aria-hidden', 'true');
+
+        // header
+        const profileImgSrc = (document.querySelector('.profile-icon img') || {}).src || '';
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'drawer-header';
+        headerDiv.innerHTML = `
+          <img src="${profileImgSrc}" alt="Profile" />
+          <div class="drawer-title">Menu</div>
+          <button class="drawer-close" aria-label="Close menu" type="button">&times;</button>
+        `;
+        drawer.appendChild(headerDiv);
+
+        // nav area: clone existing nav UL if present
+        const navWrap = document.createElement('nav');
+        navWrap.className = 'drawer-nav';
+        navWrap.setAttribute('aria-label', 'Mobile menu');
+
+        const desktopNav = document.querySelector('header.navbar nav');
+        if (desktopNav) {
+          const desktopUl = desktopNav.querySelector('ul');
+          if (desktopUl) {
+            const clone = desktopUl.cloneNode(true);
+            // normalize cloned anchors' classes: keep .active if present
+            navWrap.appendChild(clone);
+          } else {
+            // fallback: copy anchors
+            const links = desktopNav.querySelectorAll('a');
+            const ul = document.createElement('ul');
+            links.forEach(a => {
+              const li = document.createElement('li');
+              const a2 = a.cloneNode(true);
+              li.appendChild(a2);
+              ul.appendChild(li);
+            });
+            navWrap.appendChild(ul);
+          }
+        } else {
+          navWrap.innerHTML = '<ul><li><a href="home.html">Home</a></li><li><a href="submission.html">Submission</a></li><li><a href="history.html">History</a></li></ul>';
+        }
+
+        drawer.appendChild(navWrap);
+        document.body.appendChild(drawer);
+      }
+    }
+
+    function wireActions() {
+      const hamburger = document.getElementById('mobile-hamburger');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      const drawer = document.getElementById('mobile-drawer');
+      if (!hamburger || !overlay || !drawer) return;
+
+      const closeBtn = drawer.querySelector('.drawer-close');
+
+      function openDrawer() {
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        hamburger.setAttribute('aria-expanded', 'true');
+        overlay.classList.add('visible');
+        // focus close button
+        if (closeBtn) closeBtn.focus();
+        document.documentElement.style.overflow = 'hidden';
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        hamburger.setAttribute('aria-expanded', 'false');
+        overlay.classList.remove('visible');
+        document.documentElement.style.overflow = '';
+        hamburger.focus();
+      }
+
+      // prevent duplicate listeners
+      if (!hamburger._wired) {
+        hamburger.addEventListener('click', () => {
+          // toggle
+          if (drawer.classList.contains('open')) closeDrawer(); else openDrawer();
+        });
+        overlay.addEventListener('click', closeDrawer);
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+        // close on Esc
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+        });
+
+        // close when clicking a link inside drawer (simulate native close)
+        drawer.addEventListener('click', function (e) {
+          const a = e.target.closest('a');
+          if (a) closeDrawer();
+        });
+
+        hamburger._wired = true;
+      }
+    }
+
+    function toggleVisibilityByWidth() {
+      const isMobile = window.innerWidth <= BREAKPOINT;
+      const hamburger = document.getElementById('mobile-hamburger');
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+
+      if (hamburger) hamburger.style.display = isMobile ? 'inline-flex' : 'none';
+      if (drawer) drawer.style.display = isMobile ? 'flex' : 'none';
+      if (overlay) overlay.style.display = isMobile ? 'block' : 'none';
+
+      // ensure drawer closed when switching to desktop
+      if (!isMobile && drawer && drawer.classList.contains('open')) {
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        hamburger && hamburger.setAttribute('aria-expanded', 'false');
+        overlay && overlay.classList.remove('visible');
+        document.documentElement.style.overflow = '';
+      }
+    }
+
+    function init() {
+      createIfMissing();
+      wireActions();
+      toggleVisibilityByWidth();
+
+      let rt;
+      window.addEventListener('resize', () => {
+        clearTimeout(rt);
+        rt = setTimeout(toggleVisibilityByWidth, 120);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+</body>
+</html>

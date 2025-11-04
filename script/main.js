@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`Login successful! Welcome, ${user.role.toUpperCase()}.`);
 
         switch (user.role) {
-          case "student": window.location.href = "student/home.html"; break;
+          case "student": window.location.href = "student/submission.html"; break;
           case "osas":    window.location.href = "osas/calendar.html"; break;
           case "admin":   window.location.href = "admin/dashboard.html"; break;
         }
@@ -58,7 +58,7 @@ function handleCredentialResponse(response) {
   // --- Role detection logic based on email ---
   if (email.includes("@slu.edu.ph")) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
-      window.location.href = "student/home.html";
+      window.location.href = "student/submission.html";
     } else if (email.startsWith("osas@")) {
       window.location.href = "osas/dashboard.html";
     } else if (email.startsWith("admin@")) {
@@ -70,37 +70,6 @@ function handleCredentialResponse(response) {
     alert("Access denied: Please use your SLU email account.");
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const images = document.querySelectorAll('.schools-section .carousel-slide img');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  let current = 0;
-
-  function updateCarousel() {
-    images.forEach(img => img.classList.remove('active', 'prev', 'next'));
-
-    const total = images.length;
-    const prevIndex = (current - 1 + total) % total;
-    const nextIndex = (current + 1) % total;
-
-    images[current].classList.add('active');
-    images[prevIndex].classList.add('prev');
-    images[nextIndex].classList.add('next');
-  }
-
-  prevBtn.addEventListener('click', () => {
-    current = (current - 1 + images.length) % images.length;
-    updateCarousel();
-  });
-
-  nextBtn.addEventListener('click', () => {
-    current = (current + 1) % images.length;
-    updateCarousel();
-  });
-
-  updateCarousel();
-});
 
 // --- Navbar profile + organization table ---
 document.addEventListener("DOMContentLoaded", () => {
@@ -139,7 +108,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  updateGallery();
-  prevBtn.addEventListener("click", updateGallery);
-  nextBtn.addEventListener("click", updateGallery);
 });

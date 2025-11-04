@@ -321,10 +321,6 @@ async function renderPastEvents(filterText = '') {
     }
     
     details.innerHTML = `
-      <div class="event-meta">
-        <span class="cat">${event.organizationType}</span>
-        ${sdgDisplay}
-      </div>
       <div class="event-desc">${event.completeName}</div>
       <div class="event-extra">Applicant: ${event.submissionData.applicationInfo?.applicantName || 'N/A'}</div>
     `;

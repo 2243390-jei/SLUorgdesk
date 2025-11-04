@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
         rm.className = "remove-file";
         rm.setAttribute("title", "Remove " + f.name);
         
-        // Ensure we're working with the current index
         rm.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -300,5 +299,46 @@ document.addEventListener("DOMContentLoaded", function () {
       const inlinePrev = inlineInput.closest(".drop-zone").querySelector(".file-preview-container");
       if (inlinePrev) inlinePrev.innerHTML = "<p>No files selected.</p>";
     };
+  }
+
+  /* -----------------------------------------------------------------
+   *  7. AUTO-FILL END YEAR: End Year = Start Year + 1
+   *     - Updates automatically when Start Year changes
+   *     - Prevents manual edit of End Year
+   * ----------------------------------------------------------------- */
+  const startYearInput = document.getElementById("startYear");
+  const endYearInput = document.getElementById("endYear");
+
+  if (startYearInput && endYearInput) {
+    // Auto-update End Year
+    const updateEndYear = () => {
+      const start = parseInt(startYearInput.value, 10);
+      if (!isNaN(start) && start >= 2000) {
+        endYearInput.value = start + 1;
+      } else {
+        endYearInput.value = "";
+      }
+    };
+
+    startYearInput.addEventListener("input", updateEndYear);
+    startYearInput.addEventListener("change", updateEndYear);
+
+    // Optional: Prevent manual typing in End Year
+    endYearInput.addEventListener("input", function (e) {
+      e.preventDefault();
+      this.value = ""; // Clear any attempt to type
+    });
+
+    endYearInput.addEventListener("keydown", function (e) {
+      e.preventDefault(); // Block all keyboard input
+    });
+
+    // Make it visually read-only but still submittable
+    endYearInput.readOnly = true;
+    endYearInput.style.backgroundColor = "#f5f5f5";
+    endYearInput.style.cursor = "not-allowed";
+
+    // Trigger on page load (in case pre-filled)
+    updateEndYear();
   }
 });
