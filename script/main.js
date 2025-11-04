@@ -1,8 +1,5 @@
-/* ======================================
-   DATABASE-DRIVEN LOGIN + GOOGLE SSO
-   ====================================== */
 
-// --- API endpoint for real users from your DB ---
+
 const USERS_API = "dataFetch/fetchUsers.php"; 
 
 // Unified helper — gets whichever login is active (manual or Google)
@@ -20,7 +17,6 @@ function getLoggedInUser() {
   return null;
 }
 
-// Utility: Fetch with timeout (helps prevent hang)
 async function fetchWithTimeout(url, options = {}, timeout = 7000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -84,7 +80,6 @@ async function setupManualLogin() {
 
    localStorage.removeItem("currentOrgId");
 
-// then, set based on the logged-in organization
 if (normalized.role === "Organization" && normalized.organization) {
   const orgId = (typeof normalized.organization === "object" && normalized.organization.$oid)
     ? normalized.organization.$oid
@@ -192,12 +187,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Default fallback (no logo found)
   navbarProfilePic.src = "assets/default-avatar.png";
   navbarProfilePic.style.borderRadius = "50%";
 });
 
-// main.js – Desktop: Modal | Mobile: Disabled + Logout in Menu
 
 document.addEventListener("DOMContentLoaded", () => {
   const profilePic = document.getElementById('nav-profile-pic');
@@ -205,7 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn  = document.getElementById('logoutBtn');
   const cancelBtn  = document.getElementById('cancelBtn');
 
-  // Only run modal logic on DESKTOP
   if (window.innerWidth > 767 && profilePic && modal && logoutBtn && cancelBtn) {
     profilePic.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -230,11 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Optionally attach events if prev/next exist
-  if (prevBtn && nextBtn) {
-    prevBtn.addEventListener("click", updateGallery);
-    nextBtn.addEventListener("click", updateGallery);
-  }
 });
 
 /* ==============================

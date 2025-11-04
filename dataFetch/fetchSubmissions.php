@@ -25,7 +25,7 @@ register_shutdown_function(function () {
     }
 });
 
-// Helper: normalize MongoDB extended JSON recursively
+// Normalize MongoDB extended JSON recursively
 function normalize_mongo_extended($val) {
     if (is_array($val)) {
         if (count($val) === 1) {
@@ -114,7 +114,6 @@ try {
         }
     }
 
-    // ✅ Existing filter logic (keep as is)
     $filter = [];
     if (isset($_GET['orgId']) && !empty($_GET['orgId'])) {
         try {
