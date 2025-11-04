@@ -1,4 +1,4 @@
-// ✅ Load event details from localStorage (if redirected from OSASsubmissions)
+// Load event details from localStorage (if redirected from OSASsubmissions)
 const storedEvent = localStorage.getItem("selectedEvent");
 if (storedEvent) {
   const e = JSON.parse(storedEvent);
@@ -24,13 +24,13 @@ if (storedEvent) {
     docsList.innerHTML = "<li>No additional documents</li>";
   }
 
-  // ✅ Save the event_id temporarily to query PHP
+  // Save the event_id temporarily to query PHP
   if (e.id) localStorage.setItem("selectedEventId", e.id);
 
   localStorage.removeItem("selectedEvent");
 }
 
-// ✅ Fetch submission details from PHP backend
+// Fetch submission details from PHP backend
 async function loadSubmissionDetails() {
   const params = new URLSearchParams(window.location.search);
   let eventId = params.get("event_id");
@@ -109,7 +109,7 @@ async function loadSubmissionDetails() {
     enhanceMobileExperience();
 
   } catch (error) {
-    console.error("❌ Error loading submission:", error);
+    console.error("Error loading submission:", error);
     document.body.innerHTML = "<p style='padding: 20px; text-align: center;'>Failed to load submission details.</p>";
   }
 }
@@ -141,9 +141,97 @@ function enhanceMobileExperience() {
 // Handle responsive behavior on resize
 window.addEventListener('resize', enhanceMobileExperience);
 
-loadSubmissionDetails();
+// Comment Revisions Modal Logic - ADDED THIS MISSING SECTION
+document.addEventListener("DOMContentLoaded", () => {
+  const commentBtn = document.getElementById("commentRevisionsBtn");
+  const modal = document.getElementById("commentModal");
+  const closeModal = document.getElementById("closeModal");
+  const submitComment = document.getElementById("submitComment");
+  const commentBox = document.getElementById("revisionComment");
 
+  if (!commentBtn || !modal) {
+    console.error("Modal elements not found");
+    return;
+  }
 
+  console.log("Modal elements loaded successfully");
+
+  // Function to open modal
+  function openModal() {
+    console.log("Opening modal");
+    modal.style.display = "block";
+    // Focus on textarea for better UX
+    setTimeout(() => {
+      commentBox.focus();
+    }, 100);
+  }
+
+  // Function to close modal
+  function closeModalFunc() {
+    console.log("Closing modal");
+    modal.style.display = "none";
+    commentBox.value = ""; // Clear comment when closing
+  }
+
+  // Add event listeners to both buttons
+  commentBtn.addEventListener("click", openModal);
+  
+  closeModal.addEventListener("click", closeModalFunc);
+  
+  // Close modal when clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModalFunc();
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "block") {
+      closeModalFunc();
+    }
+  });
+
+  // Enhanced comment submission
+  submitComment.addEventListener("click", async () => {
+    const comment = commentBox.value.trim();
+    if (!comment) {
+      if (window.innerWidth <= 768) {
+        showMobileAlert("⚠️ Please write a comment before submitting.");
+      } else {
+        alert("⚠️ Please write a comment before submitting.");
+      }
+      commentBox.focus();
+      return;
+    }
+
+    // Here you would typically send the comment to your backend
+    // For now, we'll just show a success message
+    console.log("Comment submitted:", comment);
+    
+    if (window.innerWidth <= 768) {
+      showMobileAlert("Comment submitted successfully!");
+    } else {
+      alert("Comment submitted successfully!\n\n" + comment);
+    }
+    
+    // Clear and close modal
+    commentBox.value = "";
+    closeModalFunc();
+  });
+
+  // Handle Enter key in comment box (Ctrl+Enter to submit)
+  commentBox.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      submitComment.click();
+    }
+  });
+});
+
+// Load submission details after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  loadSubmissionDetails();
+});
 
 // Mobile-friendly alert function
 function showMobileAlert(message) {
@@ -180,11 +268,15 @@ function showMobileAlert(message) {
   
   // Auto-close after 2 seconds
   setTimeout(() => {
-    document.body.removeChild(overlay);
+    if (document.body.contains(overlay)) {
+      document.body.removeChild(overlay);
+    }
   }, 2000);
   
   // Also allow tap to close
   overlay.addEventListener('click', () => {
-    document.body.removeChild(overlay);
+    if (document.body.contains(overlay)) {
+      document.body.removeChild(overlay);
+    }
   });
 }

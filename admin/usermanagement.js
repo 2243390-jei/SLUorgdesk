@@ -11,12 +11,12 @@ let userToDelete = null;
 
 // DOM Elements
 const userTableBody = document.getElementById('userTableBody');
+const userCardList = document.getElementById('userCardList');
 const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
 const searchInput = document.getElementById('searchInput');
-const roleFilter = document.getElementById('roleFilter');
-const schoolFilter = document.getElementById('schoolFilter');
+// roleFilter and schoolFilter replaced by button-based filters inside #filterMenu
 const filterToggle = document.getElementById('filterToggle');
 const filterMenu = document.querySelector('.filter-menu');
 const rowsPerPageSelect = document.getElementById('rowsPerPage');
@@ -31,11 +31,34 @@ document.addEventListener('DOMContentLoaded', initialize);
 addUserBtn.addEventListener('click', () => openModal());
 userForm.addEventListener('submit', handleSubmit);
 searchInput.addEventListener('input', handleSearch);
-roleFilter.addEventListener('change', handleFilter);
-schoolFilter.addEventListener('change', handleFilter);
 filterToggle.addEventListener('click', toggleFilterMenu);
 document.getElementById('clearFilterBtn').addEventListener('click', clearFilters);
 rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
+
+// Event delegation for filter buttons (role and school)
+filterMenu?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-item');
+    if (!btn) return;
+    const type = btn.dataset.type; // 'role' or 'school'
+    const value = btn.dataset.filter || '';
+
+    if (type === 'role') {
+        currentFilters.role = value;
+        // mark active state
+        document.querySelectorAll('#filterMenu .filter-item[data-type="role"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    if (type === 'school') {
+        currentFilters.school = value;
+        document.querySelectorAll('#filterMenu .filter-item[data-type="school"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    currentPage = 1;
+    updateTable();
+    // close menu on mobile after select
+    filterMenu.classList.add('hidden');
+});
 
 // Initialize the page
 async function initialize() {
@@ -43,6 +66,11 @@ async function initialize() {
         users = await fetchUsers();
         if (users && users.length > 0) {
             updateTable();
+            // mark default 'All' filters as active
+            const defaultRoleBtn = document.querySelector('#filterMenu .filter-item[data-type="role"][data-filter=""]');
+            const defaultSchoolBtn = document.querySelector('#filterMenu .filter-item[data-type="school"][data-filter=""]');
+            defaultRoleBtn?.classList.add('active');
+            defaultSchoolBtn?.classList.add('active');
         } else {
             userTableBody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
         }
@@ -50,6 +78,10 @@ async function initialize() {
         console.error('Error initializing:', error);
         userTableBody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
     }
+
+    // Initial render for mobile/desktop
+    renderUserCardsOrTable();
+    window.addEventListener('resize', renderUserCardsOrTable);
 }
 
 // Fetch users from MongoDB
@@ -111,7 +143,61 @@ function updateTable() {
         </tr>
     `).join('');
 
+    renderUserCardsOrTable();
     updatePagination(totalPages);
+}
+
+// Detect mobile screen
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+// Render user cards for mobile, table for desktop
+function renderUserCardsOrTable() {
+    if (!userCardList) return;
+    if (isMobile()) {
+        userCardList.style.display = 'flex';
+        userTableBody.parentElement.parentElement.style.display = 'none';
+        renderUserCards();
+    } else {
+        userCardList.style.display = 'none';
+        userTableBody.parentElement.parentElement.style.display = '';
+    }
+}
+
+function renderUserCards() {
+    userCardList.innerHTML = '';
+    let filteredUsers = filterUsers();
+    if (!filteredUsers.length) {
+        userCardList.innerHTML = `<div style='text-align:center;color:#888;'>No users found.</div>`;
+        return;
+    }
+    // Pagination
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = filteredUsers.slice(start, end);
+    pageData.forEach(user => {
+        userCardList.innerHTML += `
+        <div class="card-item">
+            <div class="card-header">
+                <div class="card-logo"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="card-title">${user.name}</div>
+                    <div class="card-email">${user.email}</div>
+                </div>
+            </div>
+            <div class="card-meta">
+                <span><b>Role:</b> ${user.role}</span>
+                <span><b>School:</b> ${user.school}</span>
+                <span><b>Status:</b> ${user.status}</span>
+            </div>
+            <div class="card-actions">
+                <button class="action-icon" title="Edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                <button class="action-icon" title="Delete" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        `;
+    });
 }
 
 // Update pagination controls
@@ -243,8 +329,8 @@ function handleFilter(event) {
 function clearFilters() {
     currentFilters = { search: '', role: '', school: '' };
     searchInput.value = '';
-    roleFilter.value = '';
-    schoolFilter.value = '';
+    // remove active classes from filter buttons
+    document.querySelectorAll('#filterMenu .filter-item').forEach(b => b.classList.remove('active'));
     currentPage = 1;
     updateTable();
 }
