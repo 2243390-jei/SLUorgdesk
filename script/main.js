@@ -86,26 +86,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// main.js – Desktop: Modal | Mobile: Disabled + Logout in Menu
+
 document.addEventListener("DOMContentLoaded", () => {
-  const prevBtn = document.getElementById("prev-btn");
-  const nextBtn = document.getElementById("next-btn");
+  const profilePic = document.getElementById('nav-profile-pic');
+  const modal      = document.getElementById('profileModal');
+  const logoutBtn  = document.getElementById('logoutBtn');
+  const cancelBtn  = document.getElementById('cancelBtn');
 
-  function getActiveSchool() {
-    const activeImg = document.querySelector('.carousel-slide img.active');
-    return activeImg ? activeImg.alt : null;
-  }
+  // Only run modal logic on DESKTOP
+  if (window.innerWidth > 767 && profilePic && modal && logoutBtn && cancelBtn) {
+    profilePic.addEventListener('click', (e) => {
+      e.stopPropagation();
+      modal.style.display = 'block';
+    });
 
-  function updateGallery() {
-    const school = getActiveSchool();
-    const allGroups = document.querySelectorAll('.org-group');
+    const closeModal = () => modal.style.display = 'none';
+    cancelBtn.addEventListener('click', closeModal);
 
-    allGroups.forEach(group => {
-      if (group.dataset.school === school) {
-        group.classList.add("active");
-      } else {
-        group.classList.remove("active");
+    document.addEventListener('click', (e) => {
+      if (modal.style.display === 'block' && !modal.contains(e.target) && e.target !== profilePic) {
+        closeModal();
       }
+    });
+
+    modal.addEventListener('click', (e) => e.stopPropagation());
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '../index.html';
     });
   }
 
+  // Google Profile Picture
+  const user = JSON.parse(localStorage.getItem("googleUser"));
+  if (user && user.picture && profilePic) {
+    profilePic.src = user.picture;
+    profilePic.style.borderRadius = "50%";
+  }
 });
