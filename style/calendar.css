@@ -13,7 +13,12 @@
 }
 
 /* App layout */
-body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased; }
+body { 
+  background: var(--bg); 
+  color:#0f1720; 
+  -webkit-font-smoothing:antialiased; 
+  overflow-x: hidden;
+}
 .app { 
   display:flex; 
   min-height:100vh; 
@@ -94,21 +99,31 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   flex: 1; 
   display: flex; 
   flex-direction: column; 
-  padding: 18px;
+  padding: 24px;
   background: var(--bg);
-  margin-left: 92px; /* Account for static sidebar */
+  gap: 24px;
   min-height: 100vh;
+  margin-left: 92px; /* Account for static sidebar */
 }
 
 /* HEADER */
 .header { 
   display: flex; 
   justify-content: space-between; 
-  align-items: center; 
-  padding: 8px 4px 20px 4px;
+  align-items: flex-start; 
+  padding: 0;
+  margin-bottom: 0;
 }
-.greeting h1 { font-size: 20px; letter-spacing: 0.3px; font-weight: 600; }
-.muted { color: var(--muted); font-size: 13px; }
+.greeting h1 { 
+  font-size: 28px; 
+  letter-spacing: 0.3px; 
+  font-weight: 600; 
+  margin-bottom: 8px;
+}
+.muted { 
+  color: var(--muted); 
+  font-size: 14px; 
+}
 
 /* TOP ACTIONS WITH PROFILE */
 .top-actions { 
@@ -172,10 +187,10 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   transform: translateY(-1px);
 }
 
-/* body layout */
+/* BODY LAYOUT */
 .body { 
   display: flex; 
-  gap: 18px; 
+  gap: 24px; 
   align-items: flex-start; 
   flex: 1;
 }
@@ -481,15 +496,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   margin-top: 4px;
 }
 
-/* footer */
-.footer { 
-  margin-top: 20px; 
-  padding: 16px 8px 8px 8px; 
-  text-align: right; 
-  border-top: 1px solid #eef2f6;
-}
-
-/* detail slide-in panel */
+/* DETAIL SLIDE-IN PANEL - RESTORED */
 .overlay {
   position: fixed; 
   inset: 0; 
@@ -521,9 +528,35 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 .detail-panel.open { transform: translateX(0); }
 
-.detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.detail-close { background: transparent; border: none; font-size: 18px; cursor: pointer; color: #334; padding: 4px; }
-.detail-body { overflow: auto; padding-right: 8px; flex: 1; }
+.detail-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 12px; 
+}
+.detail-close { 
+  background: transparent; 
+  border: none; 
+  font-size: 18px; 
+  cursor: pointer; 
+  color: #334; 
+  padding: 4px; 
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.detail-close:hover {
+  background: #f1f5f9;
+}
+.detail-body { 
+  overflow: auto; 
+  padding-right: 8px; 
+  flex: 1; 
+}
 
 /* Improved Detail Panel Styles */
 #detailPanel {
@@ -746,11 +779,6 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 
 /* ========== MOBILE RESPONSIVE DESIGN ========== */
-@media (max-width: 1200px){
-  .events-list { height: 46vh; }
-  .detail-panel { width: 360px; }
-}
-
 @media (max-width: 1024px) {
   .body {
     flex-direction: column;
@@ -764,6 +792,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   
   .calendar-column {
     order: 1;
+    width: 100%;
   }
   
   .events-list { 
@@ -776,7 +805,7 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 
 /* MOBILE BOTTOM NAVIGATION - 768px and below */
-@media (max-width: 768px){
+@media (max-width: 768px) {
   /* Mobile Sidebar - Convert to bottom navigation */
   .leftbar {
     position: fixed;
@@ -788,13 +817,13 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
     height: 70px;
     flex-direction: row;
     justify-content: space-around;
-    padding: 8px;
+    padding: 8px 4px;
     z-index: 1000;
     border-radius: 0;
   }
 
   .logo {
-    display: none; /* Hide logo on mobile */
+    display: none;
   }
 
   .left-nav {
@@ -808,13 +837,16 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   .circle-btn {
     width: 50px;
     height: 50px;
+    border-radius: 10px;
   }
 
   /* Main area adjustment for mobile bottom nav */
   .main-area {
     margin-left: 0;
-    margin-bottom: 70px; /* Space for bottom nav */
+    margin-bottom: 70px;
     padding: 16px;
+    gap: 20px;
+    width: 100%;
   }
 
   /* Header mobile adjustments */
@@ -827,15 +859,23 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   .top-actions {
     width: 100%;
     justify-content: space-between;
+    order: 2;
   }
   
   .search-wrap {
     width: 100%;
     max-width: none;
+    flex: 1;
+  }
+
+  .greeting {
+    order: 1;
+    text-align: center;
   }
 
   .greeting h1 {
     font-size: 24px;
+    margin-bottom: 4px;
   }
 
   /* Calendar head mobile */
@@ -847,72 +887,14 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   
   .nav-controls {
     align-self: center;
+    order: 2;
   }
   
   .month-block {
     min-width: auto;
     justify-content: center;
-  }
-
-  /* Calendar grid mobile */
-  .calendar-grid { 
-    padding: 16px; 
-    gap: 8px;
-    min-height: 450px;
-  }
-  
-  .day { 
-    min-height: 80px;
-    padding: 8px;
-  }
-
-  /* Right panel mobile */
-  .right-panel {
-    padding: 12px;
-  }
-  
-  .events-list {
-    height: 280px;
-  }
-
-  /* Detail panel mobile */
-  .detail-panel { 
-    width: 100%;
-    padding: 16px;
-  }
-
-  /* Profile mobile */
-  .profile-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
-}
-
-/* Small Mobile Styles - 480px and below */
-@media (max-width: 480px) {
-  .main-area {
-    padding: 12px;
-  }
-
-  .calendar-grid {
-    padding: 12px;
-    gap: 6px;
-    min-height: 400px;
-  }
-
-  .day {
-    min-height: 70px;
-    padding: 6px;
-  }
-
-  .event-badge {
-    font-size: 10px;
-    padding: 3px 5px;
-  }
-
-  .events-list {
-    height: 250px;
+    order: 1;
+    padding: 12px 16px;
   }
 
   .month-name {
@@ -923,19 +905,142 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
     font-size: 14px;
   }
 
+  /* Calendar grid mobile - CRITICAL FIX */
+  .calendar-grid { 
+    padding: 12px; 
+    gap: 6px;
+    min-height: 400px;
+    grid-template-columns: repeat(7, 1fr);
+    overflow-x: auto;
+  }
+  
+  .day { 
+    min-height: 70px;
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+
+  .day .date-row {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .event-badge {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+
+  .week {
+    font-size: 11px;
+    padding: 8px 2px;
+  }
+
+  /* Right panel mobile */
+  .right-panel {
+    padding: 12px;
+    width: 100%;
+  }
+  
+  .events-list {
+    height: 250px;
+  }
+
+  /* Detail Panel Mobile Styles */
+  .detail-panel {
+    width: 100%;
+    padding: 16px;
+    z-index: 1001;
+  }
+
+  .detail-org-name {
+    font-size: 1.3rem;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .detail-section {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  /* Profile mobile */
+  .profile-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .search-wrap input[type="search"] {
+    padding: 10px 36px 10px 12px;
+    font-size: 14px;
+  }
+}
+
+/* Small Mobile Styles - 480px and below */
+@media (max-width: 480px) {
+  .main-area {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .calendar-grid {
+    padding: 8px;
+    gap: 4px;
+    min-height: 350px;
+  }
+
+  .day {
+    min-height: 60px;
+    padding: 4px 2px;
+  }
+
+  .event-badge {
+    font-size: 8px;
+    padding: 1px 3px;
+  }
+
+  .events-list {
+    height: 200px;
+  }
+
+  .month-name {
+    font-size: 15px;
+  }
+
+  .year-name {
+    font-size: 13px;
+  }
+
   .btn-small {
-    padding: 10px 14px;
+    padding: 10px 12px;
     font-size: 12px;
   }
 
   .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Detail Panel Small Mobile */
+  .detail-panel {
+    padding: 12px;
+  }
+
+  .detail-org-name {
+    font-size: 1.2rem;
+  }
+
+  .detail-section-title {
+    font-size: 1rem;
   }
 
   /* Bottom navigation smaller on very small screens */
   .leftbar {
     height: 65px;
+    padding: 6px 2px;
   }
 
   .circle-btn {
@@ -945,6 +1050,56 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 
   .main-area {
     margin-bottom: 65px;
+  }
+
+  /* Header text adjustments */
+  .greeting h1 {
+    font-size: 22px;
+  }
+
+  .muted {
+    font-size: 13px;
+  }
+}
+
+/* Very Small Mobile Styles - 360px and below */
+@media (max-width: 360px) {
+  .calendar-grid {
+    gap: 3px;
+    padding: 6px;
+  }
+
+  .day {
+    min-height: 55px;
+    padding: 3px 1px;
+    font-size: 11px;
+  }
+
+  .week {
+    font-size: 10px;
+    padding: 6px 1px;
+  }
+
+  .event-badge {
+    font-size: 7px;
+    padding: 1px 2px;
+  }
+
+  .detail-panel {
+    padding: 10px;
+  }
+
+  .circle-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .leftbar {
+    height: 60px;
+  }
+
+  .main-area {
+    margin-bottom: 60px;
   }
 }
 
@@ -964,5 +1119,50 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   
   .events-list {
     height: 580px;
+  }
+}
+
+/* Loading animation */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
