@@ -7,47 +7,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  margin-top: 20px;
   background: white;
-  border-top: 1px solid #eee;
-  flex-direction: row;
-}
-
-.rows-per-page {
-  flex-shrink: 0;
-  margin-right: 20px;
-}
-
-.pagination-controls label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #666;
-}
-
-.pagination-controls select {
-  padding: 4px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  margin-left: 8px;
-}
-
-#pagination {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-}
-
-.page-numbers {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  align-items: center;
+  border-top: 1px solid #e1e8ed;
 }
 
 #pagination button {
@@ -55,10 +16,11 @@
   height: 32px;
   border: none;
   background: transparent;
-  border-radius: 50%;
+  border-radius: 8px;
   cursor: pointer;
-  color: #666;
+  color: var(--deep-blue);
   font-size: 14px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,11 +28,11 @@
 }
 
 #pagination button:hover {
-  background: #f0f0f0;
+  background: #f8f9fa;
 }
 
 #pagination button.active-page {
-  background: #1a73e8;
+  background: var(--accent);
   color: white;
 }
 
@@ -358,53 +320,12 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
   cursor: pointer;
 }
 
-
-
-/* Profile in header */
-.profile-header {
-  display: flex;
-  align-items: center;
-}
-
-.profile-circle { 
-  width: 44px; 
-  height: 44px; 
-  border-radius: 12px; 
-  background: linear-gradient(135deg, #e74c3c, #c0392b); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  color: white; 
-  font-weight: 700; 
-  box-shadow: 0 4px 12px rgba(231,76,60,0.3);
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.profile-circle:hover {
-  transform: translateY(-1px);
-}
-
-.body { 
-  display: flex; 
-  gap: 18px; 
-  align-items: flex-start; 
-  flex: 1;
-}
-
+/* Organization Styles */
 .org-logo {
   width: 50px;
   height: 50px;
   object-fit: cover;
   border-radius: 8px;
-}
-.org-table tr:hover {
-  background-color: #f2f2f2;
-}
-.org-table td, .org-table th {
-  padding: 10px;
-  text-align: center;
 }
 
 .footer { 
@@ -565,50 +486,10 @@ body { background: var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;
 }
 
 
-/* Dashboard */
-.grid {
-  display: grid;
-}
-.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Common Spacing Utilities */
 .gap-6 { gap: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
 .mt-6 { margin-top: 1.5rem; }
-
-/* Stat Card */
-.stat-card {
-  background-color: var(--card);
-  border: 1px solid #e2e8f0;
-  border-radius: var(--rounded);
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  transition: all 0.2s;
-}
-.stat-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-}
-
-.metric-value {
-   text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #0f1720;
-}
-.metric-label {
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
-.metric-change {
-  text-align: center;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-.metric-change.positive { color: #10b981; }
-.metric-change.negative { color: #ef4444; }
 
 /* Table Container */
 .table-container {
@@ -732,13 +613,9 @@ tr:hover {
   color: #64748b;
 }
 
-.center-flex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
+/* Removed dashboard-specific center-flex style */
 
+/* === Modal Styles === */
 .modal {
   display: flex;
   justify-content: center;
@@ -752,11 +629,8 @@ tr:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content,
-.addorg-modal-content,
-.google-modal-content {
+.modal-content {
   background-color: #fff;
-  /* Let flexbox center this; don't rely on margin-top percentages */
   margin: 0;
   padding: 25px 30px;
   border-radius: 12px;
@@ -767,36 +641,6 @@ tr:hover {
   animation: fadeIn 0.3s ease;
   max-height: 90vh;
   overflow-y: auto;
-}
-
-.modal-buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-buttons button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.confirm-btn {
-  background-color: #4caf50;
-  color: white;
-}
-
-.cancel-btn {
-  background-color: #777;
-  color: white;
-}
-
-.delete-confirm {
-  background-color: #f44336;
-  color: white;
 }
 
 @keyframes fadeIn {
