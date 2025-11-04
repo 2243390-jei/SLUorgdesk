@@ -1,10 +1,7 @@
-/* mobile-drawer.js – Logout at bottom, no overlap, profile disabled (no blur) */
 (function () {
   const BREAKPOINT = 767;
 
-  /* --------------------------------------------------------------
-     1. CREATE ELEMENTS (hamburger, overlay, drawer)
-     -------------------------------------------------------------- */
+
   function createIfMissing() {
     const header = document.querySelector('header.navbar');
     if (!header) return;
@@ -67,7 +64,6 @@
           const clone = desktopUl.cloneNode(true);
           clone.className = 'drawer-nav-list';
 
-          /* ---- LOGOUT – ALWAYS LAST ---- */
           const logoutLi = document.createElement('li');
           logoutLi.innerHTML = `<a href="#" id="mobileLogoutLink">Logout</a>`;
           clone.appendChild(logoutLi);
@@ -79,7 +75,6 @@
       drawer.appendChild(navWrap);
       document.body.appendChild(drawer);
 
-      /* ---- Logout handler (run after DOM is ready) ---- */
       setTimeout(() => {
         const mobileLogout = document.getElementById('mobileLogoutLink');
         if (mobileLogout) {
@@ -94,9 +89,6 @@
     }
   }
 
-  /* --------------------------------------------------------------
-     2. OPEN / CLOSE LOGIC
-     -------------------------------------------------------------- */
   function wireActions() {
     const hamburger = document.getElementById('mobile-hamburger');
     const overlay   = document.getElementById('mobile-drawer-overlay');
@@ -140,9 +132,7 @@
     }
   }
 
-  /* --------------------------------------------------------------
-     3. SHOW/HIDE + DISABLE PROFILE ON MOBILE (NO BLUR)
-     -------------------------------------------------------------- */
+
   function toggleVisibilityByWidth() {
     const isMobile   = window.innerWidth <= BREAKPOINT;
     const hamburger  = document.getElementById('mobile-hamburger');
@@ -155,7 +145,6 @@
     if (drawer)    drawer.style.display    = isMobile ? 'flex'       : 'none';
     if (overlay)   overlay.style.display   = isMobile ? 'block'      : 'none';
 
-    // DISABLE profile click on mobile – NO OPACITY CHANGE
     if (profilePic) {
       profilePic.style.pointerEvents = isMobile ? 'none' : 'auto';
       // Removed: profilePic.style.opacity = ... (no blur!)
@@ -171,9 +160,7 @@
     }
   }
 
-  /* --------------------------------------------------------------
-     4. INITIALISE
-     -------------------------------------------------------------- */
+
   function init() {
     createIfMissing();
     wireActions();
