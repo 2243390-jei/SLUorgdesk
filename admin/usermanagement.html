@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>User Management - SLU OrgDesk Admin</title>
     <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -58,23 +58,29 @@
                         <!-- Search input -->
                         <input type="search" id="searchInput" placeholder="Search">
 
-                        <!-- Filter Menu -->
+                        <!-- Filter Menu (styled like orgmanagement) -->
                         <div id="filterMenu" class="filter-menu hidden">
-                            <select id="roleFilter">
-                                <option value="">All Roles</option>
-                                <option value="OSAS">OSAS</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-                            <select id="schoolFilter">
-                                <option value="">All Schools</option>
-                                <option value="SAMCIS">SAMCIS</option>
-                                <option value="SEA">SEA</option>
-                                <option value="STELA">STELA</option>
-                                <option value="SOL">SOL</option>
-                                <option value="SOM">SOM</option>
-                                <option value="SONAHBS">SONAHBS</option>
-                            </select>
-                            <button id="clearFilterBtn">Clear Filters</button>
+                            <div class="filter-group" style="margin-bottom:10px;">
+                                <div style="font-weight:600; margin-bottom:6px;">Roles</div>
+                                <button class="filter-item" data-type="role" data-filter="">All Roles</button>
+                                <button class="filter-item" data-type="role" data-filter="OSAS">OSAS</button>
+                                <button class="filter-item" data-type="role" data-filter="Admin">Admin</button>
+                            </div>
+
+                            <div class="filter-group" style="margin-bottom:10px;">
+                                <div style="font-weight:600; margin-bottom:6px;">Schools</div>
+                                <button class="filter-item" data-type="school" data-filter="">All Schools</button>
+                                <button class="filter-item" data-type="school" data-filter="SAMCIS">SAMCIS</button>
+                                <button class="filter-item" data-type="school" data-filter="SEA">SEA</button>
+                                <button class="filter-item" data-type="school" data-filter="STELA">STELA</button>
+                                <button class="filter-item" data-type="school" data-filter="SOL">SOL</button>
+                                <button class="filter-item" data-type="school" data-filter="SOM">SOM</button>
+                                <button class="filter-item" data-type="school" data-filter="SONAHBS">SONAHBS</button>
+                            </div>
+
+                            <div class="filter-clear">
+                                <button id="clearFilterBtn">Clear Filters</button>
+                            </div>
                         </div>
                     </div>
                 </div>
