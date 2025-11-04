@@ -715,7 +715,7 @@ function showProfileModal() {
   // Update modal content with direct logout button
   const modalContent = `
     <div class="profile-info">
-      <div class="profile-large">M</div>
+      <div class="profile-large">O</div>
       <div class="profile-details">
         <h4>Hello, OSAS</h4>
         <div class="profile-logout">
