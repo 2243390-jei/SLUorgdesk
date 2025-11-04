@@ -1,5 +1,3 @@
-
-
 // Updated SDG Category Mapping for your format
 const SDG_CATEGORIES = {
     "1. No Poverty": "1. No Poverty",
@@ -751,6 +749,101 @@ class AnalyticsDashboard {
         alert(`Analytics Dashboard Error: ${message}`);
     }
 }
+
+// DOM Elements
+const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+const profileModal = document.getElementById('profileModal');
+const profileModalClose = document.getElementById('profileModalClose');
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutModal = document.getElementById('logoutModal');
+const logoutModalClose = document.getElementById('logoutModalClose');
+const logoutCancel = document.getElementById('logoutCancel');
+const logoutConfirm = document.getElementById('logoutConfirm');
+
+// Fetch analytics data
+async function fetchAnalyticsData() {
+    try {
+        const response = await fetch('../data/analytics.json');
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
+}
+
+// Show/Hide Modal Functions
+function showLogoutModal() {
+    logoutModal.style.display = 'flex';
+    logoutModal.setAttribute('aria-hidden', 'false');
+}
+
+function hideLogoutModal() {
+    logoutModal.style.display = 'none';
+    logoutModal.setAttribute('aria-hidden', 'true');
+}
+
+// Profile Modal Functions
+function showProfileModal() {
+    profileModal.style.display = 'flex';
+    profileModal.setAttribute('aria-hidden', 'false');
+    
+    const modalContent = `
+        <div class="profile-info">
+            <div class="profile-large">M</div>
+            <div class="profile-details">
+                <h4>Hello, OSAS</h4>
+                <div class="profile-logout">
+                    <button id="profileLogoutBtn" class="btn-logout">
+                        <img src="../Images/logout.png" alt="Logout" class="nav-icon">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    profileModal.querySelector('.modal-body').innerHTML = modalContent;
+    
+    // Add logout event listener
+    document.getElementById('profileLogoutBtn').addEventListener('click', () => {
+        window.location.href = "../index.html";
+    });
+}
+
+function hideProfileModal() {
+    profileModal.style.display = 'none';
+    profileModal.setAttribute('aria-hidden', 'true');
+}
+
+// Logout function
+function performLogout() {
+    window.location.href = "../index.html";
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Profile modal events
+    mobileProfileBtn.addEventListener('click', showProfileModal);
+    profileModalClose.addEventListener('click', hideProfileModal);
+    
+    // Logout modal events
+    logoutBtn.addEventListener('click', showLogoutModal);
+    logoutModalClose.addEventListener('click', hideLogoutModal);
+    logoutCancel.addEventListener('click', hideLogoutModal);
+    logoutConfirm.addEventListener('click', performLogout);
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === logoutModal) {
+            hideLogoutModal();
+        }
+        if (e.target === profileModal) {
+            hideProfileModal();
+        }
+    });
+});
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
