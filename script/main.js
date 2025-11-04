@@ -209,14 +209,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   navbarProfilePic.style.borderRadius = "50%";
 });
 
-<<<<<<< HEAD
 // main.js – Desktop: Modal | Mobile: Disabled + Logout in Menu
 
-=======
-/* ==============================
-   CAROUSEL & GALLERY HANDLER
-   ============================== */
->>>>>>> 66f3c5caa97709aab3e5bff09b6a461119347204
 document.addEventListener("DOMContentLoaded", () => {
   const profilePic = document.getElementById('nav-profile-pic');
   const modal      = document.getElementById('profileModal');
@@ -248,15 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-<<<<<<< HEAD
-  // Google Profile Picture
-  const user = JSON.parse(localStorage.getItem("googleUser"));
-  if (user && user.picture && profilePic) {
-    profilePic.src = user.picture;
-    profilePic.style.borderRadius = "50%";
-  }
-});
-=======
   // Optionally attach events if prev/next exist
   if (prevBtn && nextBtn) {
     prevBtn.addEventListener("click", updateGallery);
@@ -268,4 +253,3 @@ document.addEventListener("DOMContentLoaded", () => {
    INIT MANUAL LOGIN SETUP
    ============================== */
 document.addEventListener("DOMContentLoaded", setupManualLogin);
->>>>>>> 66f3c5caa97709aab3e5bff09b6a461119347204
