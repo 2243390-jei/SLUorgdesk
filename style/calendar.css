@@ -1,5 +1,41 @@
+/* Font face declarations for Inter */
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 /* Reset & base */
-* { box-sizing: border-box; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+* { 
+  box-sizing: border-box; 
+  margin:0; 
+  padding:0; 
+  font-family: "Inter", system-ui, sans-serif; 
+  font-weight: 400; /* Default weight */
+}
+
 :root{
   --bg: #f5f7fa;
   --card: #ffffff;
@@ -18,7 +54,6 @@
 body { 
   background: var(--bg); 
   color:#0f1720; 
-  -webkit-font-smoothing:antialiased; 
   overflow-x: hidden;
 }
 .app { 
@@ -74,6 +109,7 @@ body {
   justify-content: center; 
   color: #bdc3c7;
   transition: all 0.2s ease;
+  font-weight: 400;
 }
 
 .circle-btn:hover { 
@@ -138,6 +174,7 @@ body {
 .muted { 
   color: var(--muted); 
   font-size: 14px; 
+  font-weight: 400;
 }
 
 /* TOP ACTIONS WITH PROFILE */
@@ -160,6 +197,7 @@ body {
   background: white; 
   box-shadow: 0 2px 8px rgba(10,20,30,0.04);
   font-size: 14px;
+  font-weight: 400;
 }
 
 #searchClear { 
@@ -275,6 +313,7 @@ body {
   justify-content: center;
   transition: all 0.2s ease;
   color: #2c3e50;
+  font-weight: 400;
 }
 
 .icon-btn:hover { 
@@ -382,6 +421,7 @@ body {
   text-overflow: ellipsis; 
   max-width: 100%;
   line-height: 1.2;
+  font-weight: 500;
 }
 
 /* highlight when clicked */
@@ -423,23 +463,10 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Scrollbar styling for events list */
-.events-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.events-list::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 3px;
-}
-
-.events-list::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-}
-
-.events-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
+/* Scrollbar styling for events list - STANDARD PROPERTIES */
+.events-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) rgba(255,255,255,0.05);
 }
 
 /* event card */
@@ -476,6 +503,7 @@ body {
   font-size: 12px; 
   color: #c1d3e6; 
   margin-top: 4px; 
+  font-weight: 400;
 }
 
 .event-desc { 
@@ -483,12 +511,14 @@ body {
   font-size: 13px; 
   color: #dceaf5; 
   line-height: 1.4; 
+  font-weight: 400;
 }
 
 .event-extra { 
   margin-top: 8px; 
   font-size: 12px; 
   color: #b9c5cf; 
+  font-weight: 400;
 }
 
 /* small category badge */
@@ -498,6 +528,7 @@ body {
   border-radius: 999px; 
   background: rgba(255,255,255,0.08); 
   color: #eaf6ff; 
+  font-weight: 500;
 }
 
 /* SDG badge */
@@ -509,6 +540,7 @@ body {
   color: #eaf6ff; 
   border: 1px solid rgba(255,255,255,0.2);
   margin-top: 4px;
+  font-weight: 500;
 }
 
 /* DETAIL SLIDE-IN PANEL - RESTORED */
@@ -517,11 +549,11 @@ body {
   inset: 0; 
   background: rgba(6,8,12,0.45); 
   opacity: 0; 
-  pointer-events: none; 
-  transition: opacity .22s ease;
+  visibility: hidden;
+  transition: opacity .22s ease, visibility .22s ease;
   z-index: 50;
 }
-.overlay.show { opacity: 1; pointer-events: auto; }
+.overlay.show { opacity: 1; visibility: visible; }
 
 .detail-panel {
   position: fixed;
@@ -606,6 +638,7 @@ body {
   color: #6b7280;
   font-size: 0.9rem;
   margin: 0;
+  font-weight: 400;
 }
 
 .detail-section-title {
@@ -660,6 +693,7 @@ body {
 .monospace {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.85rem;
+  font-weight: 400;
 }
 
 .status-badge {
@@ -672,10 +706,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-approved { background: #d1fae5; color: #065f46; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
-.status-needs-revision { background: #ffedd5; color: #9a3412; }
 
 .social-links {
   display: flex;
@@ -694,6 +724,7 @@ body {
   text-decoration: none;
   font-size: 0.9rem;
   transition: all 0.2s ease;
+  font-weight: 400;
 }
 
 .social-link:hover {
@@ -730,7 +761,7 @@ body {
 .doc-info {
   flex: 1;
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -774,23 +805,10 @@ body {
   margin-bottom: 8px;
 }
 
-/* Scrollbar styling for events list */
-#eventsList::-webkit-scrollbar {
-  width: 6px;
-}
-
-#eventsList::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-#eventsList::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-#eventsList::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+/* Scrollbar styling for events list - STANDARD PROPERTIES */
+#eventsList {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
 /* ========== MODAL STYLES ========== */
@@ -806,13 +824,13 @@ body {
   justify-content: center;
   z-index: 2000;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal.show {
   opacity: 1;
-  pointer-events: auto;
+  visibility: visible;
 }
 
 .modal-content {
