@@ -1,4 +1,36 @@
-/* Reset & base */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 * { 
   box-sizing: border-box; 
   margin:0; 
@@ -18,7 +50,6 @@
   --sidebar-accent: #2d3e50;
 }
 
-/* App layout */
 body { 
   background: var(--bg); 
   color:#0f1720; 
@@ -31,7 +62,6 @@ body {
   gap:0;
 }
 
-/* LEFT BAR - STATIC NAVIGATION ON DESKTOP */
 .leftbar { 
   width: 92px; 
   display: flex; 
@@ -100,17 +130,16 @@ body {
   object-fit: contain;
 }
 
-/* MAIN AREA */
 .main-area { 
   flex: 1; 
   display: flex; 
   flex-direction: column; 
   padding: 18px;
   background: var(--bg);
-  margin-left: 92px; /* Added to account for fixed sidebar */
+  margin-left: 92px; 
 }
 
-/* HEADER */
+
 .header { 
   display: flex; 
   justify-content: space-between; 
@@ -129,7 +158,6 @@ body {
   font-size: 13px; 
 }
 
-/* HEADER RIGHT SECTION */
 .header-right {
   display: flex;
   align-items: center;
@@ -146,7 +174,6 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* FILTER DROPDOWN */
 #filterToggle {
   background: #1f2b34;
   border: none;
@@ -158,7 +185,7 @@ body {
   justify-content: center;
   cursor: pointer;
   color: white;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 #filterToggle:hover {
@@ -198,7 +225,7 @@ body {
   font-size: 14px;
   margin-bottom: 4px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .filter-clear {
@@ -219,7 +246,6 @@ body {
   background-color: #d32f2f;
 }
 
-/* SEARCH CONTAINER - UPDATED TO REMOVE X BUTTON */
 .search-container {
   display: flex;
   align-items: center;
@@ -231,14 +257,13 @@ body {
   align-items: center;
 }
 
-/* Remove the clear button completely */
 .clear-btn {
   display: none !important;
 }
 
 .search-container input {
   width: 260px;
-  padding: 10px 16px; /* Removed extra padding for X button */
+  padding: 10px 16px; 
   border-radius: 10px;
   border: 1px solid #e1e8ed;
   background: white;
@@ -253,7 +278,6 @@ body {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
-/* Filter Button */
 .filter-btn {
   background-color: #1f2937; 
   color: #ffffff;
@@ -278,7 +302,6 @@ body {
   transform: scale(0.97);
 }
 
-/* Dropdown */
 .filter-dropdown {
   position: absolute;
   right: 0;
@@ -306,14 +329,13 @@ body {
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 5px;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .filter-category:hover {
   background: #e7e7e7;
 }
 
-/* Sub-options */
 .filter-sub {
   margin-left: 10px;
   margin-bottom: 8px;
@@ -332,14 +354,13 @@ body {
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .filter-sub button:hover, .filter-sub2 button:hover {
   background: #f0f0f0;
 }
 
-/* Nested location */
 .filter-sub2 {
   margin-left: 15px;
 }
@@ -360,14 +381,13 @@ body {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 #clearFilterBtn:hover {
   background-color: #d32f2f;
 }
 
-/* TABLE STYLING */
 table {
   width: 100%;
   border-collapse: separate;
@@ -392,7 +412,6 @@ tr:hover td {
   background: #f9fbff;
 }
 
-/* SUBMISSIONS WRAPPER */
 .submission-wrapper {
   border-bottom: 1px solid #ddd;
   margin-bottom: 10px;
@@ -420,7 +439,6 @@ tr:hover td {
   display: none;
 }
 
-/* VIEW DETAILS BUTTON */
 .view-details-btn {
   background: var(--accent);
   color: white;
@@ -437,7 +455,6 @@ tr:hover td {
   transform: translateY(-1px);
 }
 
-/* Improved filter menu for mobile */
 @media (max-width: 768px) {
   #filterMenu {
     position: fixed;
@@ -451,16 +468,13 @@ tr:hover td {
 
   .filter-item {
     padding: 12px;
-    font-size: 16px; /* Better touch targets */
+    font-size: 16px; 
   }
-
-  /* Improve search input for mobile */
   .search-wrap input[type="search"] {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px; /
   }
 }
 
-/* Ensure proper scrolling on mobile */
 html, body {
   overflow-x: hidden;
 }
@@ -470,8 +484,6 @@ html, body {
   position: relative;
 }
 
-
-/* Back Button Styles */
 .header-title-container {
   display: flex;
   align-items: center;
@@ -500,7 +512,6 @@ html, body {
   height: 20px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .back-button {
     padding: 6px;
@@ -512,7 +523,6 @@ html, body {
   }
 }
 
-/* ========== TABLET (≤1024px) ========== */
 @media (max-width: 1024px) {
   .app {
     flex-direction: column;
@@ -576,7 +586,6 @@ html, body {
     width: 200px;
   }
 
-  /* Table improvements for tablet */
   .submissions-table {
     font-size: 14px;
   }
@@ -587,7 +596,6 @@ html, body {
   }
 }
 
-/* ========== MOBILE (≤768px) ========== */
 @media (max-width: 768px) {
   .main-area {
     padding: 12px;
@@ -616,15 +624,14 @@ html, body {
 
   .search-container input {
     width: 100%;
-    font-size: 16px; /* Prevent zoom on iOS */
-    padding: 12px 16px; /* Consistent padding for mobile */
+    font-size: 16px; 
+    padding: 12px 16px; 
   }
 
   .filter-container {
     align-self: flex-end;
   }
 
-  /* Mobile table transformation */
   .submissions-table {
     display: block;
     overflow-x: auto;
@@ -683,7 +690,6 @@ html, body {
     font-weight: 600;
   }
 
-  /* Filter dropdown adjustments for mobile */
   .filter-dropdown {
     position: fixed;
     top: 50%;
@@ -696,7 +702,6 @@ html, body {
   }
 }
 
-/* ========== SMALL MOBILE (≤480px) ========== */
 @media (max-width: 480px) {
   .main-area {
     padding: 10px;
@@ -731,7 +736,6 @@ html, body {
   }
 }
 
-/* Additional utility classes for mobile */
 .mobile-hidden {
   display: none;
 }
@@ -742,7 +746,6 @@ html, body {
   }
 }
 
-/* Mobile card layout */
 .submissions-mobile {
   display: flex;
   flex-direction: column;
