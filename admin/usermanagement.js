@@ -15,8 +15,7 @@ const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
 const searchInput = document.getElementById('searchInput');
-const roleFilter = document.getElementById('roleFilter');
-const schoolFilter = document.getElementById('schoolFilter');
+// roleFilter and schoolFilter replaced by button-based filters inside #filterMenu
 const filterToggle = document.getElementById('filterToggle');
 const filterMenu = document.querySelector('.filter-menu');
 const rowsPerPageSelect = document.getElementById('rowsPerPage');
@@ -31,11 +30,34 @@ document.addEventListener('DOMContentLoaded', initialize);
 addUserBtn.addEventListener('click', () => openModal());
 userForm.addEventListener('submit', handleSubmit);
 searchInput.addEventListener('input', handleSearch);
-roleFilter.addEventListener('change', handleFilter);
-schoolFilter.addEventListener('change', handleFilter);
 filterToggle.addEventListener('click', toggleFilterMenu);
 document.getElementById('clearFilterBtn').addEventListener('click', clearFilters);
 rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
+
+// Event delegation for filter buttons (role and school)
+filterMenu?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-item');
+    if (!btn) return;
+    const type = btn.dataset.type; // 'role' or 'school'
+    const value = btn.dataset.filter || '';
+
+    if (type === 'role') {
+        currentFilters.role = value;
+        // mark active state
+        document.querySelectorAll('#filterMenu .filter-item[data-type="role"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    if (type === 'school') {
+        currentFilters.school = value;
+        document.querySelectorAll('#filterMenu .filter-item[data-type="school"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    currentPage = 1;
+    updateTable();
+    // close menu on mobile after select
+    filterMenu.classList.add('hidden');
+});
 
 // Initialize the page
 async function initialize() {
@@ -43,6 +65,11 @@ async function initialize() {
         users = await fetchUsers();
         if (users && users.length > 0) {
             updateTable();
+            // mark default 'All' filters as active
+            const defaultRoleBtn = document.querySelector('#filterMenu .filter-item[data-type="role"][data-filter=""]');
+            const defaultSchoolBtn = document.querySelector('#filterMenu .filter-item[data-type="school"][data-filter=""]');
+            defaultRoleBtn?.classList.add('active');
+            defaultSchoolBtn?.classList.add('active');
         } else {
             userTableBody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
         }
@@ -243,8 +270,8 @@ function handleFilter(event) {
 function clearFilters() {
     currentFilters = { search: '', role: '', school: '' };
     searchInput.value = '';
-    roleFilter.value = '';
-    schoolFilter.value = '';
+    // remove active classes from filter buttons
+    document.querySelectorAll('#filterMenu .filter-item').forEach(b => b.classList.remove('active'));
     currentPage = 1;
     updateTable();
 }
