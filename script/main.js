@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`Login successful! Welcome, ${user.role.toUpperCase()}.`);
 
         switch (user.role) {
-          case "student": window.location.href = "student/home.html"; break;
+          case "student": window.location.href = "student/submission.html"; break;
           case "osas":    window.location.href = "osas/calendar.html"; break;
           case "admin":   window.location.href = "admin/dashboard.html"; break;
         }
@@ -58,7 +58,7 @@ function handleCredentialResponse(response) {
   // --- Role detection logic based on email ---
   if (email.includes("@slu.edu.ph")) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
-      window.location.href = "student/home.html";
+      window.location.href = "student/submission.html";
     } else if (email.startsWith("osas@")) {
       window.location.href = "osas/dashboard.html";
     } else if (email.startsWith("admin@")) {

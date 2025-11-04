@@ -22,7 +22,7 @@ body::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2); 
   pointer-events: none;
 }
 
@@ -94,7 +94,6 @@ input {
   font-size: 0.9rem;
 }
 
-
 button[type="submit"] {
   background-color: #404040;
   color: #fff;
@@ -131,6 +130,7 @@ button[type="submit"]:hover {
   justify-content: center;
   height: auto;
 }
+
 /* ============================= */
 /* ✅ MOBILE RESPONSIVE (≤ 799) */
 /* ============================= */
@@ -191,9 +191,7 @@ button[type="submit"]:hover {
     padding: 0.55rem;
   }
 
-  input::placeholder {
-    font-size: 0.85rem; 
-    color: #999;
+ 
 
   button[type="submit"] {
     padding: 0.65rem;
@@ -203,7 +201,6 @@ button[type="submit"]:hover {
   #g_id_signin {
     scale: 0.85;
   }
-}
 }
 
 /* Home html */
@@ -220,7 +217,7 @@ button[type="submit"]:hover {
   src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
   font-weight: 400;
 }
-/* ===== HOME BODY ===== */
+
 body.home-body {
   margin: 0;
   padding: 0;
@@ -291,297 +288,7 @@ body.home-body {
   cursor: pointer;
 }
 
-/* ===== HERO SECTION ===== */
-.home-body .hero {
-  display: block;
-  padding: 40px 80px 0 80px; 
-  min-height: 30vh; 
-  box-sizing: border-box;
-  background: #ffffff;
-}
 
-.home-body .hero-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end; 
-  max-width: 1200px;
-  margin: 0 auto;
-  gap: 60px;
-  flex-wrap: wrap;
-}
-
-.home-body .hero-text {
-  flex: 1;
-  align-self: center; 
-}
-
-.home-body .hero-text h1 {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 3rem;
-  color: #000000;
-  margin: 0 0 10px 0; 
-  line-height: 1.2;
-}
-
-.home-body .hero-text p {
-  font-family: "Inter", sans-serif;
-  font-size: 1.2rem;
-  color: #000000;
-  margin: 0 0 15px 0; 
-  max-width: 500px;
-}
-
-.home-body .submit-btn {
-  display: inline-block;
-  background-color: transparent;
-  color: #000000;
-  padding: 10px 25px;
-  border-radius: 8px;
-  border: 2px solid #000000;
-  text-decoration: none;
-  font-weight: 600;
-  font-family: "Inter", sans-serif;
-  letter-spacing: 0.5px;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-}
-
-.home-body .submit-btn:hover {
-  background-color: #000000;
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-.home-body .hero-image {
-  flex: 1;
-  align-self: flex-end; 
-}
-
-.home-body .hero-image img {
-  width: 100%;
-  max-width: 700px;
-  height: auto;
-  display: block;
-}
-/* Org Section */
-.organizations-section h2{
-  text-align: center;
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 3rem;
-  margin-bottom: 30px;
-}
-
-.org-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  
-  justify-content: center;
-}
-
-.org-group {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-  gap: 50px;
-}
-
-.org-group.active {
-  display: flex;
-  opacity: 1;
-}
-
-.org-group img {
-  width: 175px;
-  height: 175px;
-  object-fit: contain;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
-}
-
-.org-group img:hover {
-  transform: scale(1.1);
-}
-
-/* ORGDESK DESCRIPTION SECTION */
-.orgdesk-description-section {
-  background: #242E3A; 
-   padding-top: 50px;
-}
-
-.orgdesk-inner {
-  max-width: 1200px; 
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 0 40px; 
-  box-sizing: border-box;
-}
-
-.orgdesk-description-image {
-  width: 620px;
-  height: auto;
-  max-width: 40%;
-  object-fit: contain;
-  
-}
-
-.org-desk-content {
-  max-width: 680px;
-  flex: 1;
-  text-align: right;
-  padding-left: 16px;
-}
-
-.org-desk-title {
-  color: #FFF;
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 3rem;
-  margin: 0 0 10px 0; 
-  line-height: 1.2;
-  text-align: right;
-}
-
-.org-desk-text {
-  color: #FFF;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: right;
-  max-width: 480px;
-  margin-left: auto;
-  margin-bottom: 12px;
-}
-
-.org-desk-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.btn-outlined {
-  border: 1px solid #FFF;
-  border-radius: 12px;
-  background: transparent;
-  color: #FFF;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.btn-outlined:hover {
-  background: #FFF;
-  color: #242E3A;
-}
-
-/* STEP-BY-STEP SECTION */
-.step-by-step-topic {
-  background: #ffffff; 
-  padding-top: 40px;
-}
-
-.step-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 0 40px;
-  box-sizing: border-box;
-}
-
-.step-text {
-  flex: 1;
-  max-width: 500px;
-}
-
-.step-by-step-top-title {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 2.6rem;
-  margin: 0 0 8px 0;
-  color: #000;
-}
-
-.step-by-step-top-text {
-  font-family: Inter, sans-serif;
-  font-size: 1.1rem;
-  margin: 0 0 12px 0;
-  color: #333;
-  max-width: 680px;
-}
-
-.step-image {
-  width: 420px;
-  max-width: 38%;
-}
-
-.step-image img {
-  width: 60%;
-  height: auto;
-  display: block;
-}
-
-/* STEP-BY-STEP BOTTOM */
-
-.step-by-step-bottom {
-  background: #ffffff;
-  padding: 0 0 60px 0;
-}
-
-.step-bottom-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 0 40px;
-  box-sizing: border-box;
-}
-
-.step-bottom-image {
-  width: 420px;
-  max-width: 38%;
-}
-
-.step-bottom-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.step-box {
-  background: white;
-  border-radius: 18px;
-  padding: 28px 32px;
-  border: 1px solid #E5E5E5;
-  max-width: 580px;
-  width: 100%;
-}
-
-.step-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.step-num {
-  width: 34px;
-  height: auto;
-}
-
-.step-item p {
-  font-family: Inter, sans-serif;
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: #333;
-}
 
 /* MODAL STYLES FOR HISTORY VIEW/EDIT */
 .modal {
@@ -925,11 +632,11 @@ body.submission-body {
 }
 
 /* INPUTS */
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="url"],
-input[type="date"],
+.submission .input[type="text"],
+.submission .input[type="email"],
+.submission .input[type="number"],
+.submission .input[type="url"],
+.submission .input[type="date"],
 textarea,
 select {
   width: 100%;
