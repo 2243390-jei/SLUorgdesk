@@ -16,16 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const addOrgBtn = document.getElementById("addOrgBtn");
   const addOrgModal = document.getElementById("addOrgModal");
-  const closeAddOrg = document.getElementById("closeAddOrg");
-  const googleBtn = document.getElementById("signInGoogleBtn");
-  const googleModal = document.getElementById("googleEmailModal");
-  const cancelGoogle = document.getElementById("cancelGoogle");
-  const nextGoogle = document.getElementById("googleNext");
-  const createAccountBtn = document.querySelector("#createAccountSection button");
-  const createOrgModal = document.getElementById("createOrgModal");
   const cancelCreateOrg = document.getElementById("cancelCreateOrg");
-  const saveOrgBtn = document.getElementById("saveOrgBtn");
-  const createOrgForm = document.getElementById("createOrgForm"); // Add this line
+  const createOrgForm = document.getElementById("createOrgForm");
+  const orgFormTitle = document.getElementById("orgFormTitle");
 
   const confirmModal = document.getElementById("confirmModal");
   const confirmTitle = document.getElementById("confirmTitle");
@@ -239,11 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const org = organizations.find(o => o._id === orgId);
     if (!org) return;
 
-    if (createOrgModal) {
-      createOrgModal.style.display = "flex";
-      const titleElement = createOrgModal.querySelector("h2");
-      if (titleElement) {
-        titleElement.textContent = "Edit Organization";
+    if (addOrgModal) {
+      // Update title
+      if (orgFormTitle) {
+        orgFormTitle.textContent = "Edit Organization";
       }
 
       // Fill in the form with organization data
@@ -258,12 +250,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (emailField) emailField.value = org.email || "";
       if (schoolField) schoolField.value = org.school || "";
       if (logoField) logoField.value = org.logoUrl || "";
+
+      addOrgModal.style.display = "flex";
     }
   }
 
   function closeEditModal() {
-    if (createOrgModal) {
-      createOrgModal.style.display = "none";
+    if (addOrgModal) {
+      addOrgModal.style.display = "none";
     }
     orgToEdit = null;
     // Reset the form
@@ -361,21 +355,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Open modal for adding new organization
   function openAddModal() {
     orgToEdit = null;
-    if (createOrgModal) {
-      createOrgModal.style.display = "flex";
-      const titleElement = createOrgModal.querySelector("h2");
-      if (titleElement) {
-        titleElement.textContent = "Create New Organization";
+    if (addOrgModal) {
+      // Update title
+      if (orgFormTitle) {
+        orgFormTitle.textContent = "Add Organization";
       }
+      
+      addOrgModal.style.display = "flex";
       // Reset the form
       if (createOrgForm) createOrgForm.reset();
     }
   }
-
-  // Update the existing delete button handler to use the new modal system
-  document.addEventListener("click", (e) => {
-    // Remove old edit button handler since we're using onclick attributes now
-  });
 
   // Update the existing confirm modal handlers to use the new delete system
   if (confirmYes) {
@@ -386,24 +376,25 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmCancel.onclick = closeDeleteModal;
   }
 
-  // Update save organization button to use new form handler
-  if (saveOrgBtn) {
-    saveOrgBtn.onclick = handleOrgSubmit;
-  }
-
-  // Update create account button to open add modal directly
-  if (createAccountBtn) {
-    createAccountBtn.addEventListener('click', () => {
-      if (addOrgModal) addOrgModal.style.display = "none";
-      openAddModal();
-    });
-  }
-
   // Add form submit event listener to handle Enter key submissions
   if (createOrgForm) {
     createOrgForm.addEventListener('submit', function(e) {
       e.preventDefault();
       handleOrgSubmit();
+    });
+  }
+
+  // Add Organization button and modal handling
+  if (addOrgBtn && addOrgModal) {
+    addOrgBtn.addEventListener('click', () => {
+      openAddModal();
+    });
+  }
+
+  // Cancel button for organization form
+  if (cancelCreateOrg) {
+    cancelCreateOrg.addEventListener('click', () => {
+      closeEditModal();
     });
   }
 
@@ -470,78 +461,18 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPagination();
   });
 
-  // Add Organization button and modal handling
-  if (addOrgBtn && addOrgModal) {
-    addOrgBtn.addEventListener('click', () => {
-      addOrgModal.style.display = "flex";
-    });
-
-    if (closeAddOrg) {
-      closeAddOrg.addEventListener('click', () => {
-        addOrgModal.style.display = "none";
-      });
-    }
-
-    addOrgModal.addEventListener('click', (e) => {
-      if (e.target === addOrgModal) {
-        addOrgModal.style.display = "none";
-      }
-    });
-  }
-
-  // Google sign-in button handler
-  if (googleBtn && googleModal) {
-    googleBtn.addEventListener('click', () => {
-      if (addOrgModal) addOrgModal.style.display = "none";
-      googleModal.style.display = "flex";
-    });
-  }
-
-  // Google modal cancel button
-  if (cancelGoogle) {
-    cancelGoogle.addEventListener('click', () => {
-      if (googleModal) googleModal.style.display = "none";
-      if (addOrgModal) addOrgModal.style.display = "flex";
-    });
-  }
-
-  // Google modal next button
-  if (nextGoogle) {
-    nextGoogle.addEventListener('click', () => {
-      alert("Google email submitted.");
-      if (googleModal) googleModal.style.display = "none";
-    });
-  }
-
-  // Create Organization modal cancel button
-  if (cancelCreateOrg) {
-    cancelCreateOrg.addEventListener('click', () => {
-      closeEditModal();
-      if (addOrgModal) addOrgModal.style.display = "flex";
-    });
-  }
-
+  // Close modal when clicking outside
   window.addEventListener("click", (event) => {
-    const modals = [addOrgModal, googleModal, createOrgModal, confirmModal, editConfirmModal];
+    const modals = [addOrgModal, confirmModal, editConfirmModal];
     modals.forEach(modal => {
       if (modal && event.target === modal) {
         modal.style.display = "none";
-        if (modal === createOrgModal) {
+        if (modal === addOrgModal) {
           orgToEdit = null;
           if (createOrgForm) createOrgForm.reset();
         }
       }
     });
-  });
-
-  [
-    addOrgModal,
-    googleModal,
-    createOrgModal,
-    confirmModal,
-    editConfirmModal
-  ].forEach(modal => {
-    if (modal) modal.style.display = "none";
   });
 
   // Make functions globally available for onclick attributes
