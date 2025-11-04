@@ -9,32 +9,42 @@ let currentFilters = {
 };
 let userToDelete = null;
 let currentViewport = isMobile() ? 'mobile' : 'desktop';
+let selectedRole = '';
 
 // DOM Elements
 const userTableBody = document.getElementById('userTableBody');
 const userCardList = document.getElementById('userCardList');
+const roleModal = document.getElementById('roleModal');
 const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
 const searchInput = document.getElementById('searchInput');
-// roleFilter and schoolFilter replaced by button-based filters inside #filterMenu
 const filterToggle = document.getElementById('filterToggle');
 const filterMenu = document.querySelector('.filter-menu');
 const rowsPerPageSelect = document.getElementById('rowsPerPage');
 const addUserBtn = document.getElementById('addUserBtn');
 
 // Ensure modals are hidden by default
+roleModal.style.display = 'none';
 userModal.style.display = 'none';
 deleteModal.style.display = 'none';
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initialize);
-addUserBtn.addEventListener('click', () => openModal());
+addUserBtn.addEventListener('click', openRoleModal);
 userForm.addEventListener('submit', handleSubmit);
 searchInput.addEventListener('input', handleSearch);
 filterToggle.addEventListener('click', toggleFilterMenu);
 document.getElementById('clearFilterBtn').addEventListener('click', clearFilters);
 rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
+
+// Role selection event listeners
+document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        selectedRole = e.target.closest('.role-btn').dataset.role;
+        openUserFormModal(selectedRole);
+    });
+});
 
 // Event delegation for filter buttons (role and school)
 filterMenu?.addEventListener('click', (e) => {
@@ -161,7 +171,7 @@ function updateTable() {
                 </span>
             </td>
             <td class="action-buttons">
-                <button class="action-icon" onclick="openModal('${user._id}')">
+                <button class="action-icon" onclick="openEditModal('${user._id}')">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="action-icon" onclick="openDeleteModal('${user._id}')">
@@ -229,7 +239,7 @@ function renderUserCards() {
                 <span><b>Status:</b> ${user.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <div class="card-actions">
-                <button class="action-icon" title="Edit" onclick="openModal('${user._id}')">
+                <button class="action-icon" title="Edit" onclick="openEditModal('${user._id}')">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="action-icon" title="Delete" onclick="openDeleteModal('${user._id}')">
@@ -266,42 +276,97 @@ function updatePagination(totalPages) {
 }
 
 // Modal functions
-function openModal(userId = null) {
-    const modalTitle = document.getElementById('modalTitle');
-    const form = document.getElementById('userForm');
+function openRoleModal() {
+    roleModal.style.display = 'flex';
+    selectedRole = '';
+}
+
+function closeRoleModal() {
+    roleModal.style.display = 'none';
+}
+
+function openUserFormModal(role) {
+    closeRoleModal();
+    selectedRole = role;
     
-    if (userId) {
-        const user = users.find(u => u._id === userId);
-        if (!user) return;
-        
-        modalTitle.textContent = 'Edit User';
-        form.elements.name.value = user.name;
-        form.elements.email.value = user.email;
-        form.elements.password.value = ''; // Don't populate password
-        form.elements.role.value = user.role;
-        form.elements.studentId.value = user.studentId || '';
-        form.elements.school.value = user.school || '';
-        form.elements.course.value = user.course || '';
-        form.elements.yearLevel.value = user.yearLevel || '';
-        form.dataset.userId = userId;
-    } else {
-        modalTitle.textContent = 'Add New User';
-        form.reset();
-        delete form.dataset.userId;
+    const modalTitle = document.getElementById('modalTitle');
+    modalTitle.textContent = `Add ${role} User`;
+    
+    // Set the role in the form and disable it
+    const roleSelect = document.getElementById('role');
+    roleSelect.value = role;
+    
+    // Show/hide role-specific fields
+    hideAllRoleSpecificFields();
+    
+    switch(role) {
+        case 'Organization':
+            document.getElementById('organizationFields').classList.add('show');
+            break;
+        case 'OSAS':
+            document.getElementById('osasFields').classList.add('show');
+            break;
+        case 'Admin':
+            document.getElementById('adminFields').classList.add('show');
+            break;
     }
     
-    // use flex so the CSS flex centering rules apply
     userModal.style.display = 'flex';
 }
 
-function closeModal() {
+function hideAllRoleSpecificFields() {
+    document.querySelectorAll('.role-specific-fields').forEach(field => {
+        field.classList.remove('show');
+    });
+}
+
+function openEditModal(userId) {
+    const user = users.find(u => u._id === userId);
+    if (!user) return;
+    
+    const modalTitle = document.getElementById('modalTitle');
+    modalTitle.textContent = 'Edit User';
+    
+    // Populate the form
+    document.getElementById('name').value = user.name;
+    document.getElementById('email').value = user.email;
+    document.getElementById('password').value = ''; // Don't populate password
+    document.getElementById('role').value = user.role;
+    
+    // Show/hide role-specific fields based on user's role
+    hideAllRoleSpecificFields();
+    
+    switch(user.role) {
+        case 'Organization':
+            document.getElementById('organizationFields').classList.add('show');
+            document.getElementById('studentId').value = user.studentId || '';
+            document.getElementById('school').value = user.school || '';
+            document.getElementById('course').value = user.course || '';
+            document.getElementById('yearLevel').value = user.yearLevel || '';
+            break;
+        case 'OSAS':
+            document.getElementById('osasFields').classList.add('show');
+            document.getElementById('osasDepartment').value = user.osasDepartment || '';
+            break;
+        case 'Admin':
+            document.getElementById('adminFields').classList.add('show');
+            document.getElementById('adminLevel').value = user.adminLevel || 'Regular Admin';
+            break;
+    }
+    
+    userForm.dataset.userId = userId;
+    userModal.style.display = 'flex';
+}
+
+function closeUserModal() {
     userModal.style.display = 'none';
     userForm.reset();
+    hideAllRoleSpecificFields();
+    selectedRole = '';
 }
 
 function openDeleteModal(userId) {
     userToDelete = userId;
-    // open as flex so modal centers vertically
     deleteModal.style.display = 'flex';
 }
 
@@ -336,7 +401,7 @@ async function handleSubmit(event) {
     
     // Update UI only
     updateTable();
-    closeModal();
+    closeUserModal();
 }
 
 // Delete user (temporary - only updates UI)
@@ -357,12 +422,6 @@ async function confirmDelete() {
 // Filter and search handlers
 function handleSearch(event) {
     currentFilters.search = event.target.value;
-    currentPage = 1;
-    updateTable();
-}
-
-function handleFilter(event) {
-    currentFilters[event.target.id.replace('Filter', '')] = event.target.value;
     currentPage = 1;
     updateTable();
 }
@@ -391,3 +450,16 @@ function changePage(page) {
     currentPage = page;
     updateTable();
 }
+
+// Close modals when clicking outside
+window.addEventListener('click', function(event) {
+    if (event.target === roleModal) {
+        closeRoleModal();
+    }
+    if (event.target === userModal) {
+        closeUserModal();
+    }
+    if (event.target === deleteModal) {
+        closeDeleteModal();
+    }
+});
