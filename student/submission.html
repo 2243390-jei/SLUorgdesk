@@ -4,14 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submission Page</title>
-
-  <!-- Custom Styles -->
   <link rel="stylesheet" href="../style/style.css">
   <script src="../script/mobile-drawer.js" defer></script>
 </head>
 
 <body class="submission-body">
-  <!-- NAVIGATION BAR -->
   <header class="navbar">
     <div class="logo">
       <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
@@ -22,11 +19,9 @@
         <li><a href="history.html">History</a></li>
       </ul>
     </nav>
-    <!-- PROFILE ICON + MODAL -->
         <div id="profileContainer" class="profile-icon">
             <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile">
 
-            <!-- Profile Modal -->
             <div class="profile-modal" id="profileModal" style="display: none;">
                 <div class="profile-modal-content">
                     <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -36,7 +31,6 @@
         </div>
 </header>
 
-  <!-- HERO SECTION -->
   <section class="submission-hero">
     <div class="submission-hero-text">
       <h1>SUBMISSION OF ORGANIZATION DOCUMENTS</h1>
@@ -47,12 +41,9 @@
     </div>
   </section>
 
-  <!-- FORM SECTION -->
   <section class="submission-form-section">
     <div class="submission-form-wrapper">
       <form id="submissionForm" method="POST" enctype="multipart/form-data">
-
-        <!-- ORGANIZATION INFORMATION -->
         <h3 class="form-section-title">Organization Information</h3>
 
         <div class="form-group">
@@ -87,7 +78,6 @@
           <input type="text" name="applicant_position" placeholder="Your answer">
         </div>
 
-        <!-- ACADEMIC YEAR INFORMATION -->
         <h3 class="form-section-title">Academic Year Information</h3>
         <div class="form-row">
           <div class="form-group">
@@ -108,12 +98,8 @@
           </div>
         </div>
 
-        <!-- EVENT DETAILS -->
         <h3 class="form-section-title">Event Details</h3>
 
-        <!-- Event List Preview -->
-
-        <!-- Inline Event Form -->
         <div class="event-form-container" id="inlineEventForm">
           <div class="form-group">
             <label>Event Name</label>
@@ -137,7 +123,6 @@
             <input type="date" id="eventDate" required>
           </div>
 
-          <!-- Event Time -->
           <div class="form-group">
             <label>Event Time</label>
             <div class="event-time-container">
@@ -181,7 +166,6 @@
             <input type="url" id="eventProof" placeholder="https://example.com">
           </div>
 
-          <!-- SDGs -->
           <div class="form-group">
             <label>Select Applicable SDGs</label>
             <div class="event-sdg-options">
@@ -210,7 +194,6 @@
             <textarea id="eventDesc" rows="3" placeholder="Briefly describe the event..."></textarea>
           </div>
 
-          <!-- SUPPORTING DOCUMENT (INLINE) -->
           <div class="form-group">
             <label>Supporting Document</label>
             <div class="drop-zone">
@@ -226,7 +209,6 @@
           </div>
         </div>
 
-        <!-- ADD EVENT SECTION -->
         <div class="add-event-section">
           <h3 class="form-section-title">Add Event</h3>
           <button type="button" id="openEventModalBtn" class="add-event-btn">
@@ -237,14 +219,11 @@
           <p><em>No events added yet.</em></p>
         </div>
 
-
-        <!-- ADDITIONAL INFO -->
         <div class="form-group">
           <label>Additional Note/Message</label>
           <textarea name="add_note" rows="3" placeholder="Your message"></textarea>
         </div>
 
-        <!-- CONFIRMATION -->
         <div class="form-group confirm-group">
           <label>
             <input type="checkbox" name="confirm" required>
@@ -252,7 +231,6 @@
           </label>
         </div>
 
-        <!-- SUBMIT / RESET -->
         <div class="form-buttons">
           <button type="reset" class="reset-btn">Reset</button>
           <button type="submit" class="submit-btn">Submit</button>
@@ -261,7 +239,6 @@
     </div>
   </section>
 
-  <!-- EVENT MODAL -->
   <div class="event-modal" id="eventModal">
     <div class="event-modal-content">
       <span class="event-modal-close" id="closeEventModal">×</span>
@@ -354,7 +331,6 @@
           <textarea id="modalEventDesc" rows="3" placeholder="Briefly describe the event..."></textarea>
         </div>
 
-        <!-- SUPPORTING DOCUMENT (MODAL) -->
         <div class="form-group">
           <label>Supporting Document</label>
           <div class="drop-zone">
@@ -373,7 +349,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="../script/submission.js" defer></script>
   <script src="../script/main.js" defer></script>
 </body>
