@@ -147,7 +147,7 @@ function handleCredentialResponse(response) {
 
   if (email.includes("@slu.edu.ph")) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
-      window.location.href = "student/home.html";
+      window.location.href = "student/submission.html";
     } else if (email.startsWith("osas@")) {
       window.location.href = "osas/dashboard.html";
     } else if (email.startsWith("admin@")) {

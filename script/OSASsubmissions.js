@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!orgId) {
     console.error("No orgId found in URL");
     document.getElementById("submissionsContainer").innerHTML = `
-      <p style="color:red;">No organization selected. Please go back to the organization list.</p>
+      <p style="color:red; padding: 20px; text-align: center;">No organization selected. Please go back to the organization list.</p>
     `;
     return;
   }
@@ -24,11 +24,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const response = await fetch(`../dataFetch/fetchSubmissions.php?orgId=${orgId}`);
     submissions = await response.json();
+    
+    // Debug: Log the submissions to see the event types
+    console.log("All submissions:", submissions);
+    if (submissions.length > 0) {
+      console.log("Event types found:", submissions.map(sub => sub.event?.eventType));
+    }
+    
     renderSubmissions(submissions);
   } catch (error) {
     console.error("Error fetching submissions:", error);
     document.getElementById("submissionsContainer").innerHTML = `
-      <p style="color:red;">Failed to load submissions. Please try again later.</p>
+      <p style="color:red; padding: 20px; text-align: center;">Failed to load submissions. Please try again later.</p>
     `;
   }
 
@@ -75,6 +82,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  // --- Category Filter ---
+  const categoryContainer = document.querySelector('.filter-sub[data-type="category"]');
+  if (categoryContainer) {
+    categoryContainer.addEventListener("click", (ev) => {
+      if (ev.target.tagName === "BUTTON") {
+        const selectedCategory = ev.target.getAttribute("data-category");
+        console.log("Category filter clicked:", selectedCategory);
+        applyCategoryFilter(selectedCategory);
+        filterDropdown.classList.add("hidden");
+      }
+    });
+  }
+
   // --- SDG Filter ---
   const sdgContainer = document.querySelector('.filter-sub[data-type="sdg"]');
   if (sdgContainer) {
@@ -113,28 +133,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- Search ---
   const searchInput = document.getElementById("searchInput");
-  const clearSearchBtn = document.getElementById("clearSearchBtn");
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase();
-      const rows = document.querySelectorAll(".submissions-table tbody tr");
-      rows.forEach((row) => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? "" : "none";
+      const filtered = submissions.filter((sub) => {
+        const eventName = (sub.event && sub.event.eventName) || "";
+        return eventName.toLowerCase().includes(query);
       });
-    });
-  }
-
-  if (clearSearchBtn) {
-    clearSearchBtn.addEventListener("click", () => {
-      searchInput.value = "";
-      const rows = document.querySelectorAll(".submissions-table tbody tr");
-      rows.forEach((row) => (row.style.display = ""));
+      renderSubmissions(filtered);
     });
   }
 
   // ==================== FILTER LOGIC ====================
+  function applyCategoryFilter(selectedCategory) {
+    console.log("Applying category filter for:", selectedCategory);
+    
+    const filtered = submissions.filter((sub) => {
+      const eventType = (sub.event && sub.event.eventType) || "";
+      console.log("Checking event type:", eventType, "against category:", selectedCategory);
+      
+      // More flexible matching - check if event type contains the category
+      return eventType.toLowerCase().includes(selectedCategory.toLowerCase());
+    });
+    
+    console.log("Filtered results:", filtered.length);
+    renderSubmissions(filtered);
+  }
+
   function applySDGFilter(selectedFilter) {
     const normalizedFilter = normalizeText(selectedFilter);
     const filtered = submissions.filter((sub) => {
@@ -152,15 +178,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderSubmissions(filtered);
   }
 
-  // --- RENDER SUBMISSIONS FUNCTION ---
+  // --- RENDER SUBMISSIONS FUNCTION (Now Responsive) ---
   function renderSubmissions(submissions) {
     const container = document.getElementById("submissionsContainer");
+    const isMobile = window.innerWidth <= 768;
 
     if (!submissions || submissions.length === 0) {
-      container.innerHTML = `<p>No submissions found for this organization.</p>`;
+      container.innerHTML = `<p style="padding: 20px; text-align: center; color: var(--muted);">No submissions found for this organization.</p>`;
       return;
     }
 
+    if (isMobile) {
+      renderMobileSubmissions(container, submissions);
+    } else {
+      renderDesktopSubmissions(container, submissions);
+    }
+  }
+
+  function renderDesktopSubmissions(container, submissions) {
     let html = `
       <table class="submissions-table">
         <thead>
@@ -200,15 +235,78 @@ document.addEventListener("DOMContentLoaded", async () => {
           <td>${sdgs}</td>
           <td>${e.eventProof ? `<a href="${e.eventProof}" target="_blank">View Proof</a>` : "N/A"}</td>
           <td>${docs || "None"}</td>
-          <td><button class="view-details-btn" data-event='${JSON.stringify(e)}'>View Full Details</button></td>
+          <td><button class="view-details-btn" data-event='${JSON.stringify(e).replace(/'/g, "&#39;")}'>View Full Details</button></td>
         </tr>
       `;
     });
 
     html += "</tbody></table>";
     container.innerHTML = html;
+    attachEventListeners();
+  }
 
-    // Add event listeners to buttons
+  function renderMobileSubmissions(container, submissions) {
+    let html = '<div class="submissions-mobile">';
+
+    submissions.forEach((sub) => {
+      const e = sub.event || {};
+      const sdgs = e.eventSDG && e.eventSDG.length > 0 ? e.eventSDG.join(", ") : "None";
+      const docs = (e.supportingDocuments || [])
+        .map((d, i) => `<a href="${d}" target="_blank">File ${i + 1}</a>`)
+        .join(", ");
+
+      html += `
+        <div class="submission-card">
+          <div class="card-header">
+            <h3 class="event-name">${e.eventName || "N/A"}</h3>
+            <span class="event-type">${e.eventType || "N/A"}</span>
+          </div>
+          
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="detail-label">Date & Time:</span>
+              <span class="detail-value">${e.eventDate || "N/A"} • ${e.startTime || "N/A"} - ${e.endTime || "N/A"}</span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Venue:</span>
+              <span class="detail-value">${e.eventVenue || "N/A"}</span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Attendance:</span>
+              <span class="detail-value">${e.attendance || "N/A"}</span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">SDG Goals:</span>
+              <span class="detail-value">${sdgs}</span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Proof:</span>
+              <span class="detail-value">${e.eventProof ? `<a href="${e.eventProof}" target="_blank">View Proof</a>` : "N/A"}</span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Documents:</span>
+              <span class="detail-value">${docs || "None"}</span>
+            </div>
+          </div>
+          
+          <button class="view-details-btn mobile-btn" data-event='${JSON.stringify(e).replace(/'/g, "&#39;")}'>
+            View Full Details
+          </button>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+    attachEventListeners();
+  }
+
+  function attachEventListeners() {
     document.querySelectorAll(".view-details-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const eventData = JSON.parse(e.target.getAttribute("data-event"));
@@ -217,6 +315,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
   }
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    renderSubmissions(submissions);
+  });
 });
 
 // --- NORMALIZE TEXT ---

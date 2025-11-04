@@ -12,6 +12,7 @@ async function loadOrganizations() {
     organizationsData = organizations; // save for filtering
 
     renderTable(organizations);
+    initializeResponsiveTable(); // Initialize responsive layout after loading data
   } catch (error) {
     console.error("Error loading organizations:", error);
   }
@@ -43,6 +44,74 @@ function renderTable(orgs) {
 
     tableBody.appendChild(row);
   });
+
+  // Update responsive layout after rendering
+  if (typeof updateTableLayout === 'function') {
+    updateTableLayout();
+  }
+}
+
+// Enhanced responsive table layout function
+function initializeResponsiveTable() {
+  function updateTableLayout() {
+    const rows = tableBody.getElementsByTagName('tr');
+    
+    for (let row of rows) {
+      const cells = row.getElementsByTagName('td');
+      if (cells.length >= 3) {
+        const firstCell = cells[0];
+        const orgNameCell = cells[1];
+        const schoolCell = cells[2];
+        const actionCell = cells[3];
+        
+        if (window.innerWidth <= 768) {
+          // Mobile layout - combine image, name, and school in first cell
+          const orgImage = firstCell.querySelector('.org-logo') ? firstCell.querySelector('.org-logo').outerHTML : firstCell.innerHTML;
+          const orgName = orgNameCell.textContent;
+          const school = schoolCell.textContent;
+          
+          firstCell.innerHTML = `
+            ${orgImage}
+            <div class="org-info">
+              <div class="org-name">${orgName}</div>
+              <div class="org-school">${school}</div>
+            </div>
+          `;
+          
+          // Hide the original cells
+          orgNameCell.style.display = 'none';
+          schoolCell.style.display = 'none';
+          actionCell.style.display = 'table-cell'; // Keep action cell visible
+          
+          // Ensure the row uses flex for side-by-side layout
+          row.style.display = 'flex';
+          row.style.flexDirection = 'column';
+          firstCell.style.display = 'flex';
+          firstCell.style.alignItems = 'center';
+          firstCell.style.gap = '16px';
+          firstCell.style.padding = '12px';
+          
+        } else {
+          // Desktop layout - restore original structure
+          const orgImage = firstCell.querySelector('.org-logo');
+          if (orgImage) {
+            firstCell.innerHTML = orgImage.outerHTML;
+          }
+          orgNameCell.style.display = '';
+          schoolCell.style.display = '';
+          actionCell.style.display = '';
+          row.style.display = '';
+          firstCell.style.display = '';
+        }
+      }
+    }
+  }
+  
+  // Initial setup
+  updateTableLayout();
+  
+  // Update on resize
+  window.addEventListener('resize', updateTableLayout);
 }
 
 // Filter function using the Search Bar
@@ -104,4 +173,3 @@ document.addEventListener("click", (e) => {
     filterMenu.classList.add("hidden");
   }
 });
-

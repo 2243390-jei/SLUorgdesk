@@ -16,6 +16,18 @@ const detailMeta = document.getElementById('detailMeta');
 const detailBody = document.getElementById('detailBody');
 const detailClose = document.getElementById('detailClose');
 
+// Logout and Profile Modal Elements
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutModal = document.getElementById('logoutModal');
+const logoutModalClose = document.getElementById('logoutModalClose');
+const logoutCancel = document.getElementById('logoutCancel');
+const logoutConfirm = document.getElementById('logoutConfirm');
+
+const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+const profileModal = document.getElementById('profileModal');
+const profileModalClose = document.getElementById('profileModalClose');
+const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
 document.getElementById('curYear').textContent = new Date().getFullYear();
 
 // Use current system date - no hardcoded dates
@@ -661,6 +673,88 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeDetailPanel();
     clearDayHighlights();
+  }
+});
+
+// ---------------- Logout Functionality ----------------
+// Show logout confirmation modal
+function showLogoutModal() {
+  logoutModal.classList.add('show');
+  logoutModal.setAttribute('aria-hidden', 'false');
+}
+
+// Hide logout confirmation modal
+function hideLogoutModal() {
+  logoutModal.classList.remove('show');
+  logoutModal.setAttribute('aria-hidden', 'true');
+}
+
+// Show profile modal (mobile)
+function showProfileModal() {
+  profileModal.classList.add('show');
+  profileModal.setAttribute('aria-hidden', 'false');
+}
+
+// Hide profile modal (mobile)
+function hideProfileModal() {
+  profileModal.classList.remove('show');
+  profileModal.setAttribute('aria-hidden', 'true');
+}
+
+// Logout function
+function performLogout() {
+  // Redirect to index.html instead of login.html
+  window.location.href = "../index.html";
+}
+
+// Update mobile profile modal content
+function showProfileModal() {
+  profileModal.classList.add('show');
+  profileModal.setAttribute('aria-hidden', 'false');
+  
+  // Update modal content with direct logout button
+  const modalContent = `
+    <div class="profile-info">
+      <div class="profile-large">M</div>
+      <div class="profile-details">
+        <h4>Hello, OSAS</h4>
+        <div class="profile-logout">
+          <button id="profileLogoutBtn" class="btn-logout">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  profileModal.querySelector('.modal-body').innerHTML = modalContent;
+  
+  // Add direct logout event listener
+  document.getElementById('profileLogoutBtn').addEventListener('click', () => {
+    window.location.href = "../index.html";
+  });
+}
+
+// Event listeners for logout functionality
+logoutBtn.addEventListener('click', showLogoutModal);
+logoutModalClose.addEventListener('click', hideLogoutModal);
+logoutCancel.addEventListener('click', hideLogoutModal);
+logoutConfirm.addEventListener('click', performLogout);
+
+// Event listeners for mobile profile modal
+mobileProfileBtn.addEventListener('click', showProfileModal);
+profileModalClose.addEventListener('click', hideProfileModal);
+
+// Close modals when clicking on overlay
+logoutModal.addEventListener('click', (e) => {
+  if (e.target === logoutModal) {
+    hideLogoutModal();
+  }
+});
+
+profileModal.addEventListener('click', (e) => {
+  if (e.target === profileModal) {
+    hideProfileModal();
   }
 });
 

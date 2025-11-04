@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +7,7 @@
 
   <!-- Custom Styles -->
   <link rel="stylesheet" href="../style/style.css" />
-     <script src="../script/mobile-drawer.js" defer></script>
+  <script src="../script/mobile-drawer.js" defer></script>
 </head>
 
 <body class="submission-body">
@@ -19,7 +18,6 @@
     </div>
     <nav>
       <ul>
-        <li><a href="home.html">Home</a></li>
         <li><a href="submission.html" class="active">Submission</a></li>
         <li><a href="history.html">History</a></li>
       </ul>
@@ -97,7 +95,6 @@
               <option value="" disabled selected>Select Semester</option>
               <option value="1st Semester">1st Semester</option>
               <option value="2nd Semester">2nd Semester</option>
-              <option value="Midyear">Midyear</option>
             </select>
           </div>
         </div>
@@ -116,7 +113,14 @@
 
           <div class="form-group">
             <label>Event Type</label>
-            <input type="text" id="eventType" placeholder="Your answer" />
+            <input list="eventTypeOptions" id="eventType" placeholder="Your answer" required />
+
+            <datalist id="eventTypeOptions">
+              <option value="Workshop"></option>
+              <option value="Seminar"></option>
+              <option value="Exhibition"></option>
+              <option value="Fundraiser"></option>
+            </datalist>
           </div>
 
           <div class="form-group">
@@ -203,11 +207,8 @@
             <div class="drop-zone">
               <p>Browse File</p>
               <span>Drag & Drop files here</span>
-              <input type="file" 
-                     name="supporting_doc[]" 
-                     class="drop-zone-input" 
-                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
-                     multiple />
+              <input type="file" name="supporting_doc[]" class="drop-zone-input"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple />
             </div>
           </div>
 
@@ -226,7 +227,7 @@
         <div id="eventListPreview" class="event-list-preview">
           <p><em>No events added yet.</em></p>
         </div>
-        
+
 
         <!-- ADDITIONAL INFO -->
         <div class="form-group">
@@ -350,12 +351,8 @@
           <div class="drop-zone">
             <p>Browse File</p>
             <span>Drag & Drop files here</span>
-            <input type="file" 
-                   id="modalFileInput" 
-                   name="modal_supporting_doc[]" 
-                   class="drop-zone-input" 
-                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
-                   multiple />
+            <input type="file" id="modalFileInput" name="modal_supporting_doc[]" class="drop-zone-input"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple />
           </div>
         </div>
 
