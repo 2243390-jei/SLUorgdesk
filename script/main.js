@@ -165,16 +165,48 @@ function handleCredentialResponse(response) {
 /* ==============================
    NAVBAR PROFILE + ORG TABLE
    ============================== */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const navbarProfilePic = document.getElementById("nav-profile-pic");
+  if (!navbarProfilePic) return;
 
-  if (navbarProfilePic) {
-    const user = getLoggedInUser();
-    if (user && user.picture) {
-      navbarProfilePic.src = user.picture;
-      navbarProfilePic.style.borderRadius = "50%";
+  const user = getLoggedInUser();
+  if (!user) return;
+
+  // If Google user (has picture)
+  if (user.picture) {
+    navbarProfilePic.src = user.picture;
+    navbarProfilePic.style.borderRadius = "50%";
+    return;
+  }
+
+  // If manual login and role = organization, fetch logo
+  if ((user.role || "").toLowerCase() === "organization") {
+    try {
+      const resp = await fetch("../dataFetch/fetchDatabase.php");
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const orgs = await resp.json();
+
+      const orgMatch = orgs.find(
+        (org) =>
+          org.email?.toLowerCase() === (user.email || "").toLowerCase() ||
+          org._id === user.organization ||
+          org._id === localStorage.getItem("currentOrgId")
+      );
+
+      if (orgMatch && orgMatch.logoUrl) {
+        navbarProfilePic.src = orgMatch.logoUrl;
+        navbarProfilePic.style.borderRadius = "0"; // keep square logos
+        navbarProfilePic.style.objectFit = "cover";
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to load organization logo:", err);
     }
   }
+
+  // Default fallback (no logo found)
+  navbarProfilePic.src = "assets/default-avatar.png";
+  navbarProfilePic.style.borderRadius = "50%";
 });
 
 /* ==============================
