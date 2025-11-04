@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Immediately hide all modals
   const allModals = document.querySelectorAll('.modal, .createorg-modal');
   allModals.forEach(modal => {
     modal.style.display = 'none';
@@ -40,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   curYear.textContent = new Date().getFullYear();
 
-  // Check for viewport changes periodically (for DevTools)
   function checkViewportChange() {
     const nowMobile = isMobile();
     const nowViewport = nowMobile ? 'mobile' : 'desktop';
@@ -53,10 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Check every 500ms for viewport changes
   setInterval(checkViewportChange, 500);
 
-  // Also check when DevTools might be opened/closed
   window.addEventListener('resize', () => {
     checkViewportChange();
   });

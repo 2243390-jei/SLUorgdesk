@@ -1,5 +1,68 @@
-/* Reset & base */
-* { box-sizing: border-box; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+* { box-sizing: border-box; margin:0; padding:0; }
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/Fonts/Inter-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root{
   --bg: #f5f7fa;
   --card: #ffffff;
@@ -14,12 +77,13 @@
   --danger-hover: #c0392b;
 }
 
-/* App layout */
+
 body { 
   background: var(--bg); 
   color:#0f1720; 
   -webkit-font-smoothing:antialiased; 
   overflow-x: hidden;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 .app { 
   display:flex; 
@@ -27,7 +91,6 @@ body {
   gap:0;
 }
 
-/* LEFT BAR */
 .leftbar { 
   width: 92px; 
   display: flex; 
@@ -96,9 +159,8 @@ body {
   color: white; 
 }
 
-/* Logout button specific styling */
 .circle-btn.logout-btn {
-  margin-top: auto; /* Push to bottom */
+  margin-top: auto; 
   margin-bottom: 20px;
   background: rgba(231, 76, 60, 0.1);
   color: #e74c3c;
@@ -109,7 +171,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* MAIN AREA */
 .main-area { 
   flex: 1; 
   display: flex; 
@@ -117,10 +178,9 @@ body {
   padding: 24px;
   background: var(--bg);
   min-height: 100vh;
-  margin-left: 92px; /* Account for static sidebar */
+  margin-left: 92px;
 }
 
-/* HEADER */
 .header { 
   display: flex; 
   justify-content: space-between; 
@@ -139,7 +199,6 @@ body {
   font-size: 14px; 
 }
 
-/* TOP ACTIONS WITH PROFILE */
 .top-actions { 
   display: flex; 
   gap: 16px; 
@@ -178,7 +237,6 @@ body {
   font-size: 12px;
 }
 
-/* Profile in header */
 .profile-header {
   display: flex;
   align-items: center;
@@ -205,7 +263,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* body layout */
 .body { 
   display: flex; 
   gap: 18px; 
@@ -213,7 +270,6 @@ body {
   flex: 1;
 }
 
-/*Deals with the table*/
 .org-logo {
   width: 50px;
   height: 50px;
@@ -253,7 +309,7 @@ body {
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
   font-weight: 500;
 }
 
@@ -261,7 +317,6 @@ body {
   background: #1d4ed8;
 }
 
-/* FILTER DROPDOWN */
 #filterToggle {
   background: #1f2b34;
   border: none;
@@ -273,7 +328,7 @@ body {
   justify-content: center;
   cursor: pointer;
   color: white;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 #filterToggle:hover {
@@ -313,7 +368,7 @@ body {
   font-size: 14px;
   margin-bottom: 4px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .filter-clear {
@@ -334,7 +389,6 @@ body {
   background-color: #d32f2f;
 }
 
-/* ========== MODAL STYLES ========== */
 .modal {
   position: fixed;
   top: 0;
@@ -399,7 +453,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -426,7 +480,7 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -441,14 +495,13 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-secondary:hover {
   background: #e2e8f0;
 }
 
-/* Profile modal specific styles */
 .profile-modal .modal-content {
   max-width: 350px;
 }
@@ -456,7 +509,7 @@ body {
 .profile-info {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 16px; 
   margin-bottom: 20px;
 }
 
@@ -501,11 +554,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* ========== MOBILE RESPONSIVE DESIGN ========== */
-
-/* MOBILE BOTTOM NAVIGATION - 768px and below */
 @media (max-width: 768px) {
-  /* Mobile Sidebar - Convert to bottom navigation */
   .leftbar {
     position: fixed;
     bottom: 0;
@@ -539,12 +588,10 @@ body {
     border-radius: 10px;
   }
 
-  /* Hide logout button in mobile bottom nav */
   .circle-btn.logout-btn {
     display: none;
   }
 
-  /* Main area adjustment for mobile bottom nav */
   .main-area {
     margin-left: 0;
     margin-bottom: 70px;
@@ -552,7 +599,6 @@ body {
     width: 100%;
   }
 
-  /* Header mobile adjustments */
   .header {
     flex-direction: column;
     gap: 16px;
@@ -581,7 +627,6 @@ body {
     margin-bottom: 4px;
   }
 
-  /* Improved mobile table layout */
   .org-table {
     display: block;
     overflow-x: auto;
@@ -624,7 +669,6 @@ body {
     white-space: normal;
   }
 
-  /* Organization image and info row */
   .org-table td:first-child {
     display: flex;
     align-items: center;
@@ -661,12 +705,10 @@ body {
     line-height: 1.2;
   }
 
-  /* Remove data labels for the new layout */
   .org-table td:before {
     display: none;
   }
 
-  /* Action button */
   .org-table td:last-child {
     justify-content: center;
     margin-top: 8px;
@@ -680,7 +722,6 @@ body {
     border-radius: 10px;
   }
 
-  /* Profile mobile */
   .profile-circle {
     width: 40px;
     height: 40px;
@@ -693,7 +734,6 @@ body {
   }
 }
 
-/* Small Mobile Styles - 480px and below */
 @media (max-width: 480px) {
   .main-area {
     padding: 12px;
@@ -731,7 +771,6 @@ body {
     font-size: 13px;
   }
 
-  /* Bottom navigation smaller on very small screens */
   .leftbar {
     height: 65px;
     padding: 6px 2px;
@@ -747,7 +786,6 @@ body {
   }
 }
 
-/* Very Small Mobile Styles - 360px and below */
 @media (max-width: 360px) {
   .circle-btn {
     width: 42px;
@@ -767,7 +805,6 @@ body {
   }
 }
 
-/* Add to your mobile media query in CSS */
 @media (max-width: 768px) {
   .org-table tr {
     display: flex;

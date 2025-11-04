@@ -1,8 +1,5 @@
-/* ======================================
-   DATABASE-DRIVEN LOGIN + GOOGLE SSO
-   ====================================== */
 
-// --- API endpoint for real users from your DB ---
+
 const USERS_API = "dataFetch/fetchUsers.php"; 
 
 // Unified helper — gets whichever login is active (manual or Google)
@@ -20,7 +17,6 @@ function getLoggedInUser() {
   return null;
 }
 
-// Utility: Fetch with timeout (helps prevent hang)
 async function fetchWithTimeout(url, options = {}, timeout = 7000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -66,19 +62,7 @@ async function setupManualLogin() {
     if (!user) return alert("User not found. Please check your email.");
 
     const dbPass = user.password || "";
-    const isLikelyBcrypt = typeof dbPass === "string" && dbPass.startsWith("$2");
-    if (isLikelyBcrypt) {
-      return alert(
-        "This account uses a secure server-side password. Manual sign-in is disabled.\n\n" +
-        "Please use Google SSO instead."
-      );
-    }
-
-    console.log("User object from server:", user);
-console.log("DB password (raw):", JSON.stringify(dbPass));
-console.log("Typed password (raw):", JSON.stringify(password));
-console.log("Lengths:", (dbPass||"").length, password.length);
-console.log("Exact equality test:", dbPass === password);
+  
 
     if (dbPass !== password) return alert("Invalid password. Please try again.");
 
@@ -96,7 +80,6 @@ console.log("Exact equality test:", dbPass === password);
 
    localStorage.removeItem("currentOrgId");
 
-// then, set based on the logged-in organization
 if (normalized.role === "Organization" && normalized.organization) {
   const orgId = (typeof normalized.organization === "object" && normalized.organization.$oid)
     ? normalized.organization.$oid
@@ -109,13 +92,13 @@ if (normalized.role === "Organization" && normalized.organization) {
     }
 
     const role = (normalized.role || "").toLowerCase();
-    alert(`Login successful — welcome ${normalized.name || normalized.email}!`);
+    alert(`Login successful, welcome ${normalized.name || normalized.email}!`);
 
     switch (role) {
       case "osas": window.location.href = "osas/calendar.html"; break;
       case "admin": window.location.href = "admin/dashboard.html"; break;
       case "organization": window.location.href = "student/submission.html"; break;
-      default: window.location.href = "student/home.html"; break;
+      default: window.location.href = "student/submission.html"; break;
     }
   });
 }
@@ -204,12 +187,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Default fallback (no logo found)
   navbarProfilePic.src = "assets/default-avatar.png";
   navbarProfilePic.style.borderRadius = "50%";
 });
 
-// main.js – Desktop: Modal | Mobile: Disabled + Logout in Menu
 
 document.addEventListener("DOMContentLoaded", () => {
   const profilePic = document.getElementById('nav-profile-pic');
@@ -217,7 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn  = document.getElementById('logoutBtn');
   const cancelBtn  = document.getElementById('cancelBtn');
 
-  // Only run modal logic on DESKTOP
   if (window.innerWidth > 767 && profilePic && modal && logoutBtn && cancelBtn) {
     profilePic.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -242,11 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Optionally attach events if prev/next exist
-  if (prevBtn && nextBtn) {
-    prevBtn.addEventListener("click", updateGallery);
-    nextBtn.addEventListener("click", updateGallery);
-  }
 });
 
 /* ==============================

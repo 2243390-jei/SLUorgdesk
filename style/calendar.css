@@ -1,5 +1,39 @@
-/* Reset & base */
-* { box-sizing: border-box; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+* { 
+  box-sizing: border-box; 
+  margin:0; 
+  padding:0; 
+  font-family: "Inter", system-ui, sans-serif; 
+  font-weight: 400; 
+}
+
 :root{
   --bg: #f5f7fa;
   --card: #ffffff;
@@ -14,11 +48,9 @@
   --danger-hover: #c0392b;
 }
 
-/* App layout */
 body { 
   background: var(--bg); 
   color:#0f1720; 
-  -webkit-font-smoothing:antialiased; 
   overflow-x: hidden;
 }
 .app { 
@@ -27,7 +59,6 @@ body {
   gap:0;
 }
 
-/* LEFT BAR - STATIC NAVIGATION ON DESKTOP */
 .leftbar { 
   width: 92px; 
   display: flex; 
@@ -74,6 +105,7 @@ body {
   justify-content: center; 
   color: #bdc3c7;
   transition: all 0.2s ease;
+  font-weight: 400;
 }
 
 .circle-btn:hover { 
@@ -90,9 +122,8 @@ body {
   color: white; 
 }
 
-/* Logout button specific styling */
 .circle-btn.logout-btn {
-  margin-top: auto; /* Push to bottom */
+  margin-top: auto; 
   margin-bottom: 20px;
   background: rgba(231, 76, 60, 0.1);
   color: #e74c3c;
@@ -109,7 +140,6 @@ body {
   object-fit: contain;
 }
 
-/* MAIN AREA - ADJUSTED FOR STATIC SIDEBAR */
 .main-area { 
   flex: 1; 
   display: flex; 
@@ -118,10 +148,9 @@ body {
   background: var(--bg);
   gap: 24px;
   min-height: 100vh;
-  margin-left: 92px; /* Account for static sidebar */
+  margin-left: 92px; 
 }
 
-/* HEADER */
 .header { 
   display: flex; 
   justify-content: space-between; 
@@ -138,9 +167,9 @@ body {
 .muted { 
   color: var(--muted); 
   font-size: 14px; 
+  font-weight: 400;
 }
 
-/* TOP ACTIONS WITH PROFILE */
 .top-actions { 
   display: flex; 
   gap: 16px; 
@@ -160,6 +189,7 @@ body {
   background: white; 
   box-shadow: 0 2px 8px rgba(10,20,30,0.04);
   font-size: 14px;
+  font-weight: 400;
 }
 
 #searchClear { 
@@ -176,7 +206,6 @@ body {
   font-size: 12px;
 }
 
-/* Profile in header */
 .profile-header {
   display: flex;
   align-items: center;
@@ -202,7 +231,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* BODY LAYOUT */
 .body { 
   display: flex; 
   gap: 24px; 
@@ -210,7 +238,6 @@ body {
   flex: 1;
 }
 
-/* CALENDAR COLUMN */
 .calendar-column { 
   flex: 1; 
   min-width: 0; 
@@ -224,7 +251,6 @@ body {
   gap: 16px;
 }
 
-/* Month block - linear layout */
 .month-block { 
   background: var(--deep-blue); 
   color: var(--soft); 
@@ -254,7 +280,6 @@ body {
   font-weight: 600;
 }
 
-/* Navigation controls */
 .nav-controls { 
   display: flex; 
   gap: 8px; 
@@ -275,6 +300,7 @@ body {
   justify-content: center;
   transition: all 0.2s ease;
   color: #2c3e50;
+  font-weight: 400;
 }
 
 .icon-btn:hover { 
@@ -305,7 +331,6 @@ body {
   box-shadow: 0 4px 10px rgba(43,61,71,0.3);
 }
 
-/* CALENDAR GRID - FIXED LAYOUT */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -318,7 +343,6 @@ body {
   min-height: 580px;
 }
 
-/* Weekday headers */
 .week { 
   color: #c9d7df; 
   font-size: 13px; 
@@ -329,7 +353,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Day cells - FIXED HEIGHT */
 .day {
   min-height: 100px;
   background: var(--card);
@@ -382,16 +405,15 @@ body {
   text-overflow: ellipsis; 
   max-width: 100%;
   line-height: 1.2;
+  font-weight: 500;
 }
 
-/* highlight when clicked */
 .day.highlight { 
   box-shadow: 0 8px 24px rgba(37,99,235,0.15); 
   border: 6px solid rgba(37,99,235,0.1); 
   transform: translateY(-2px); 
 }
 
-/* RIGHT PANEL - SCROLLABLE PAST EVENTS */
 .right-panel {
   width: 340px; 
   background: var(--deep-blue); 
@@ -423,26 +445,11 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Scrollbar styling for events list */
-.events-list::-webkit-scrollbar {
-  width: 6px;
+.events-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) rgba(255,255,255,0.05);
 }
 
-.events-list::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 3px;
-}
-
-.events-list::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-}
-
-.events-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
-}
-
-/* event card */
 .event-card {
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
   border-radius: 10px; 
@@ -476,6 +483,7 @@ body {
   font-size: 12px; 
   color: #c1d3e6; 
   margin-top: 4px; 
+  font-weight: 400;
 }
 
 .event-desc { 
@@ -483,24 +491,25 @@ body {
   font-size: 13px; 
   color: #dceaf5; 
   line-height: 1.4; 
+  font-weight: 400;
 }
 
 .event-extra { 
   margin-top: 8px; 
   font-size: 12px; 
   color: #b9c5cf; 
+  font-weight: 400;
 }
 
-/* small category badge */
 .cat { 
   font-size: 11px; 
   padding: 4px 8px; 
   border-radius: 999px; 
   background: rgba(255,255,255,0.08); 
   color: #eaf6ff; 
+  font-weight: 500;
 }
 
-/* SDG badge */
 .sdg-badge { 
   font-size: 11px; 
   padding: 4px 8px; 
@@ -509,19 +518,19 @@ body {
   color: #eaf6ff; 
   border: 1px solid rgba(255,255,255,0.2);
   margin-top: 4px;
+  font-weight: 500;
 }
 
-/* DETAIL SLIDE-IN PANEL - RESTORED */
 .overlay {
   position: fixed; 
   inset: 0; 
   background: rgba(6,8,12,0.45); 
   opacity: 0; 
-  pointer-events: none; 
-  transition: opacity .22s ease;
+  visibility: hidden;
+  transition: opacity .22s ease, visibility .22s ease;
   z-index: 50;
 }
-.overlay.show { opacity: 1; pointer-events: auto; }
+.overlay.show { opacity: 1; visibility: visible; }
 
 .detail-panel {
   position: fixed;
@@ -562,7 +571,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 .detail-close:hover {
   background: #f1f5f9;
@@ -573,7 +582,6 @@ body {
   flex: 1; 
 }
 
-/* Improved Detail Panel Styles */
 #detailPanel {
   background: white;
   box-shadow: -4px 0 20px rgba(0,0,0,0.15);
@@ -606,6 +614,7 @@ body {
   color: #6b7280;
   font-size: 0.9rem;
   margin: 0;
+  font-weight: 400;
 }
 
 .detail-section-title {
@@ -660,6 +669,7 @@ body {
 .monospace {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.85rem;
+  font-weight: 400;
 }
 
 .status-badge {
@@ -672,10 +682,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-approved { background: #d1fae5; color: #065f46; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
-.status-needs-revision { background: #ffedd5; color: #9a3412; }
 
 .social-links {
   display: flex;
@@ -694,6 +700,7 @@ body {
   text-decoration: none;
   font-size: 0.9rem;
   transition: all 0.2s ease;
+  font-weight: 400;
 }
 
 .social-link:hover {
@@ -730,7 +737,7 @@ body {
 .doc-info {
   flex: 1;
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -748,14 +755,13 @@ body {
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: 500;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .doc-link:hover {
   background: #1d4ed8;
 }
 
-/* SDG specific styles */
 .sdg-section {
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
   border-radius: 8px;
@@ -774,26 +780,11 @@ body {
   margin-bottom: 8px;
 }
 
-/* Scrollbar styling for events list */
-#eventsList::-webkit-scrollbar {
-  width: 6px;
+#eventsList {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
-#eventsList::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-#eventsList::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-#eventsList::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* ========== MODAL STYLES ========== */
 .modal {
   position: fixed;
   top: 0;
@@ -806,13 +797,13 @@ body {
   justify-content: center;
   z-index: 2000;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal.show {
   opacity: 1;
-  pointer-events: auto;
+  visibility: visible;
 }
 
 .modal-content {
@@ -858,7 +849,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -885,7 +876,7 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -900,14 +891,13 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-secondary:hover {
   background: #e2e8f0;
 }
 
-/* Profile modal specific styles */
 .profile-modal .modal-content {
   max-width: 350px;
 }
@@ -960,7 +950,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* ========== MOBILE RESPONSIVE DESIGN ========== */
 @media (max-width: 1024px) {
   .body {
     flex-direction: column;
@@ -986,9 +975,7 @@ body {
   }
 }
 
-/* MOBILE BOTTOM NAVIGATION - 768px and below */
 @media (max-width: 768px) {
-  /* Mobile Sidebar - Convert to bottom navigation */
   .leftbar {
     position: fixed;
     bottom: 0;
@@ -1022,12 +1009,10 @@ body {
     border-radius: 10px;
   }
 
-  /* Hide logout button in mobile bottom nav */
   .circle-btn.logout-btn {
     display: none;
   }
 
-  /* Main area adjustment for mobile bottom nav */
   .main-area {
     margin-left: 0;
     margin-bottom: 70px;
@@ -1036,7 +1021,6 @@ body {
     width: 100%;
   }
 
-  /* Header mobile adjustments */
   .header {
     flex-direction: column;
     gap: 16px;
@@ -1065,7 +1049,6 @@ body {
     margin-bottom: 4px;
   }
 
-  /* Calendar head mobile */
   .calendar-head {
     flex-direction: column;
     align-items: stretch;
@@ -1092,7 +1075,6 @@ body {
     font-size: 14px;
   }
 
-  /* Calendar grid mobile - CRITICAL FIX */
   .calendar-grid { 
     padding: 12px; 
     gap: 6px;
@@ -1122,7 +1104,6 @@ body {
     padding: 8px 2px;
   }
 
-  /* Right panel mobile */
   .right-panel {
     padding: 12px;
     width: 100%;
@@ -1132,7 +1113,6 @@ body {
     height: 250px;
   }
 
-  /* Detail Panel Mobile Styles */
   .detail-panel {
     width: 100%;
     padding: 16px;
@@ -1153,7 +1133,6 @@ body {
     padding-bottom: 12px;
   }
 
-  /* Profile mobile */
   .profile-circle {
     width: 40px;
     height: 40px;
@@ -1166,7 +1145,6 @@ body {
   }
 }
 
-/* Small Mobile Styles - 480px and below */
 @media (max-width: 480px) {
   .main-area {
     padding: 12px;
@@ -1211,7 +1189,6 @@ body {
     height: 38px;
   }
 
-  /* Detail Panel Small Mobile */
   .detail-panel {
     padding: 12px;
   }
@@ -1224,7 +1201,6 @@ body {
     font-size: 1rem;
   }
 
-  /* Bottom navigation smaller on very small screens */
   .leftbar {
     height: 65px;
     padding: 6px 2px;
@@ -1239,7 +1215,6 @@ body {
     margin-bottom: 65px;
   }
 
-  /* Header text adjustments */
   .greeting h1 {
     font-size: 22px;
   }
@@ -1249,7 +1224,6 @@ body {
   }
 }
 
-/* Very Small Mobile Styles - 360px and below */
 @media (max-width: 360px) {
   .calendar-grid {
     gap: 3px;
@@ -1290,7 +1264,6 @@ body {
   }
 }
 
-/* Large Desktop Enhancement */
 @media (min-width: 1440px) {
   .main-area {
     padding: 24px;
@@ -1309,7 +1282,6 @@ body {
   }
 }
 
-/* Loading animation */
 .loading {
   opacity: 0.7;
   pointer-events: none;
@@ -1333,7 +1305,6 @@ body {
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;

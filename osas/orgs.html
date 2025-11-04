@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/OSASorgs.css">
+    <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
     <script src="../script/OSASorgs.js" defer></script>
     <title>Organizations in SLU</title>
 </head>
@@ -14,32 +15,27 @@
         <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
       </div>
 
-      <nav class="left-nav" role="navigation" aria-label="Sidebar">
-        <a href="../osas/calendar.html">
-          <button class="circle-btn" title="Calendar" aria-label="Calendar">
-            <img src="../Images/calendar.png" alt="Calendar" class="nav-icon">
-          </button>
-        </a>
+      <nav class="left-nav" aria-label="Sidebar">
+        <button class="circle-btn" title="Calendar" aria-label="Calendar" onclick="window.location.href='../osas/calendar.html'">
+          <img src="../Images/calendar.png" alt="Calendar" class="nav-icon">
+        </button>
 
-        <a href="../osas/orgs.html">
-          <button class="circle-btn active" title="Organizations" aria-label="Organizations">
-            <img src="../Images/group.png" alt="Organizations" class="nav-icon">
-          </button>
-        </a>
+        <button class="circle-btn active" title="Organizations" aria-label="Organizations" onclick="window.location.href='../osas/orgs.html'">
+          <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
+        </button>
         
-        <a href="../osas/analytics.html">
-          <button class="circle-btn" title="Analytics" aria-label="Analytics">
-            <img src="../Images/statistics.png" alt="Analytics" class="nav-icon">
-          </button>
-        </a>
+        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="window.location.href='../osas/analytics.html'">
+          <img src="../Images/statistics.png" alt="Analytics" class="nav-icon">
+        </button>
         
         <!-- Logout button for desktop -->
         <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
-          <img src="../Images/logout.png" alt="Logout" class="nav-icon">
+          <img src="../Images/osas/logout.png" alt="Logout" class="nav-icon">
         </button>
       </nav>
     </aside>
-    <main class="main-area" role="main">
+    
+    <main class="main-area">
       <header class="header">
         <div class="greeting">
           <h1>Hello, OSAS</h1>
@@ -52,7 +48,7 @@
               <img src="../Images/filter.png" alt="Filter" class="filter-icon">
             </button>
 
-            <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization" />
+            <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization">
             <button id="searchClear" title="Clear" aria-label="Clear search">✕</button>
 
             <div id="filterMenu" class="filter-menu hidden">
@@ -90,7 +86,7 @@
     </main>
 
     <!-- Logout Confirmation Modal -->
-    <div id="logoutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="logoutModalTitle">
+    <div id="logoutModal" class="modal" aria-hidden="true" aria-labelledby="logoutModalTitle">
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="logoutModalTitle">Confirm Logout</h3>
@@ -109,7 +105,7 @@
     </div>
 
     <!-- Mobile Profile Modal -->
-    <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true" aria-labelledby="profileModalTitle">
+    <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="profileModalTitle">Profile</h3>
