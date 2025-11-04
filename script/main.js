@@ -97,7 +97,7 @@ if (normalized.role === "Organization" && normalized.organization) {
     }
 
     const role = (normalized.role || "").toLowerCase();
-    alert(`Login successful — welcome ${normalized.name || normalized.email}!`);
+    alert(`Login successful, welcome ${normalized.name || normalized.email}!`);
 
     switch (role) {
       case "osas": window.location.href = "osas/calendar.html"; break;
