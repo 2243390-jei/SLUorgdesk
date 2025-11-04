@@ -219,16 +219,26 @@ body {
   background-color: #d32f2f;
 }
 
-/* SEARCH CONTAINER */
+/* SEARCH CONTAINER - UPDATED TO REMOVE X BUTTON */
 .search-container {
   display: flex;
   align-items: center;
+}
+
+.search-box {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Remove the clear button completely */
+.clear-btn {
+  display: none !important;
 }
 
 .search-container input {
   width: 260px;
-  padding: 10px 16px;
+  padding: 10px 16px; /* Removed extra padding for X button */
   border-radius: 10px;
   border: 1px solid #e1e8ed;
   background: white;
@@ -425,4 +435,353 @@ tr:hover td {
 .view-details-btn:hover {
   background: #1e4fb8;
   transform: translateY(-1px);
+}
+
+/* Improved filter menu for mobile */
+@media (max-width: 768px) {
+  #filterMenu {
+    position: fixed;
+    top: auto;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 300px;
+  }
+
+  .filter-item {
+    padding: 12px;
+    font-size: 16px; /* Better touch targets */
+  }
+
+  /* Improve search input for mobile */
+  .search-wrap input[type="search"] {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Ensure proper scrolling on mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ========== TABLET (≤1024px) ========== */
+@media (max-width: 1024px) {
+  .app {
+    flex-direction: column;
+  }
+  
+  .leftbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: 70px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 1000;
+    border-radius: 0;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .left-nav {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin: 0;
+    gap: 0;
+  }
+
+  .circle-btn {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+  }
+
+  .main-area {
+    margin-left: 0;
+    margin-bottom: 80px;
+    padding: 16px;
+    width: 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-container input {
+    width: 200px;
+  }
+
+  /* Table improvements for tablet */
+  .submissions-table {
+    font-size: 14px;
+  }
+
+  .submissions-table th,
+  .submissions-table td {
+    padding: 10px 12px;
+  }
+}
+
+/* ========== MOBILE (≤768px) ========== */
+@media (max-width: 768px) {
+  .main-area {
+    padding: 12px;
+    margin-bottom: 72px;
+  }
+
+  .header {
+    gap: 12px;
+  }
+
+  .header-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .org-name-display {
+    text-align: center;
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .search-container {
+    order: -1;
+  }
+
+  .search-container input {
+    width: 100%;
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px 16px; /* Consistent padding for mobile */
+  }
+
+  .filter-container {
+    align-self: flex-end;
+  }
+
+  /* Mobile table transformation */
+  .submissions-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .submissions-table thead {
+    display: none;
+  }
+
+  .submissions-table tbody,
+  .submissions-table tr,
+  .submissions-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .submissions-table tr {
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  .submissions-table td {
+    padding: 8px 0;
+    text-align: left;
+    border: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .submissions-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--muted);
+    width: 120px;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .submissions-table td:last-child {
+    justify-content: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .view-details-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* Filter dropdown adjustments for mobile */
+  .filter-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
+/* ========== SMALL MOBILE (≤480px) ========== */
+@media (max-width: 480px) {
+  .main-area {
+    padding: 10px;
+    margin-bottom: 68px;
+  }
+
+  .greeting h1 {
+    font-size: 18px;
+  }
+
+  .muted {
+    font-size: 12px;
+  }
+
+  .circle-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .submissions-table tr {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .submissions-table td:before {
+    width: 100px;
+    font-size: 13px;
+  }
+
+  .search-container input {
+    padding: 12px 16px;
+  }
+}
+
+/* Additional utility classes for mobile */
+.mobile-hidden {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .desktop-hidden {
+    display: none;
+  }
+}
+
+/* Mobile card layout */
+.submissions-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.submission-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e1e8ed;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.event-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--deep-blue);
+  margin: 0;
+  flex: 1;
+}
+
+.event-type {
+  background: var(--soft);
+  color: var(--accent);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 14px;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 14px;
+  color: var(--deep-blue);
+  word-break: break-word;
+}
+
+.detail-value a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.detail-value a:hover {
+  text-decoration: underline;
+}
+
+.mobile-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
 }
