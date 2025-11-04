@@ -253,7 +253,7 @@ body {
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
   font-weight: 500;
 }
 
@@ -273,7 +273,7 @@ body {
   justify-content: center;
   cursor: pointer;
   color: white;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 #filterToggle:hover {
@@ -313,7 +313,7 @@ body {
   font-size: 14px;
   margin-bottom: 4px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .filter-clear {
@@ -426,7 +426,7 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -441,7 +441,7 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-secondary:hover {
