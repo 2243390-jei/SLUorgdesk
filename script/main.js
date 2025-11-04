@@ -66,19 +66,7 @@ async function setupManualLogin() {
     if (!user) return alert("User not found. Please check your email.");
 
     const dbPass = user.password || "";
-    const isLikelyBcrypt = typeof dbPass === "string" && dbPass.startsWith("$2");
-    if (isLikelyBcrypt) {
-      return alert(
-        "This account uses a secure server-side password. Manual sign-in is disabled.\n\n" +
-        "Please use Google SSO instead."
-      );
-    }
-
-    console.log("User object from server:", user);
-console.log("DB password (raw):", JSON.stringify(dbPass));
-console.log("Typed password (raw):", JSON.stringify(password));
-console.log("Lengths:", (dbPass||"").length, password.length);
-console.log("Exact equality test:", dbPass === password);
+  
 
     if (dbPass !== password) return alert("Invalid password. Please try again.");
 
@@ -109,13 +97,13 @@ if (normalized.role === "Organization" && normalized.organization) {
     }
 
     const role = (normalized.role || "").toLowerCase();
-    alert(`Login successful — welcome ${normalized.name || normalized.email}!`);
+    alert(`Login successful, welcome ${normalized.name || normalized.email}!`);
 
     switch (role) {
       case "osas": window.location.href = "osas/calendar.html"; break;
       case "admin": window.location.href = "admin/dashboard.html"; break;
       case "organization": window.location.href = "student/submission.html"; break;
-      default: window.location.href = "student/home.html"; break;
+      default: window.location.href = "student/submission.html"; break;
     }
   });
 }
