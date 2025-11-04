@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  // --- Back Button Functionality ---
+  const backButton = document.getElementById("backButton");
+  if (backButton) {
+    backButton.addEventListener("click", () => {
+      window.location.href = "../osas/orgs.html";
+    });
+  }
+
   // --- Get organization info from URL ---
   const urlParams = new URLSearchParams(window.location.search);
   const orgId = urlParams.get("orgId");

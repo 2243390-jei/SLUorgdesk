@@ -1,9 +1,38 @@
+/* Font face declarations for all the weights you need */
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../Fonts/Inter_18pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 /* Reset & base */
 * { 
   box-sizing: border-box; 
   margin:0; 
   padding:0; 
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; 
+  font-family: "Inter", system-ui, sans-serif; 
 }
 
 :root{
@@ -23,9 +52,10 @@
 /* App layout */
 body { 
   background: var(--bg); 
-  color:#0f1720; 
-  -webkit-font-smoothing:antialiased; 
+  color: #0f1720; 
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  font-weight: 400; /* Regular weight for body text */
 }
 
 .app { 
@@ -81,6 +111,7 @@ body {
   justify-content: center; 
   color: #bdc3c7;
   transition: all 0.2s ease;
+  font-weight: 400; /* Regular weight for icons */
 }
 
 .circle-btn:hover { 
@@ -104,7 +135,7 @@ body {
 }
 
 .circle-btn.logout-btn {
-  margin-top: auto; /* Push to bottom */
+  margin-top: auto;
   margin-bottom: 20px;
   background: rgba(231, 76, 60, 0.1);
   color: #e74c3c;
@@ -115,7 +146,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* MAIN AREA - ADJUSTED FOR STATIC SIDEBAR */
+/* MAIN AREA */
 .main-area { 
   flex: 1; 
   display: flex; 
@@ -124,7 +155,7 @@ body {
   background: var(--bg);
   gap: 24px;
   min-height: 100vh;
-  margin-left: 92px; /* Account for static sidebar */
+  margin-left: 92px;
 }
 
 /* HEADER */
@@ -139,13 +170,14 @@ body {
 .greeting h1 { 
   font-size: 28px; 
   letter-spacing: 0.3px; 
-  font-weight: 600; 
+  font-weight: 600; /* SemiBold weight for main headings */
   margin-bottom: 8px;
 }
 
 .muted { 
   color: var(--muted); 
   font-size: 14px; 
+  font-weight: 400; /* Regular weight for muted text */
 }
 
 /* TOP ACTIONS WITH PROFILE */
@@ -168,6 +200,7 @@ body {
   background: white; 
   box-shadow: 0 2px 8px rgba(10,20,30,0.04);
   font-size: 14px;
+  font-weight: 400; /* Regular weight for input text */
 }
 
 #searchClear { 
@@ -184,7 +217,6 @@ body {
   font-size: 12px;
 }
 
-/* Profile in header */
 .profile-header {
   display: flex;
   align-items: center;
@@ -194,20 +226,22 @@ body {
   width: 44px; 
   height: 44px; 
   border-radius: 12px; 
-  background: linear-gradient(135deg, #e74c3c, #c0392b); 
+  background: linear-gradient(135deg, #e74c3c, #e74c3c); 
   display: flex; 
   align-items: center; 
   justify-content: center; 
   color: white; 
-  font-weight: 700; 
-  box-shadow: 0 4px 12px rgba(231,76,60,0.3);
+  font-weight: 700; /* Bold weight for profile initials */
   font-size: 16px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25); 
+  border: 2px solid rgba(255, 255, 255, 0.3); 
 }
 
 .profile-circle:hover {
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
 }
 
 /* BODY LAYOUT */
@@ -247,7 +281,7 @@ body {
 
 .section-header h2 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for section headers */
   color: var(--deep-blue);
 }
 
@@ -291,7 +325,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700; /* Bold weight for rank numbers */
   transition: all 0.3s ease;
 }
 
@@ -300,7 +334,7 @@ body {
 }
 
 .org-name {
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for organization names */
   font-size: 16px;
   color: var(--deep-blue);
   transition: color 0.3s ease;
@@ -323,7 +357,7 @@ body {
 }
 
 .org-stat-value {
-  font-weight: 700;
+  font-weight: 700; /* Bold weight for stat values */
   color: var(--accent);
   font-size: 18px;
   transition: all 0.3s ease;
@@ -338,7 +372,7 @@ body {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500;
+  font-weight: 500; /* Medium weight for stat labels */
 }
 
 /* Charts Section */
@@ -377,7 +411,7 @@ body {
 .chart-header h2,
 .chart-header h3 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for chart headers */
   color: var(--deep-blue);
   margin: 0;
 }
@@ -408,7 +442,7 @@ body {
   background: var(--soft);
   padding: 8px 16px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for SDG stats */
   color: var(--accent);
   font-size: 14px;
 }
@@ -428,7 +462,7 @@ canvas {
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 500; /* Medium weight for hover info */
   pointer-events: none;
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -455,13 +489,13 @@ canvas {
   justify-content: center;
   z-index: 2000;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal.show {
   opacity: 1;
-  pointer-events: auto;
+  visibility: visible;
 }
 
 .modal-content {
@@ -490,7 +524,7 @@ canvas {
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for modal headers */
   color: #1f2937;
 }
 
@@ -532,7 +566,7 @@ canvas {
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for buttons */
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -547,7 +581,7 @@ canvas {
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for buttons */
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -577,7 +611,7 @@ canvas {
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 700;
+  font-weight: 700; /* Bold weight for large profile initials */
   font-size: 20px;
   box-shadow: 0 4px 12px rgba(231,76,60,0.3);
 }
@@ -585,7 +619,7 @@ canvas {
 .profile-details h4 {
   margin: 0 0 4px 0;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for profile name */
   color: #1f2937;
 }
 
@@ -599,7 +633,7 @@ canvas {
   border: 1px solid rgba(231, 76, 60, 0.2);
   padding: 12px 16px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 600; /* SemiBold weight for logout button */
   cursor: pointer;
   transition: all 0.2s ease;
 }

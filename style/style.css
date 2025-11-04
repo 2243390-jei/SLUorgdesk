@@ -131,9 +131,9 @@ button[type="submit"]:hover {
   height: auto;
 }
 
-/* ============================= */
-/* ✅ MOBILE RESPONSIVE (≤ 799) */
-/* ============================= */
+
+/* MOBILE RESPONSIVE */
+
 @media (max-width: 799px) {
 
   body {
@@ -203,8 +203,6 @@ button[type="submit"]:hover {
   }
 }
 
-/* Home html */
-
 /* FONTS */
 @font-face {
   font-family: "Bebas Neue";
@@ -217,7 +215,7 @@ button[type="submit"]:hover {
   src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
   font-weight: 400;
 }
-
+/* Home html */
 body.home-body {
   margin: 0;
   padding: 0;
@@ -233,7 +231,7 @@ body.home-body {
   background-image: none; 
 }
 
-/* ===== NAVBAR ===== */
+/*NAVBAR */
 .navbar {
   width: 100%;
   height: 80px;
@@ -437,9 +435,9 @@ body.home-body {
   font-size: 0.85rem;
   color: #fff;
 }
-.status-accepted { background: #16a34a; } /* green */
-.status-pending  { background: #f59e0b; } /* amber */
-.status-revision { background: #ef4444; } /* red */
+.status-accepted { background: #16a34a; } 
+.status-pending  { background: #f59e0b; } 
+.status-revision { background: #ef4444; } 
 .status-accepted, .status-pending, .status-revision { box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
 
 .sd-title { font-size: 1.05rem; margin: 4px 0 6px 0; color: #0f172a; }
@@ -452,7 +450,7 @@ body.home-body {
   display: flex;
   gap: 10px;
   margin-top: 12px;
-  margin-left: auto; /* push to the right */
+  margin-left: auto; 
   align-items: center;
 }
 
@@ -494,7 +492,7 @@ body.home-body {
   .sd-row { flex-direction: column; gap: 6px; }
 }
 
-/* style.css – COMPLETE & FINAL */
+
 
 body.submission-body {
   background-color: #ffffff !important;
@@ -528,7 +526,7 @@ body.submission-body {
 }
 
 .submission-hero-text h1 {
-  font-family: "Bebas Neue", (“Bebas Neue”, sans-serif);
+  font-family: "Bebas Neue", sans-serif;
   font-size: 3.2rem;
   color: #000000;
   margin: 0 0 10px 0;
@@ -583,7 +581,7 @@ body.submission-body {
   margin-top: 0;
 }
 
-/* SECTION TITLES */
+
 .form-section-title {
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.8rem;
@@ -632,11 +630,11 @@ body.submission-body {
 }
 
 /* INPUTS */
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="url"],
-input[type="date"],
+.submission .input[type="text"],
+.submission .input[type="email"],
+.submission .input[type="number"],
+.submission .input[type="url"],
+.submission .input[type="date"],
 textarea,
 select {
   width: 100%;
@@ -700,7 +698,7 @@ textarea {
   cursor: pointer;
 }
 .time-period {
-  font-size: 0.85rem !important;   /* smaller than the time input */
+  font-size: 0.85rem !important;   
   padding: 0 4px !important;
 }
 
@@ -708,7 +706,7 @@ textarea {
   border-color: #1e1362;
 }
 
-/* DROP ZONE - ENHANCED */
+/* DROP ZONE */
 .drop-zone {
   border: 2px dashed #bbb;
   border-radius: 12px;
@@ -753,7 +751,7 @@ textarea {
   pointer-events: none;
 }
 
-/* BROWSE BUTTON */
+
 .drop-zone .browse-btn {
   margin-top: 8px;
   padding: 6px 12px;
@@ -1034,7 +1032,7 @@ textarea {
   margin-top: 20px;
 }
 
-/* ADD EVENT SECTION - FIXED GAP */
+/* ADD EVENT SECTION */
 .add-event-section {
   display: flex;
   flex-direction: column;
@@ -1052,7 +1050,6 @@ textarea {
   margin: 0;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .submission-hero {
     padding: 20px 30px;
@@ -1143,10 +1140,8 @@ textarea {
   }
 }
 
-/* NAVBAR MOBILE */
-@media (max-width: 767px) {
 
-  /* hide desktop nav on mobile */
+@media (max-width: 767px) {
   header.navbar nav { display: none !important; }
 
   header.navbar > .logo {
@@ -1202,7 +1197,7 @@ textarea {
     border-radius: 2px;
   }
 
-  /* overlay shown when drawer open */
+
   .mobile-drawer-overlay {
     position: fixed;
     inset: 0;
@@ -1213,11 +1208,11 @@ textarea {
     transition: opacity .22s ease;
   }
   .mobile-drawer-overlay.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  opacity: 1;
+  pointer-events: initial; 
+}
 
-  /* drawer (right-side) */
+
   :root { --mobile-drawer-width: 340px; }
   .mobile-drawer {
     position: fixed;
@@ -1260,13 +1255,13 @@ textarea {
     cursor: pointer;
   }
 
-  /* nav area (scrollable) */
   .mobile-drawer .drawer-nav {
-    padding: 18px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
-  }
+  padding: 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; 
+  flex: 1;
+}
+
   .mobile-drawer .drawer-nav ul { list-style: none; margin: 0; padding: 0; }
   .mobile-drawer .drawer-nav li { padding: 12px 4px; }
   .mobile-drawer .drawer-nav a {
@@ -1283,7 +1278,86 @@ textarea {
     color: #fff;
     font-weight: 700;
   }
-
-  /* keep header layout tidy on mobile */
   header.navbar { display:flex; align-items:center; padding:8px 12px; }
+}
+
+/* Profile Modal  */
+.profile-modal {
+  position: absolute;
+  top: 60px;          
+  right: 20px;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  padding: 12px 16px;
+  min-width: 180px;
+  font-family: "Inter", sans-serif;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .profile-modal {
+    top: 64px;
+    left: 20px;
+    right: auto;
+    transform: none;
+  }
+}
+
+.profile-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.logout-btn,
+.cancel-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.logout-btn  { background:#221671; color:#fff; }
+.cancel-btn  { background:#f1f1f1; color:#333; }
+
+.logout-btn:hover  { background:#170f4c; }
+.cancel-btn:hover  { background:#e0e0e0; }
+
+
+.drawer-nav-list {
+  display: block !important;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+#mobileLogoutLink {
+  display: block;
+  width: calc(100% - 32px);   
+  margin: 24px 16px 12px;     
+  padding: 12px 0;
+  background: #221671;
+  color: #fff !important;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;   
+}
+
+#mobileLogoutLink:hover {
+  background-color: #170f4c;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

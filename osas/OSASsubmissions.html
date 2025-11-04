@@ -18,19 +18,19 @@
       <nav class="left-nav" role="navigation" aria-label="Sidebar">
         <a href="../osas/calendar.html">
           <button class="circle-btn" title="Calendar" aria-label="Calendar">
-            <img src="../Images/calendar.png" alt="Calendar" class="nav-icon">
+            <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
           </button>
         </a>
 
         <a href="../osas/orgs.html">
           <button class="circle-btn active" title="Organizations" aria-label="Organizations">
-            <img src="../Images/group.png" alt="Organizations" class="nav-icon">
+            <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
           </button>
         </a>
         
         <a href="../osas/analytics.html">
           <button class="circle-btn" title="Analytics" aria-label="Analytics">
-            <img src="../Images/statistics.png" alt="Analytics" class="nav-icon">
+            <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
           </button>
         </a>
       </nav>
@@ -40,7 +40,14 @@
     <main class="main-area">
       <header class="header">
         <div class="greeting">
-          <h1>Organization Submissions</h1>
+          <div class="header-title-container">
+            <button id="backButton" class="back-button" title="Back to Organizations" aria-label="Back to Organizations">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+              </svg>
+            </button>
+            <h1>Organization Submissions</h1>
+          </div>
           <div class="muted">Viewing submissions for selected organization</div>
         </div>
 

@@ -470,6 +470,48 @@ html, body {
   position: relative;
 }
 
+
+/* Back Button Styles */
+.header-title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  color: var(--text-color, #333);
+}
+
+.back-button:hover {
+  background-color: var(--hover-color, #f5f5f5);
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .back-button {
+    padding: 6px;
+  }
+  
+  .back-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 /* ========== TABLET (≤1024px) ========== */
 @media (max-width: 1024px) {
   .app {
