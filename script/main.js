@@ -66,19 +66,7 @@ async function setupManualLogin() {
     if (!user) return alert("User not found. Please check your email.");
 
     const dbPass = user.password || "";
-    const isLikelyBcrypt = typeof dbPass === "string" && dbPass.startsWith("$2");
-    if (isLikelyBcrypt) {
-      return alert(
-        "This account uses a secure server-side password. Manual sign-in is disabled.\n\n" +
-        "Please use Google SSO instead."
-      );
-    }
-
-    console.log("User object from server:", user);
-console.log("DB password (raw):", JSON.stringify(dbPass));
-console.log("Typed password (raw):", JSON.stringify(password));
-console.log("Lengths:", (dbPass||"").length, password.length);
-console.log("Exact equality test:", dbPass === password);
+  
 
     if (dbPass !== password) return alert("Invalid password. Please try again.");
 
