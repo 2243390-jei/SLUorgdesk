@@ -783,7 +783,6 @@ function showProfileModal() {
                 <h4>Hello, OSAS</h4>
                 <div class="profile-logout">
                     <button id="profileLogoutBtn" class="btn-logout">
-                        <img src="../Images/logout.png" alt="Logout" class="nav-icon">
                         Logout
                     </button>
                 </div>
