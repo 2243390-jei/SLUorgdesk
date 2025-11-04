@@ -1,7 +1,4 @@
-
 * { box-sizing: border-box; margin:0; padding:0; }
-
-
 @font-face {
   font-family: 'Inter';
   src: url('/Fonts/Inter-Thin.ttf') format('truetype');
@@ -66,8 +63,6 @@
   font-display: swap;
 }
 
-
-
 :root{
   --bg: #f5f7fa;
   --card: #ffffff;
@@ -95,7 +90,6 @@ body {
   min-height:100vh; 
   gap:0;
 }
-
 
 .leftbar { 
   width: 92px; 
