@@ -45,9 +45,7 @@
       headerDiv.innerHTML = `
         <div class="drawer-title">SLU OrgDesk Menu</div>
         <button class="drawer-close" aria-label="Close menu" type="button">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
+          <img src="../Images/student_img/history/close_modal.png" alt="Close Icon" width="24" height="24" class="icon">
         </button>
       `;
       drawer.appendChild(headerDiv);
