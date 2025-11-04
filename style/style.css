@@ -94,6 +94,7 @@ input {
   font-size: 0.9rem;
 }
 
+
 button[type="submit"] {
   background-color: #404040;
   color: #fff;
@@ -129,6 +130,80 @@ button[type="submit"]:hover {
   display: flex;
   justify-content: center;
   height: auto;
+}
+/* ============================= */
+/* ✅ MOBILE RESPONSIVE (≤ 799) */
+/* ============================= */
+@media (max-width: 799px) {
+
+  body {
+    flex-direction: column;
+    justify-content: center;  
+    align-items: center;
+    padding-top: 1rem;
+    background-size: 70px 70px;
+    height: 100vh;           
+    overflow: hidden;         
+  }
+
+  .container {
+    flex-direction: column;
+    justify-content: center;  
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 1.2rem;
+    padding: 0 1rem;
+  }
+
+  .left {
+    margin: 0; 
+  }
+
+  .logo {
+    width: 160px; 
+    height: auto;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 330px;
+    margin: 0 1rem;             
+    padding: 1.2rem;
+    border-radius: 14px;
+
+    
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .login-box h2 {
+    font-size: 1.25rem;
+  }
+  
+  .login-box p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  input {
+    font-size: 0.85rem;
+    padding: 0.55rem;
+  }
+
+  input::placeholder {
+    font-size: 0.85rem; 
+    color: #999;
+
+  button[type="submit"] {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  #g_id_signin {
+    scale: 0.85;
+  }
+}
 }
 
 /* Home html */
