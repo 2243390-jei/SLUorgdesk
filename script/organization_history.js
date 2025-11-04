@@ -177,27 +177,31 @@ function fillModal(sub) {
 
   modal.innerHTML = `
     <div class="modal-content">
-      <button class="modal-close" id="modalClose"><span class="icon-close"></span></button>
+    <div class="modal-header">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        ${org.name || "Unknown Organization"} 
+        <span class="org-acronym">${org.acronym ? `(${org.acronym})` : ""}</span>
+      </h2>
 
-      <div class="modal-header">
-        <h2>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-          </svg>
-          ${org.name || "Unknown Organization"} 
-          <span class="org-acronym">${org.acronym ? `(${org.acronym})` : ""}</span>
-        </h2>
-        <div class="modal-subheader">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          ${sub.academicYear || "-"} | ${sub.semester || "-"}
-        </div>
+      <!-- close button INSIDE header so it stays with the sticky header -->
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <span class="icon-close" aria-hidden="true"></span>
+      </button>
+
+      <div class="modal-subheader">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        ${sub.academicYear || "-"} | ${sub.semester || "-"}
       </div>
+    </div>
 
       <div class="modal-body">
         <form id="editEventForm">
