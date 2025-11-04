@@ -760,33 +760,20 @@ const logoutModalClose = document.getElementById('logoutModalClose');
 const logoutCancel = document.getElementById('logoutCancel');
 const logoutConfirm = document.getElementById('logoutConfirm');
 
-// Fetch analytics data
-async function fetchAnalyticsData() {
-    try {
-        const response = await fetch('../data/analytics.json');
-        if (!response.ok) throw new Error('Failed to fetch data');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return null;
-    }
-}
-
 // Show/Hide Modal Functions
 function showLogoutModal() {
-    logoutModal.style.display = 'flex';
+    logoutModal.classList.add('show');
     logoutModal.setAttribute('aria-hidden', 'false');
 }
 
 function hideLogoutModal() {
-    logoutModal.style.display = 'none';
+    logoutModal.classList.remove('show');
     logoutModal.setAttribute('aria-hidden', 'true');
 }
 
 // Profile Modal Functions
 function showProfileModal() {
-    profileModal.style.display = 'flex';
+    profileModal.classList.add('show');
     profileModal.setAttribute('aria-hidden', 'false');
     
     const modalContent = `
@@ -813,7 +800,7 @@ function showProfileModal() {
 }
 
 function hideProfileModal() {
-    profileModal.style.display = 'none';
+    profileModal.classList.remove('show');
     profileModal.setAttribute('aria-hidden', 'true');
 }
 
