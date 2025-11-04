@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submission Page</title>
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="../style/style.css" />
+  <link rel="stylesheet" href="../style/style.css">
   <script src="../script/mobile-drawer.js" defer></script>
 </head>
 
@@ -14,7 +14,7 @@
   <!-- NAVIGATION BAR -->
   <header class="navbar">
     <div class="logo">
-      <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" />
+      <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
     </div>
     <nav>
       <ul>
@@ -24,7 +24,7 @@
     </nav>
     <!-- PROFILE ICON + MODAL -->
         <div id="profileContainer" class="profile-icon">
-            <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile" />
+            <img id="nav-profile-pic" src="../Images/student_img/profile.png" alt="Profile">
 
             <!-- Profile Modal -->
             <div class="profile-modal" id="profileModal" style="display: none;">
@@ -43,7 +43,7 @@
       <p>Fill out all required fields and attach the necessary files below.</p>
     </div>
     <div class="hero-image">
-      <img src="../Images/student_img/submit/hero_submission.png" alt="Submission Illustration" />
+      <img src="../Images/student_img/submit/hero_submission.png" alt="Submission Illustration">
     </div>
   </section>
 
@@ -57,34 +57,34 @@
 
         <div class="form-group">
           <label>Complete Name of Organization or Publication <span class="required">*</span></label>
-          <input type="text" name="org_name" placeholder="Your answer" required />
+          <input type="text" name="org_name" placeholder="Your answer" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Acronym or Short Name of Organization</label>
-            <input type="text" name="org_acronym" placeholder="Your answer" />
+            <input type="text" name="org_acronym" placeholder="Your answer">
           </div>
           <div class="form-group">
             <label>Official SLU Institutional Email of Organization</label>
-            <input type="email" name="org_email" placeholder="Your answer" />
+            <input type="email" name="org_email" placeholder="Your answer">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Name of Applicant Representing The Organization</label>
-            <input type="text" name="applicant_name" placeholder="Your answer" />
+            <input type="text" name="applicant_name" placeholder="Your answer">
           </div>
           <div class="form-group">
             <label>SLU Institutional Email of Applicant</label>
-            <input type="email" name="applicant_email" placeholder="Your answer" />
+            <input type="email" name="applicant_email" placeholder="Your answer">
           </div>
         </div>
 
         <div class="form-group">
           <label>Position of Applicant in the Student Group</label>
-          <input type="text" name="applicant_position" placeholder="Your answer" />
+          <input type="text" name="applicant_position" placeholder="Your answer">
         </div>
 
         <!-- ACADEMIC YEAR INFORMATION -->
@@ -92,11 +92,11 @@
         <div class="form-row">
           <div class="form-group">
             <label for="startYear">Start Year <span class="required">*</span></label>
-            <input type="number" id="startYear" name="start_year" placeholder="e.g. 2025" min="2000" required />
+            <input type="number" id="startYear" name="start_year" placeholder="e.g. 2025" min="2000" required>
           </div>
           <div class="form-group">
             <label for="endYear">End Year <span class="required">*</span></label>
-            <input type="number" id="endYear" name="end_year" placeholder="e.g. 2026" min="2000" required />
+            <input type="number" id="endYear" name="end_year" placeholder="e.g. 2026" min="2000" required>
           </div>
           <div class="form-group">
             <label for="semester">Semester <span class="required">*</span></label>
@@ -117,12 +117,12 @@
         <div class="event-form-container" id="inlineEventForm">
           <div class="form-group">
             <label>Event Name</label>
-            <input type="text" id="eventName" placeholder="Your answer" />
+            <input type="text" id="eventName" placeholder="Your answer">
           </div>
 
           <div class="form-group">
             <label>Event Type</label>
-            <input list="eventTypeOptions" id="eventType" placeholder="Your answer" required />
+            <input list="eventTypeOptions" id="eventType" placeholder="Your answer" required>
 
             <datalist id="eventTypeOptions">
               <option value="Workshop"></option>
@@ -134,7 +134,7 @@
 
           <div class="form-group">
             <label>Event Date <span class="required">*</span></label>
-            <input type="date" id="eventDate" required />
+            <input type="date" id="eventDate" required>
           </div>
 
           <!-- Event Time -->
@@ -145,7 +145,7 @@
                 <div class="form-group time-group">
                   <label>Start Time</label>
                   <div class="time-input-group">
-                    <input type="text" id="startTime" class="time-input" placeholder="12:00" maxlength="5" required />
+                    <input type="text" id="startTime" class="time-input" placeholder="12:00" maxlength="5" required>
                     <select id="startPeriod" class="time-period">
                       <option value="AM">AM</option>
                       <option value="PM">PM</option>
@@ -155,7 +155,7 @@
                 <div class="form-group time-group">
                   <label>End Time</label>
                   <div class="time-input-group">
-                    <input type="text" id="endTime" class="time-input" placeholder="01:30" maxlength="5" required />
+                    <input type="text" id="endTime" class="time-input" placeholder="01:30" maxlength="5" required>
                     <select id="endPeriod" class="time-period">
                       <option value="AM">AM</option>
                       <option value="PM">PM</option>
@@ -168,17 +168,17 @@
 
           <div class="form-group">
             <label>Venue</label>
-            <input type="text" id="eventVenue" placeholder="Your answer" />
+            <input type="text" id="eventVenue" placeholder="Your answer">
           </div>
 
           <div class="form-group">
             <label>Total Number of Attendees</label>
-            <input type="number" id="eventAttendees" placeholder="Your answer" min="0" />
+            <input type="number" id="eventAttendees" placeholder="Your answer" min="0">
           </div>
 
           <div class="form-group">
             <label>Link of Proof (e.g., Google Drive, Photos)</label>
-            <input type="url" id="eventProof" placeholder="https://example.com" />
+            <input type="url" id="eventProof" placeholder="https://example.com">
           </div>
 
           <!-- SDGs -->
@@ -217,7 +217,7 @@
               <p>Browse File</p>
               <span>Drag & Drop files here</span>
               <input type="file" name="supporting_doc[]" class="drop-zone-input"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple />
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
             </div>
           </div>
 
@@ -247,7 +247,7 @@
         <!-- CONFIRMATION -->
         <div class="form-group confirm-group">
           <label>
-            <input type="checkbox" name="confirm" required />
+            <input type="checkbox" name="confirm" required>
             I confirm that the information provided above is accurate and complete.
           </label>
         </div>
@@ -361,7 +361,7 @@
             <p>Browse File</p>
             <span>Drag & Drop files here</span>
             <input type="file" id="modalFileInput" name="modal_supporting_doc[]" class="drop-zone-input"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple />
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
           </div>
         </div>
 
@@ -374,8 +374,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../script/submission.js"></script>
-  <script src="../script/main.js"></script>
+  <script src="../script/submission.js" defer></script>
+  <script src="../script/main.js" defer></script>
 </body>
 
 </html>
