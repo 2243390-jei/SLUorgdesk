@@ -630,11 +630,11 @@ body.submission-body {
 }
 
 /* INPUTS */
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="url"],
-input[type="date"],
+.submission .input[type="text"],
+.submission .input[type="email"],
+.submission .input[type="number"],
+.submission .input[type="url"],
+.submission .input[type="date"],
 textarea,
 select {
   width: 100%;
