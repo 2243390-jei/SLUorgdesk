@@ -1110,7 +1110,7 @@ body {
     font-size: 14px;
   }
 
-  /* Calendar grid mobile - CRITICAL FIX */
+  /* Calendar grid mobile */
   .calendar-grid { 
     padding: 12px; 
     gap: 6px;
