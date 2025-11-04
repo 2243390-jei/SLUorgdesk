@@ -469,6 +469,7 @@ canvas {
   }
 }
 
+/* MOBILE BOTTOM NAVIGATION - 768px and below */
 @media (max-width: 768px) {
   /* Mobile Sidebar - Convert to bottom navigation */
   .leftbar {
@@ -481,12 +482,13 @@ canvas {
     height: 70px;
     flex-direction: row;
     justify-content: space-around;
-    padding: 8px;
+    padding: 8px 4px;
     z-index: 1000;
+    border-radius: 0;
   }
 
   .logo {
-    display: none; /* Hide logo on mobile */
+    display: none;
   }
 
   .left-nav {
@@ -494,39 +496,60 @@ canvas {
     margin-top: 0;
     width: 100%;
     justify-content: space-around;
+    gap: 0;
   }
 
   .circle-btn {
     width: 50px;
     height: 50px;
+    border-radius: 10px;
   }
 
   /* Main area adjustment for mobile bottom nav */
   .main-area {
     margin-left: 0;
-    margin-bottom: 70px; /* Space for bottom nav */
+    margin-bottom: 70px;
     padding: 16px;
     gap: 20px;
+    width: 100%;
   }
 
-  /* Header mobile adjustments */
+  /* Header mobile adjustments - CENTERED GREETING */
   .header {
     flex-direction: column;
     gap: 16px;
+    align-items: stretch;
+    text-align: center;
   }
   
   .top-actions {
     width: 100%;
     justify-content: space-between;
+    order: 2;
   }
   
   .search-wrap {
     width: 100%;
     max-width: none;
+    flex: 1;
+  }
+
+  .greeting {
+    order: 1;
+    text-align: center;
+    width: 100%;
   }
 
   .greeting h1 {
     font-size: 24px;
+    margin-bottom: 4px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .muted {
+    text-align: center;
+    width: 100%;
   }
 
   /* Body mobile adjustments */
@@ -588,11 +611,25 @@ canvas {
     font-size: 12px;
     padding: 6px 12px;
   }
+
+  /* Profile mobile */
+  .profile-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .search-wrap input[type="search"] {
+    padding: 10px 36px 10px 12px;
+    font-size: 14px;
+  }
 }
 
+/* Small Mobile Styles - 480px and below */
 @media (max-width: 480px) {
   .main-area {
     padding: 12px;
+    gap: 16px;
   }
 
   .chart-container,
@@ -630,6 +667,41 @@ canvas {
   .search-wrap input[type="search"] {
     padding: 10px 36px 10px 12px;
     font-size: 13px;
+  }
+
+  /* Bottom navigation smaller on very small screens */
+  .leftbar {
+    height: 65px;
+    padding: 6px 2px;
+  }
+
+  .circle-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .main-area {
+    margin-bottom: 65px;
+  }
+}
+
+/* Very Small Mobile Styles - 360px and below */
+@media (max-width: 360px) {
+  .circle-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .leftbar {
+    height: 60px;
+  }
+
+  .main-area {
+    margin-bottom: 60px;
+  }
+
+  .greeting h1 {
+    font-size: 22px;
   }
 }
 
