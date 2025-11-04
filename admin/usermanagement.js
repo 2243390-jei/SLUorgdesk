@@ -11,6 +11,7 @@ let userToDelete = null;
 
 // DOM Elements
 const userTableBody = document.getElementById('userTableBody');
+const userCardList = document.getElementById('userCardList');
 const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
@@ -77,6 +78,10 @@ async function initialize() {
         console.error('Error initializing:', error);
         userTableBody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
     }
+
+    // Initial render for mobile/desktop
+    renderUserCardsOrTable();
+    window.addEventListener('resize', renderUserCardsOrTable);
 }
 
 // Fetch users from MongoDB
@@ -138,7 +143,61 @@ function updateTable() {
         </tr>
     `).join('');
 
+    renderUserCardsOrTable();
     updatePagination(totalPages);
+}
+
+// Detect mobile screen
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+// Render user cards for mobile, table for desktop
+function renderUserCardsOrTable() {
+    if (!userCardList) return;
+    if (isMobile()) {
+        userCardList.style.display = 'flex';
+        userTableBody.parentElement.parentElement.style.display = 'none';
+        renderUserCards();
+    } else {
+        userCardList.style.display = 'none';
+        userTableBody.parentElement.parentElement.style.display = '';
+    }
+}
+
+function renderUserCards() {
+    userCardList.innerHTML = '';
+    let filteredUsers = filterUsers();
+    if (!filteredUsers.length) {
+        userCardList.innerHTML = `<div style='text-align:center;color:#888;'>No users found.</div>`;
+        return;
+    }
+    // Pagination
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = filteredUsers.slice(start, end);
+    pageData.forEach(user => {
+        userCardList.innerHTML += `
+        <div class="card-item">
+            <div class="card-header">
+                <div class="card-logo"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="card-title">${user.name}</div>
+                    <div class="card-email">${user.email}</div>
+                </div>
+            </div>
+            <div class="card-meta">
+                <span><b>Role:</b> ${user.role}</span>
+                <span><b>School:</b> ${user.school}</span>
+                <span><b>Status:</b> ${user.status}</span>
+            </div>
+            <div class="card-actions">
+                <button class="action-icon" title="Edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                <button class="action-icon" title="Delete" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        `;
+    });
 }
 
 // Update pagination controls

@@ -1301,3 +1301,80 @@ tbody tr:first-child td:last-child {
   color: white;
 }
 
+/* Card layout for org/user management on mobile */
+.card-list {
+  display: none;
+}
+@media screen and (max-width: 768px) {
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .card-item {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .card-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f3f3f3;
+  }
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #26343f;
+  }
+  .card-email {
+    font-size: 0.95rem;
+    color: #2563eb;
+    word-break: break-all;
+  }
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: #6b7280;
+  }
+  .card-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .card-actions .action-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    border-radius: 8px;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .card-actions .action-icon:hover {
+    background: #2563eb;
+    color: #fff;
+  }
+  /* Hide table on mobile */
+  .org-table, .org-table thead, .org-table tbody, .org-table tr, .org-table th, .org-table td {
+    display: none !important;
+  }
+}
+
