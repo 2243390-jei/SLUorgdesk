@@ -5,8 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = 'none';
   });
 
-  const apiBase = "http://localhost:3000/api/organizations";
-
   const orgTableBody = document.getElementById("orgTableBody");
   const searchInput = document.getElementById("searchInput");
   const searchClear = document.getElementById("searchClear");
@@ -46,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchOrganizations() {
     try {
+      const apiBase = "../dataFetch/fetchDatabase.php";
       console.log('Fetching organizations from:', apiBase);
       const response = await fetch(apiBase);
       console.log('Response status:', response.status);
@@ -57,14 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
       renderPagination();
     } catch (err) {
       console.error("Error fetching organizations:", err);
-      orgTableBody.innerHTML = `<tr><td colspan="10">Error loading data. Please make sure the server is running at ${apiBase}</td></tr>`;
+      orgTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the server is running at ${apiBase}</td></tr>`;
+      return [];
     }
   }
 
   function renderTable() {
     orgTableBody.innerHTML = "";
     if (!filteredData.length) {
-      orgTableBody.innerHTML = `<tr><td colspan="10">No organizations found.</td></tr>`;
+      orgTableBody.innerHTML = `<tr><td colspan="6">No organizations found.</td></tr>`;
       return;
     }
 
@@ -79,8 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="org-name">${org.name || "N/A"}</td>
         <td class="org-email">${org.email || "N/A"}</td>
         <td>${org.isWhitelisted ? "Organization" : "Pending"}</td>
-        <td class="org-school">${org.school || "N/A"}</td>
-        <td>${org.updatedAt ? new Date(org.updatedAt).toLocaleDateString() : "—"}</td>
+  <td class="org-school">${org.school || "N/A"}</td>
         <td class="action-buttons">
           <button class="action-icon edit-btn" data-id="${org._id}">
             <i class="fas fa-edit"></i>
