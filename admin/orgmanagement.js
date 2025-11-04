@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPageSelect = document.getElementById("rowsPerPage");
   const paginationDiv = document.getElementById("pagination");
   const curYear = document.getElementById("curYear");
+  const orgCardList = document.getElementById("orgCardList"); // Add this line
 
   const addOrgBtn = document.getElementById("addOrgBtn");
   const addOrgModal = document.getElementById("addOrgModal");
@@ -39,8 +40,30 @@ document.addEventListener("DOMContentLoaded", () => {
   let filteredData = [];
   let currentPage = 1;
   let rowsPerPage = parseInt(rowsPerPageSelect.value);
+  let currentViewport = isMobile() ? 'mobile' : 'desktop';
 
   curYear.textContent = new Date().getFullYear();
+
+  // Check for viewport changes periodically (for DevTools)
+  function checkViewportChange() {
+    const nowMobile = isMobile();
+    const nowViewport = nowMobile ? 'mobile' : 'desktop';
+    
+    if (nowViewport !== currentViewport) {
+      currentViewport = nowViewport;
+      console.log('Viewport changed to:', currentViewport); // Debug log
+      renderTable(); // This will call renderCards() internally
+      renderPagination();
+    }
+  }
+
+  // Check every 500ms for viewport changes
+  setInterval(checkViewportChange, 500);
+
+  // Also check when DevTools might be opened/closed
+  window.addEventListener('resize', () => {
+    checkViewportChange();
+  });
 
   async function fetchOrganizations() {
     try {
@@ -68,11 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render organization cards for mobile
   function renderCards() {
-    const cardList = document.getElementById("orgCardList");
-    if (!cardList) return;
-    cardList.innerHTML = "";
+    console.log('Rendering cards...'); // Debug log
+    if (!orgCardList) {
+      console.error('orgCardList element not found!');
+      return;
+    }
+    
+    orgCardList.innerHTML = "";
     if (!filteredData.length) {
-      cardList.innerHTML = `<div style='text-align:center;color:#888;'>No organizations found.</div>`;
+      orgCardList.innerHTML = `<div style='text-align:center;color:#888;padding:20px;'>No organizations found.</div>`;
       return;
     }
     const start = (currentPage - 1) * rowsPerPage;
@@ -98,16 +125,34 @@ document.addEventListener("DOMContentLoaded", () => {
           <button class="action-icon delete-btn" data-id="${org._id}" title="Delete"><i class="fas fa-trash"></i></button>
         </div>
       `;
-      cardList.appendChild(card);
+      orgCardList.appendChild(card);
     });
   }
 
   // Patch renderTable to also call renderCards on mobile
   function renderTable() {
+    console.log('Rendering table, isMobile:', isMobile()); // Debug log
+    
+    // First, ensure proper display states
+    const tableContainer = orgTableBody.closest('table');
+    if (tableContainer) {
+      tableContainer.style.display = isMobile() ? 'none' : '';
+    }
+    
+    if (orgCardList) {
+      orgCardList.style.display = isMobile() ? 'flex' : 'none';
+    }
+
     orgTableBody.innerHTML = "";
     if (!filteredData.length) {
       orgTableBody.innerHTML = `<tr><td colspan="6">No organizations found.</td></tr>`;
+      // Also update card list if empty
+      if (orgCardList) {
+        orgCardList.innerHTML = `<div style='text-align:center;color:#888;padding:20px;'>No organizations found.</div>`;
+      }
+      return;
     }
+    
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const pageData = filteredData.slice(start, end);
@@ -126,11 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       orgTableBody.appendChild(row);
     });
+    
     // Render cards if mobile
-    if (isMobile()) renderCards();
-    else {
-      const cardList = document.getElementById("orgCardList");
-      if (cardList) cardList.innerHTML = "";
+    if (isMobile()) {
+      renderCards();
     }
   }
 
@@ -420,5 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modal) modal.style.display = "none";
   });
 
+  // Initial render to set up the correct view
+  renderTable();
   fetchOrganizations();
 });

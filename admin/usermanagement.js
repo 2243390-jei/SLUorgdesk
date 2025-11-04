@@ -8,6 +8,7 @@ let currentFilters = {
     school: ''
 };
 let userToDelete = null;
+let currentViewport = isMobile() ? 'mobile' : 'desktop';
 
 // DOM Elements
 const userTableBody = document.getElementById('userTableBody');
@@ -60,6 +61,26 @@ filterMenu?.addEventListener('click', (e) => {
     filterMenu.classList.add('hidden');
 });
 
+// Check for viewport changes periodically (for DevTools)
+function checkViewportChange() {
+    const nowMobile = isMobile();
+    const nowViewport = nowMobile ? 'mobile' : 'desktop';
+    
+    if (nowViewport !== currentViewport) {
+        currentViewport = nowViewport;
+        renderUserCardsOrTable();
+        updateTable(); // Re-render with current data
+    }
+}
+
+// Check every 500ms for viewport changes
+setInterval(checkViewportChange, 500);
+
+// Also check when DevTools might be opened/closed
+window.addEventListener('resize', () => {
+    checkViewportChange();
+});
+
 // Initialize the page
 async function initialize() {
     try {
@@ -73,15 +94,22 @@ async function initialize() {
             defaultSchoolBtn?.classList.add('active');
         } else {
             userTableBody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
+            userCardList.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">No users found</div>';
         }
     } catch (error) {
         console.error('Error initializing:', error);
         userTableBody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
+        userCardList.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">Error loading users</div>';
     }
 
-    // Initial render for mobile/desktop
+    // Initial render for mobile/desktop - force both to render
     renderUserCardsOrTable();
+    
+    // More frequent viewport checking
     window.addEventListener('resize', renderUserCardsOrTable);
+    
+    // Initial viewport state
+    currentViewport = isMobile() ? 'mobile' : 'desktop';
 }
 
 // Fetch users from MongoDB
@@ -155,13 +183,20 @@ function isMobile() {
 // Render user cards for mobile, table for desktop
 function renderUserCardsOrTable() {
     if (!userCardList) return;
-    if (isMobile()) {
+    
+    const mobile = isMobile();
+    
+    if (mobile) {
         userCardList.style.display = 'flex';
-        userTableBody.parentElement.parentElement.style.display = 'none';
-        renderUserCards();
+        if (userTableBody.parentElement && userTableBody.parentElement.parentElement) {
+            userTableBody.parentElement.parentElement.style.display = 'none';
+        }
+        renderUserCards(); // Make sure this is called
     } else {
         userCardList.style.display = 'none';
-        userTableBody.parentElement.parentElement.style.display = '';
+        if (userTableBody.parentElement && userTableBody.parentElement.parentElement) {
+            userTableBody.parentElement.parentElement.style.display = '';
+        }
     }
 }
 
@@ -169,13 +204,15 @@ function renderUserCards() {
     userCardList.innerHTML = '';
     let filteredUsers = filterUsers();
     if (!filteredUsers.length) {
-        userCardList.innerHTML = `<div style='text-align:center;color:#888;'>No users found.</div>`;
+        userCardList.innerHTML = `<div style='text-align:center;color:#888;padding:20px;'>No users found.</div>`;
         return;
     }
+    
     // Pagination
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const pageData = filteredUsers.slice(start, end);
+    
     pageData.forEach(user => {
         userCardList.innerHTML += `
         <div class="card-item">
@@ -188,12 +225,16 @@ function renderUserCards() {
             </div>
             <div class="card-meta">
                 <span><b>Role:</b> ${user.role}</span>
-                <span><b>School:</b> ${user.school}</span>
-                <span><b>Status:</b> ${user.status}</span>
+                <span><b>School:</b> ${user.school || '-'}</span>
+                <span><b>Status:</b> ${user.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <div class="card-actions">
-                <button class="action-icon" title="Edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
-                <button class="action-icon" title="Delete" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+                <button class="action-icon" title="Edit" onclick="openModal('${user._id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-icon" title="Delete" onclick="openDeleteModal('${user._id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
         `;
