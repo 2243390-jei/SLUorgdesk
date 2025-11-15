@@ -1,8 +1,3 @@
-/* ========================================================
-   organization_history.js – EVENTS ONLY EDITABLE
-   Works with /api/Submissions | No logo
-   ======================================================== */
-
 // Use PHP endpoint that returns submissions JSON
 const API_URL = "../dataFetch/fetchSubmissions.php";
 let allSubmissions = [];
@@ -33,11 +28,7 @@ async function fetchWithTimeout(resource, options = {}) {
   }
 }
 
-// ======================================================
-// Initialize
-// ======================================================
-/* ---------- Helpers to resolve logged-in user and org ---------- */
-// returns google user object stored by your SSO (or null)
+
 function getLoggedInGoogleUser() {
   try {
     return JSON.parse(localStorage.getItem("googleUser"));
@@ -58,7 +49,6 @@ function extractOrgIdFromSubmission(sub) {
   if (typeof raw === "string") return raw;
   if (raw && typeof raw === "object") {
     if (raw.$oid) return raw.$oid;
-    // some drivers may return {"$id": ... } or nested object; fallback:
     const keys = Object.keys(raw);
     for (const k of keys) {
       if (typeof raw[k] === "string" && /^[a-f0-9]{24}$/i.test(raw[k])) return raw[k];
@@ -75,11 +65,9 @@ async function resolveUserOrgIds() {
     return local.split(",").map(s => s.trim()).filter(Boolean);
   }
 
-  // 2) URL ?orgId=
   const urlOrg = getQueryParam("orgId");
   if (urlOrg) return [urlOrg];
 
-  // 3) Best-effort using list from fetchDatabase.php
   const user = getLoggedInGoogleUser();
   if (!user || !user.email) return [];
 
@@ -134,11 +122,7 @@ async function initialize() {
         return oid && allowed.has(oid.toString());
       });
     } else {
-      // If no user org found, you have three choices. I default to showing none and show message.
-      // If you prefer to show all instead, change `submissions = []` to `/* keep submissions as-is */`.
-      // For now show only submissions if we matched an org; otherwise keep all hidden and show helpful message.
-      submissions = []; // hide all when no org match — safer default
-      // Optionally display a helpful message:
+      submissions = []; // hide all when no org match 
       submissionList.innerHTML = `
         <div class="no-data">
           <img src="../Images/student_img/no-data.png" alt="No Data" style="width:120px;margin-bottom:1rem;">
@@ -403,13 +387,6 @@ modal.addEventListener("submit", async (e) => {
         ...updatedEvent
       };
     }
-
-    // TODO: Add API call to save changes to the backend
-    // const response = await fetch("/api/submissions/" + currentEditingId, {
-    //   method: "PATCH",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ event: updatedEvent })
-    // });
 
     // Refresh the cards display
     renderCards(allSubmissions);
