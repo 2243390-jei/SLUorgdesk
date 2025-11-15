@@ -50,11 +50,18 @@ body {
   overflow-y: auto;
 }
 
-.logo { 
-  width: 52px; 
-  height: 52px; 
-  border-radius: 12px; 
-  object-fit: cover;
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  font-size: 16px;
   margin-bottom: 8px;
 }
 
@@ -94,6 +101,7 @@ body {
   width: 20px;
   height: 20px;
   object-fit: contain;
+
 }
 
 .circle-btn.active { 
