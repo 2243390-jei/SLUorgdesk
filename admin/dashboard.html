@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,44 +8,37 @@
     <link rel="stylesheet" href="../style/dashboard.css">
 
 </head>
+
 <body>
     <div class="app">
 
-        
+
         <aside class="leftbar" aria-label="Main navigation">
             <div class="brand">
-                <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
+                <img src="../Images/Icon.png" alt="SLU Logo" class="logo">
             </div>
 
-            <nav class="left-nav" role="navigation" aria-label="Sidebar">
-                <a href="dashboard.html">
-                    <button class="circle-btn active" title="Dashboard" aria-label="Dashboard">
-                        <img src="../Images/dashboard.png" alt="Dashboard" class="nav-icon">
-                    </button>
+            <nav class="left-nav" aria-label="Sidebar">
+                <a href="dashboard.html" class="circle-btn active" title="Dashboard" aria-label="Dashboard">
+                    <img src="../Images/statisctics.png" alt="Dashboard" class="nav-icon">
                 </a>
-                <a href="orgmanagement.html">
-                    <button class="circle-btn" title="Organization Management" aria-label="Organization Management">
-                        <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
-                    </button>
+                <a href="orgmanagement.html" class="circle-btn" title="Organization Management"
+                    aria-label="Organization Management">
+                    <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
                 </a>
-                <a href="usermanagement.html">
-                    <button class="circle-btn" title="User Management" aria-label="User Management">
-                        <img src="../Images/osas/user.png" alt="Users" class="nav-icon">
-                    </button>
+                <a href="usermanagement.html" class="circle-btn" title="User Management" aria-label="User Management">
+                    <img src="../Images/osas/user.png" alt="Users" class="nav-icon">
                 </a>
-                <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
-                    <img src="../Images/osas/logout.png" alt="Logout" class="nav-icon">
-                </button>
             </nav>
         </aside>
 
-        <main class="main-area" role="main">
+        <main class="main-area">
             <header class="header">
                 <div class="greeting">
                     <h1>Admin Dashboard</h1>
                     <div class="muted">Overview of system statistics</div>
                 </div>
-                
+
                 <div class="top-actions">
                     <div class="profile-header">
                         <button class="profile-circle" id="mobileProfileBtn">A</button>
@@ -103,7 +97,8 @@
             </div>
 
             <!-- Mobile Profile Modal -->
-            <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true" aria-labelledby="profileModalTitle">
+            <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true"
+                aria-labelledby="profileModalTitle">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 id="profileModalTitle">Profile</h3>
@@ -112,7 +107,6 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Content will be populated by JS -->
                     </div>
                 </div>
             </div>
@@ -123,4 +117,5 @@
 
     <script src="../script/dashboard.js" defer></script>
 </body>
+
 </html>

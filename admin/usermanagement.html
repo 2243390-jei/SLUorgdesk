@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - SLU OrgDesk Admin</title>
     <link rel="stylesheet" href="../style/usermanagement.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -13,23 +13,23 @@
 <body>
     <div class="app">
         <!-- Left Sidebar -->
-      <aside class="leftbar">
-      <div class="brand">
-        <div class="logo">AD</div>
-      </div>
+        <aside class="leftbar">
+            <div class="brand">
+                <img src="../Images/Icon.png" alt="SLU Logo" class="logo">
+            </div>
 
-      <nav class="left-nav">
-        <a href="../admin/dashboard.html" class="circle-btn">
-          <img src="../Images/dashboard.png" alt="" height="16px" width="16px">
-        </a>
-        <a href="../admin/orgmanagement.html" class="circle-btn">
-          <img src="../Images/osas/group.png" alt="" height="16px" width="16px">
-        </a>
-        <a href="../admin/usermanagement.html" class="circle-btn active">
-          <img src="../Images/osas/user.png" alt="" height="16px" width="16px">
-        </a>
-      </nav>
-    </aside>
+            <nav class="left-nav">
+                <a href="../admin/dashboard.html" class="circle-btn">
+                    <img src="../Images/statisctics.png" alt="" height="16" width="16">
+                </a>
+                <a href="../admin/orgmanagement.html" class="circle-btn">
+                    <img src="../Images/osas/group.png" alt="" height="16" width="16">
+                </a>
+                <a href="../admin/usermanagement.html" class="circle-btn active">
+                    <img src="../Images/osas/user.png" alt="" height="16" width="16">
+                </a>
+            </nav>
+        </aside>
 
         <!-- Main Content Area -->
         <div class="main-area">
@@ -61,7 +61,8 @@
                             <div class="filter-group" style="margin-bottom:10px;">
                                 <div style="font-weight:600; margin-bottom:6px;">Roles</div>
                                 <button class="filter-item" data-type="role" data-filter="">All Roles</button>
-                                <button class="filter-item" data-type="role" data-filter="Organization">Organization</button>
+                                <button class="filter-item" data-type="role"
+                                    data-filter="Organization">Organization</button>
                                 <button class="filter-item" data-type="role" data-filter="OSAS">OSAS</button>
                                 <button class="filter-item" data-type="role" data-filter="Admin">Admin</button>
                             </div>
@@ -125,7 +126,7 @@
         </div>
     </div>
 
-        <!-- Role Selection Modal -->
+    <!-- Role Selection Modal -->
     <div class="modal" id="roleModal">
         <div class="modal-content">
             <h2>Add User</h2>
@@ -176,12 +177,12 @@
                         <option value="Admin">Admin</option>
                     </select>
                 </div>
-                
+
                 <!-- Organization-specific fields -->
                 <div class="role-specific-fields" id="organizationFields">
                     <div class="form-group">
-                        <label for="studentId">Student ID</label>
-                        <input type="text" id="studentId" name="studentId" placeholder="Enter student ID">
+                        <label for="logoURL">Logo URL</label>
+                        <input type="text" id="logoURL" name="logoURL" placeholder="Enter logo URL">
                     </div>
                     <div class="form-group">
                         <label for="school">School</label>
@@ -195,31 +196,24 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="course">Course</label>
-                        <input type="text" id="course" name="course" placeholder="Enter course">
+
                     </div>
                     <div class="form-group">
-                        <label for="yearLevel">Year Level</label>
-                        <input type="number" id="yearLevel" name="yearLevel" min="1" max="5" placeholder="Enter year level">
+
                     </div>
                 </div>
 
                 <!-- OSAS-specific fields -->
                 <div class="role-specific-fields" id="osasFields">
                     <div class="form-group">
-                        <label for="osasDepartment">Department</label>
-                        <input type="text" id="osasDepartment" name="osasDepartment" placeholder="Enter department">
+
                     </div>
                 </div>
 
                 <!-- Admin-specific fields -->
                 <div class="role-specific-fields" id="adminFields">
                     <div class="form-group">
-                        <label for="adminLevel">Admin Level</label>
-                        <select id="adminLevel" name="adminLevel">
-                            <option value="Super Admin">Super Admin</option>
-                            <option value="Regular Admin">Regular Admin</option>
-                        </select>
+
                     </div>
                 </div>
 
