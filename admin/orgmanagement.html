@@ -2,12 +2,12 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Organization Management</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">  
-  <link rel="stylesheet" href="../style/orgmanagement.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="../style/orgmanagement.css">
   <script src="../script/orgmanagement.js" defer></script>
 </head>
 
@@ -20,13 +20,13 @@
 
       <nav class="left-nav">
         <a href="../admin/dashboard.html" class="circle-btn">
-          <img src="../Images/dashboard.png" alt="" height="16px" width="16px">
+          <img src="../Images/dashboard.png" alt="" height="16" width="16">
         </a>
         <a href="../admin/orgmanagement.html" class="circle-btn active">
-          <img src="../Images/osas/group.png" alt="" height="16px" width="16px">
+          <img src="../Images/osas/group.png" alt="" height="16" width="16">
         </a>
         <a href="../admin/usermanagement.html" class="circle-btn">
-          <img src="../Images/osas/user.png" alt="" height="16px" width="16px">
+          <img src="../Images/osas/user.png" alt="" height="16" width="16">
         </a>
       </nav>
     </aside>
@@ -45,10 +45,10 @@
 
           <div class="search-wrap">
             <button id="filterToggle" title="Filter">
-              <img src="../Images/osas/filter.png" alt="filter-icon" class="" height="16px" width="16px">
+              <img src="../Images/osas/filter.png" alt="filter-icon" class="" height="16" width="16">
             </button>
 
-            <input type="search" id="searchInput" placeholder="Search" />
+            <input type="search" id="searchInput" placeholder="Search">
             <button id="searchClear" title="Clear search"></button>
 
             <div id="filterMenu" class="filter-menu hidden">
@@ -111,7 +111,6 @@
 
   <div id="confirmModal" class="modal">
     <div class="modal-content">
-      <h3 id="confirmTitle"></h3>
       <div class="modal-buttons">
         <button id="confirmYes" class="confirm-btn">Yes</button>
         <button id="confirmCancel" class="cancel-btn">Cancel</button>
@@ -136,27 +135,27 @@
       <form id="createOrgForm">
         <div class="createorg-modal-row">
           <label>Organization Name</label>
-          <input type="text" id="orgName" placeholder="Enter organization name" required />
+          <input type="text" id="orgName" placeholder="Enter organization name" required>
         </div>
 
         <div class="createorg-modal-row">
           <label>Acronym</label>
-          <input type="text" id="orgAcronym" placeholder="Enter acronym" required />
+          <input type="text" id="orgAcronym" placeholder="Enter acronym" required>
         </div>
 
         <div class="createorg-modal-row">
           <label>Official Email</label>
-          <input type="email" id="orgEmail" placeholder="Enter official email" required />
+          <input type="email" id="orgEmail" placeholder="Enter official email" required>
         </div>
 
         <div class="createorg-modal-row">
           <label>School</label>
-          <input type="text" id="orgSchool" placeholder="Enter school" required />
+          <input type="text" id="orgSchool" placeholder="Enter school" required>
         </div>
 
         <div class="createorg-modal-row">
           <label>Logo URL</label>
-          <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo" />
+          <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo">
         </div>
 
         <div class="createorg-modal-actions">
