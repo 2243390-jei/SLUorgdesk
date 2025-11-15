@@ -60,7 +60,6 @@ try {
 
     $manager = new MongoDB\Driver\Manager($uri);
 
-    // ✅ NEW FEATURE: Fetch single submission by event_id
     if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
         $eventId = $_GET['event_id'];
         $filter = ['event.id' => $eventId]; // matches how you store event.id in MongoDB

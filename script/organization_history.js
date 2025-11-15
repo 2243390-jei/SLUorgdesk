@@ -109,7 +109,7 @@ async function initialize() {
     const userOrgIds = await resolveUserOrgIds(); // array of strings, possibly []
 
     // fetch all submissions (same API you already use)
-    const response = await fetchWithTimeout(API_URL);
+    const response = await AfetchWithTimeout(API_URL);
     const data = await response.json();
     // if fetchSubmissions.php already returns only org-specific results (rare), userOrgIds won't matter.
     let submissions = Array.isArray(data) ? data : [];
