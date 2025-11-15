@@ -339,18 +339,14 @@ function openEditModal(userId) {
     switch(user.role) {
         case 'Organization':
             document.getElementById('organizationFields').classList.add('show');
-            document.getElementById('studentId').value = user.studentId || '';
+            document.getElementById('logoURL').value = user.logoURL || '';
             document.getElementById('school').value = user.school || '';
-            document.getElementById('course').value = user.course || '';
-            document.getElementById('yearLevel').value = user.yearLevel || '';
             break;
         case 'OSAS':
             document.getElementById('osasFields').classList.add('show');
-            document.getElementById('osasDepartment').value = user.osasDepartment || '';
             break;
         case 'Admin':
             document.getElementById('adminFields').classList.add('show');
-            document.getElementById('adminLevel').value = user.adminLevel || 'Regular Admin';
             break;
     }
     
