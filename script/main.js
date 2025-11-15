@@ -1,5 +1,3 @@
-
-
 const USERS_API = "dataFetch/fetchUsers.php"; 
 
 // Unified helper — gets whichever login is active (manual or Google)
