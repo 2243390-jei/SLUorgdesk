@@ -80,7 +80,7 @@
             e.preventDefault();
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '../index.html';
+            window.location.href = '../../index.php';
           });
         }
       }, 100);

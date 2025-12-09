@@ -1,4 +1,4 @@
-const USERS_API = "../php-server/routes/users.php"
+const USERS_API = "php-server/routes/users.php"
 
 // Fetch session user from server (secure server-side validation)
 async function getSessionUser() {
@@ -66,10 +66,10 @@ async function setupManualLogin() {
       alert(`Login successful, welcome ${result.data.name || result.data.email}!`);
 
       switch (role) {
-        case "osas": window.location.href = "osas/calendar.php"; break;
-        case "admin": window.location.href = "admin/dashboard.php"; break;
-        case "organization": window.location.href = "organization/submission.php"; break;
-        default: window.location.href = "organization/submission.php"; break;
+        case "osas": window.location.href = "public/osas/calendar.php"; break;
+        case "admin": window.location.href = "public/admin/dashboard.php"; break;
+        case "organization": window.location.href = "public/organization/submission.php"; break;
+        default: window.location.href = "public/organization/submission.php"; break;
       }
     } catch (err) {
       return alert("Unable to connect to server. Try again later.");
@@ -104,11 +104,11 @@ function handleCredentialResponse(response) {
 
   if (email.includes("@slu.edu.ph")) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
-      window.location.href = "organization/submission.php";
+      window.location.href = "public/organization/submission.php";
     } else if (email.startsWith("osas@")) {
-      window.location.href = "osas/dashboard.php";
+      window.location.href = "public/osas/dashboard.php";
     } else if (email.startsWith("admin@")) {
-      window.location.href = "admin/dashboard.php";
+      window.location.href = "public/admin/dashboard.php";
     } else {
       alert("Unrecognized SLU account type.");
     }
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sessionStorage.clear();
       
       // Redirect to login
-      window.location.href = '../index.html';
+      window.location.href = '../../index.php';
     });
   }
 

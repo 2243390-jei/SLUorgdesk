@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['logged_in'])) {
-    header('Location: ../index.html');
+    header('Location: ../../index.php');
     exit;
 }
 ?>
@@ -29,7 +29,7 @@ if (empty($_SESSION['logged_in'])) {
           </button>
         </a>
 
-        <a href="../osas/orgs.php">
+        <a href="../osas/orgs.html">
           <button class="circle-btn active" title="Organizations" aria-label="Organizations">
             <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
           </button>

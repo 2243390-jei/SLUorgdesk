@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saint Louis University OrgDesk</title>
-  <link rel="stylesheet" href="organization/styles/style.css">
-  <link rel="icon" type="image/png" href="images/Icon.png" sizes="32x32">
+  <link rel="stylesheet" href="public/organization/styles/style.css">
+  <link rel="icon" type="image/png" href="public/images/Icon.png" sizes="32x32">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="container">
     <div class="left">
-      <img src="images/SLU_logo.png" alt="Saint Louis University Logo" class="logo">
+      <img src="public/images/SLU_logo.png" alt="Saint Louis University Logo" class="logo">
     </div>
 
     <div class="login-box">
-      <img src="images/lock.png" alt="Lock Icon" class="lock-logo">
+      <img src="public/images/lock.png" alt="Lock Icon" class="lock-logo">
       <h2>Welcome back!</h2>
       <p>Please enter your details</p>
 
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <script src="organization/script/main.js" defer></script>
+  <script src="public/organization/script/main.js" defer></script>
 
 </body>
 </html>
