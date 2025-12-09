@@ -3,119 +3,79 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../style/dashboard.css">
-
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script/dashboard.js"></script>
 </head>
 
 <body>
-    <div class="app">
 
+    <!--LEFT SIDEBAR -->
+    <aside id="sidebar">
+        <div id="sidebar-profile">
+            <div id="profile-icon"></div>
+            <div id="profile-details">
+                <div>ADMIN</div>
+                <div>Admin Name</div>
+            </div>
+        </div>
 
-        <aside class="leftbar" aria-label="Main navigation">
-            <div class="brand">
-                <img src="../Images/Icon.png" alt="SLU Logo" class="logo">
+        <nav id="sidebar-nav">
+            <ul>
+                <li class="active">Dashboard</li>
+                <li>Org Management</li>
+                <li>User Management</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER-->
+    <main id="main-content">
+
+        <!-- ======= HEADER ======= -->
+        <header id="main-header">
+            <div id="header-text">
+                <h1>ADMIN DASHBOARD</h1>
+                <p>Good day, Admin!</p>
+                <p>Let's make sure everything's in order today.</p>
             </div>
 
-            <nav class="left-nav" aria-label="Sidebar">
-                <a href="dashboard.html" class="circle-btn active" title="Dashboard" aria-label="Dashboard">
-                    <img src="../Images/statisctics.png" alt="Dashboard" class="nav-icon">
-                </a>
-                <a href="orgmanagement.html" class="circle-btn" title="Organization Management"
-                    aria-label="Organization Management">
-                    <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
-                </a>
-                <a href="usermanagement.html" class="circle-btn" title="User Management" aria-label="User Management">
-                    <img src="../Images/osas/user.png" alt="Users" class="nav-icon">
-                </a>
-            </nav>
-        </aside>
+            <div id="header-logo">
+                <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+            </div>
+        </header>
 
-        <main class="main-area">
-            <header class="header">
-                <div class="greeting">
-                    <h1>Admin Dashboard</h1>
-                    <div class="muted">Overview of system statistics</div>
+        <!--  DASHBOARD BODY -->
+        <section id="dashboard-wrapper">
+            <h2>Analytics</h2>
+
+            <!-- TOP WIDGETS WRAPPER -->
+            <div id="top-widgets">
+                <!-- Widget 1: Users by Role -->
+                <div class="widget-box">
+                    <h3>Users by Role</h3>
+                    <canvas id="chartRoles"></canvas> 
                 </div>
 
-                <div class="top-actions">
-                    <div class="profile-header">
-                        <button class="profile-circle" id="mobileProfileBtn">A</button>
-                    </div>
-                </div>
-            </header>
-
-            <div class="body">
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Organizations by School</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="orgsBySchoolChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Users by Role</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="usersByRoleChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Users by School</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="usersBySchoolChart"></canvas>
-                        </div>
-                    </div>
+                <!-- Widget 2: Active Users -->
+                <div class="widget-box">
+                    <h3>Active Users</h3>
+                    <canvas id="chartActive"></canvas> 
                 </div>
             </div>
 
-            <!-- Logout Modal -->
-            <div id="logoutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="logoutModalTitle">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="logoutModalTitle">Confirm Logout</h3>
-                        <button id="logoutModalClose" class="modal-close" aria-label="Close">
-                            <img src="../Images/cross.png" alt="Close" class="nav-icon">
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to log out?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="logoutCancel" class="btn-secondary">Cancel</button>
-                        <button id="logoutConfirm" class="btn-primary">Logout</button>
-                    </div>
+            <!-- LARGE BOTTOM WIDGET -->
+            <div id="bottom-widget">
+                <div class="large-box">
+                    <h3>Users by School</h3>
+                    <canvas id="chartSchools"></canvas> 
                 </div>
             </div>
+        </section>
 
-            <!-- Mobile Profile Modal -->
-            <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true"
-                aria-labelledby="profileModalTitle">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="profileModalTitle">Profile</h3>
-                        <button id="profileModalClose" class="modal-close" aria-label="Close">
-                            <img src="../Images/cross.png" alt="Close" class="nav-icon">
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                    </div>
-                </div>
-            </div>
+    </main>
 
-            <footer class="footer muted">© <span id="curYear"></span> Admin Dashboard</footer>
-        </main>
-    </div>
-
-    <script src="../script/dashboard.js" defer></script>
 </body>
 
 </html>
