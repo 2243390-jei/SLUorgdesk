@@ -30,9 +30,9 @@ if (empty($_SESSION['logged_in'])) {
 
         <nav id="sidebar-nav">
             <ul>
-                <li class="active">Dashboard</li>
-                <li>Org Management</li>
-                <li>User Management</li>
+                <li class="active"><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="orgmanagement.php">Org Management</a></li>
+                <li><a href="usermanagement.php">User Management</a></li>
             </ul>
         </nav>
     </aside>

@@ -18,8 +18,12 @@ $response = [];
 
 try {
     if ($method === 'GET') {
-        // Return submissions filtered by session user's organizationId
-        if (isset($_GET['myorg']) && $_GET['myorg'] === '1') {
+        // If filtering parameters are provided, use controller->getFiltered
+        $hasFilterParams = isset($_GET['search']) || isset($_GET['status']) || isset($_GET['month']) || isset($_GET['year']) || isset($_GET['organizationId']) || isset($_GET['myorg']) || isset($_GET['date']);
+        if ($hasFilterParams) {
+            // Pass through query string params to controller filter method
+            $response = $controller->getFiltered($_GET);
+        } elseif (isset($_GET['myorg']) && $_GET['myorg'] === '1') {
             if (empty($_SESSION['user']) || empty($_SESSION['user']['organizationId'])) {
                 $response = ['success' => false, 'error' => 'User must be logged in with an organization'];
             } else {

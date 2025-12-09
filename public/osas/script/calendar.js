@@ -47,59 +47,79 @@ function makeEventsListScrollable() {
 }
 
 // ---------------- MongoDB Integration ----------------
-async function fetchOrganizationsFromMongoDB() {
-    try {
-        console.log("Fetching organizations from MongoDB...");
-        const response = await fetch(`../../php-server/routes/organizations.php`);    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+async function fetchOrganization(opts = {}) {
+  try {
+    console.log("Fetching organizations from backend with options:", opts);
+
+    const params = new URLSearchParams();
+    if (opts.id) params.append('id', opts.id);
+    if (opts.search) params.append('search', opts.search);
+    if (opts.school) params.append('school', opts.school);
+    if (opts.acronym) params.append('acronym', opts.acronym);
+    if (opts.limit) params.append('limit', opts.limit);
+
+    const url = `../../php-server/routes/organizations.php` + (Array.from(params).length ? `?${params.toString()}` : '');
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const result = await response.json();
     const organizations = result.success ? result.data : [];
-    console.log(`Successfully fetched ${organizations.length} organizations from MongoDB`);
+    console.log(`Successfully fetched ${organizations.length} organizations from backend`);
 
-    // Create organization to school mapping
+    // Create organization to school mapping (normalize _id)
+    orgToSchoolMap = {}; // reset
     organizations.forEach(org => {
-      orgToSchoolMap[org._id] = org.school;
+      const id = (org._id && typeof org._id === 'string') ? org._id : (org._id && org._id.$oid ? org._id.$oid : org._id);
+      orgToSchoolMap[id] = org.school;
     });
 
     return orgToSchoolMap;
   } catch (error) {
-    console.error("Error fetching organizations from MongoDB:", error);
+    console.error("Error fetching organizations from backend:", error);
     return {};
   }
 }
 
-async function fetchSubmissionsFromMongoDB() {
-    try {
-        console.log("Fetching submissions from MongoDB...");
-        const response = await fetch(`../../php-server/routes/submissions.php`);    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+async function fetchSubmissions(opts = {}) {
+  try {
+    console.log("Fetching submissions from backend with options:", opts);
+
+    // Build query string parameters for backend filtering
+    const params = new URLSearchParams();
+    if (opts.organizationId) params.append('organizationId', opts.organizationId);
+    if (opts.status) params.append('status', opts.status);
+    if (opts.search) params.append('search', opts.search);
+    if (opts.month) params.append('month', opts.month); // 1-12
+    if (opts.year) params.append('year', opts.year);
+    if (opts.myorg) params.append('myorg', opts.myorg ? '1' : '0');
+    if (opts.date) params.append('date', opts.date); // exact day YYYY-MM-DD
+    if (opts.limit) params.append('limit', opts.limit);
+
+    const url = `../../php-server/routes/submissions.php` + (Array.from(params).length ? `?${params.toString()}` : '');
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const result = await response.json();
     const submissions = result.success ? result.data : [];
-    console.log(`Successfully fetched ${submissions.length} submissions from MongoDB`);
+    console.log(`Successfully fetched ${Array.isArray(submissions) ? submissions.length : 0} submissions from backend`);
 
-    if (submissions.length === 0) {
-      console.warn(" No submissions found in database");
+    if (!Array.isArray(submissions) || submissions.length === 0) {
       return [];
     }
 
-    // Transform submissions to events
+    // Transform submissions to events (same as before)
     const transformedEvents = [];
-    
+
     submissions.forEach((submission) => {
-      // Process the event from submission (single event object)
       if (submission.event) {
+        // If event.eventDate stored as UTCDateTime object, format helper in backend converted it to string already.
         let eventDate = new Date(submission.event.eventDate || submission.submittedAt || Date.now());
         if (isNaN(eventDate)) eventDate = new Date();
-
         const eventDateISO = toISO(eventDate);
-        
-        // Get school from organization mapping
+
         const orgId = submission.orgInfo?.orgId;
-        const school = orgToSchoolMap[orgId] || 'Unknown School';
+        const orgKey = (typeof orgId === 'object' && orgId.$oid) ? orgId.$oid : orgId;
+        const school = orgToSchoolMap[orgKey] || orgToSchoolMap[submission.orgInfo?._id] || 'Unknown School';
 
         transformedEvents.push({
           id: submission._id?.$oid || submission._id,
@@ -116,14 +136,14 @@ async function fetchSubmissionsFromMongoDB() {
           organizationType: submission.orgInfo?.acronym || "Unknown Type",
           acronym: submission.orgInfo?.acronym || "No Acronym",
           completeName: submission.orgInfo?.name || "Unknown Name",
-          SDGCategory: submission.event.eventSDG ? submission.event.eventSDG.join(', ') : "Not specified"
+          SDGCategory: submission.event.eventSDG ? (Array.isArray(submission.event.eventSDG) ? submission.event.eventSDG.join(', ') : submission.event.eventSDG) : "Not specified"
         });
       }
     });
 
     return transformedEvents;
   } catch (error) {
-    console.error("Error fetching submissions from MongoDB:", error);
+    console.error("Error fetching submissions from backend:", error);
     return [];
   }
 }
@@ -198,7 +218,11 @@ async function renderCalendar(){
   }
 
   // Update calendar cells with events after rendering
-  const events = await fetchSubmissionsFromMongoDB();
+  const events = await fetchSubmissions({
+    month: month + 1,
+    year: year,
+    search: (searchInput.value || '').trim()
+  });
   updateCalendarCellsWithEvents(events);
 }
 
@@ -242,8 +266,14 @@ function makeDayCell(dateObj, inactive=false){
     el.classList.add('highlight');
 
     const isoStr = iso;
-    const events = await fetchSubmissionsFromMongoDB();
-    const pastEvents = events.filter(event => event.date === isoStr && fromISO(event.date) < today);
+    // Request backend for exact-day events
+    const events = await fetchSubmissions({
+      date: isoStr,
+      search: (searchInput.value || '').trim()
+    });
+
+    // all events returned are for the exact date — determine past status client-side
+    const pastEvents = events.filter(event => fromISO(event.date) < today);
     
     if (pastEvents.length > 0){
       // Find and highlight the first matching event card
@@ -280,9 +310,14 @@ async function renderPastEvents(filterText = '') {
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
 
-  // Fetch events from MongoDB
-  const events = await fetchSubmissionsFromMongoDB();
-  
+  // Fetch events from backend (month-level)
+  const events = await fetchSubmissions({
+    month: viewMonth + 1,
+    year: viewYear,
+    search: (filterText || '').trim()
+  });
+
+  // Because backend returned month-filtered data, client-side still checks isSameMonth & isPast
   const monthEvents = events.filter(event => {
     const d = fromISO(event.date);
     const isSameMonth = (d.getFullYear() === viewYear && d.getMonth() === viewMonth);
@@ -790,18 +825,18 @@ todayBtn.addEventListener('click', async () => {
   clearDayHighlights();
 });
 
-// Initial render
+// Initial render - call renamed fetchOrganization
 async function initializeCalendar() {
   try {
     makeEventsListScrollable(); // Make events list scrollable
     
-    // First fetch organizations to build the mapping
-    await fetchOrganizationsFromMongoDB();
+    // First fetch organizations to build the mapping (backend filtered)
+    await fetchOrganization();
     
     // Then render calendar and events
     await renderCalendar();
     await renderPastEvents();
-    console.log('Calendar initialized with submission data from MongoDB');
+    console.log('Calendar initialized with submission data from backend');
   } catch (error) {
     console.error('Error initializing calendar:', error);
   }

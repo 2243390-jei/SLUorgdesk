@@ -18,8 +18,10 @@ $response = [];
 
 try {
     if ($method === 'GET') {
-        if (isset($_GET['id'])) {
-            $response = $controller->getById($_GET['id']);
+        // If any filter/query params are present, route to getFiltered so backend does the filtering
+        $hasFilterParams = isset($_GET['search']) || isset($_GET['school']) || isset($_GET['acronym']) || isset($_GET['id']) || isset($_GET['limit']) || isset($_GET['offset']);
+        if ($hasFilterParams) {
+            $response = $controller->getFiltered($_GET);
         } else {
             $response = $controller->getAll();
         }
