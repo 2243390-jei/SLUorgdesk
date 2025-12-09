@@ -67,7 +67,7 @@ async function setupManualLogin() {
 
       switch (role) {
         case "osas": window.location.href = "osas/calendar.html"; break;
-        case "admin": window.location.href = "admin/dashboard.html"; break;
+        case "admin": window.location.href = "admin/dashboard.php"; break;
         case "organization": window.location.href = "organization/submission.php"; break;
         default: window.location.href = "organization/submission.php"; break;
       }
@@ -106,9 +106,9 @@ function handleCredentialResponse(response) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
       window.location.href = "organization/submission.html";
     } else if (email.startsWith("osas@")) {
-      window.location.href = "osas/dashboard.html";
+      window.location.href = "osas/dashboard.php";
     } else if (email.startsWith("admin@")) {
-      window.location.href = "admin/dashboard.html";
+      window.location.href = "admin/dashboard.php";
     } else {
       alert("Unrecognized SLU account type.");
     }

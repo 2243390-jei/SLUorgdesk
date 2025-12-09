@@ -37,7 +37,7 @@ try {
             $redirect = 'organization/submission.html';
             switch ($role) {
                 case 'osas': $redirect = 'osas/calendar.html'; break;
-                case 'admin': $redirect = 'admin/dashboard.html'; break;
+                case 'admin': $redirect = 'admin/dashboard.php'; break;
                 case 'organization': $redirect = 'organization/submission.html'; break;
             }
 

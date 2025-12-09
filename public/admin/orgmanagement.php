@@ -26,10 +26,10 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <nav class="left-nav">
-        <a href="../admin/dashboard.html" class="circle-btn">
+        <a href="../admin/dashboard.php" class="circle-btn">
           <img src="../Images/statisctics.png" alt="" height="16" width="16">
         </a>
-        <a href="../admin/orgmanagement.html" class="circle-btn active">
+        <a href="../admin/orgmanagement.php" class="circle-btn active">
           <img src="../Images/osas/group.png" alt="" height="16" width="16">
         </a>
         <a href="../admin/usermanagement.php" class="circle-btn">
