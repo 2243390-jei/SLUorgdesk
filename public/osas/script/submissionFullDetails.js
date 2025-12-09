@@ -63,6 +63,13 @@ async function loadSubmissionDetails() {
       return;
     }
 
+      // Store current submission id globally for use when submitting revision comments
+      if (submission._id) {
+        window.currentSubmissionId = submission._id;
+        // also persist temporarily in localStorage as fallback
+        localStorage.setItem('currentSubmissionId', submission._id);
+      }
+
     const org = submission.orgInfo || {};
     const app = submission.applicationInfo || {};
     const event = submission.event || {};
@@ -206,19 +213,62 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Here you would typically send the comment to your backend
-    // For now, we'll just show a success message
-    console.log("Comment submitted:", comment);
-    
-    if (window.innerWidth <= 768) {
-      showMobileAlert("Comment submitted successfully!");
-    } else {
-      alert("Comment submitted successfully!\n\n" + comment);
+    // Determine submission id (from global or localStorage)
+    const submissionId = window.currentSubmissionId || localStorage.getItem('currentSubmissionId');
+    if (!submissionId) {
+      console.error('No submission id available for updating revisionComment');
+      if (window.innerWidth <= 768) showMobileAlert('Unable to submit comment: missing submission id.');
+      else alert('Unable to submit comment: missing submission id.');
+      return;
     }
-    
-    // Clear and close modal
-    commentBox.value = "";
-    closeModalFunc();
+
+    submitComment.disabled = true;
+    submitComment.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`../../php-server/routes/submissions.php?id=${encodeURIComponent(submissionId)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ revisionComment: comment })
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        console.error('Failed to save revision comment:', result);
+        const msg = result?.error || 'Failed to save comment';
+        if (window.innerWidth <= 768) showMobileAlert(msg);
+        else alert(msg);
+        return;
+      }
+
+      // Success — optionally update UI or persist
+      console.log('Revision comment saved');
+      if (window.innerWidth <= 768) showMobileAlert('Comment submitted successfully!');
+      else alert('Comment submitted successfully!');
+
+      // Clear and close modal
+      commentBox.value = '';
+      closeModalFunc();
+
+      // Optionally update local view: store revisionComment locally
+      try {
+        if (window.currentSubmissionId && window.currentSubmissionId === submissionId) {
+          // reflect change in page if needed
+          const existing = document.getElementById('revisionCommentDisplay');
+          if (existing) existing.textContent = comment;
+        }
+      } catch (e) {
+        // ignore UI update errors
+      }
+
+    } catch (error) {
+      console.error('Error submitting revision comment:', error);
+      if (window.innerWidth <= 768) showMobileAlert('Error submitting comment.');
+      else alert('Error submitting comment.');
+    } finally {
+      submitComment.disabled = false;
+      submitComment.textContent = 'Submit Comment';
+    }
   });
 
   // Handle Enter key in comment box (Ctrl+Enter to submit)
