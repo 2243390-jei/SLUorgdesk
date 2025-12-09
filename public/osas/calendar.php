@@ -1,0 +1,212 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar</title>
+
+  <link rel="stylesheet" href="../style/calendar.css">
+  <script src="../script/calendar.js" defer></script>
+</head>
+
+<body>
+  <main class="main-area">
+    <header class="header">
+      <h1>Calendar</h1>
+      <p class="muted">Event calendar</p>
+    </header>
+
+    <div id="calendarWrap"></div>
+  </main>
+</body>
+
+</html>
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Osas Calendar — Past Events</title>
+  <link rel="stylesheet" href="styles/calendar.css">
+  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+</head>
+<body>
+  <div class="app">
+    <!-- Left circular sidebar -->
+    <aside class="leftbar" aria-label="Main navigation">
+      <div class="brand">
+        <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
+      </div>
+
+      <nav class="left-nav" aria-label="Sidebar">
+        <button class="circle-btn active" title="Calendar" aria-label="Calendar" onclick="location.href='../osas/calendar.html'">
+          <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
+        </button>
+
+        <button class="circle-btn" title="Organizations" aria-label="Organizations" onclick="location.href='../osas/orgs.html'">
+          <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
+        </button>
+
+        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="location.href='../osas/analytics.html'">
+          <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
+        </button>
+        
+        <!-- Logout button for desktop -->
+        <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
+          <img src="../Images/osas/logout.png" alt="Logout" class="nav-icon">
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main area -->
+    <main class="main-area">
+      <header class="header">
+        <div class="greeting">
+          <h1>Hello, OSAS</h1>
+          <div class="muted">Here's what happened this month</div>
+        </div>
+
+        <div class="top-actions">
+          <div class="search-wrap">
+            <input id="searchInput" type="search" placeholder="Search past events..." aria-label="Search past events">
+            <button id="searchClear" title="Clear" aria-label="Clear search">x</button>
+          </div>
+          <!-- Profile moved to header -->
+          <div class="profile-header">
+            <div class="profile-circle" id="mobileProfileBtn">O</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="body">
+        <!-- Calendar column -->
+        <section class="calendar-column" aria-label="Calendar">
+          <div class="calendar-head">
+            <div class="month-block">
+              <div class="month-year-linear">
+                <span id="monthName" class="month-name">October</span>
+                <span id="yearName" class="year-name">2025</span>
+              </div>
+            </div>
+
+            <!-- Navigation controls -->
+            <div class="nav-controls">
+              <button id="prevBtn" class="icon-btn" aria-label="Previous month">
+                <img src="../Images/osas/back.png" alt="Previous" class="nav-icon">
+              </button>
+              <button id="todayBtn" class="btn-small">
+                <img src="../Images/osas/calendar.png" alt="Today" class="nav-icon">
+                Today
+              </button>
+              <button id="nextBtn" class="icon-btn" aria-label="Next month">
+                <img src="../Images/osas/next.png" alt="Next" class="nav-icon">
+              </button>
+            </div>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid" aria-hidden="false">
+            <!-- Week headers -->
+            <div class="week">Sun</div>
+            <div class="week">Mon</div>
+            <div class="week">Tue</div>
+            <div class="week">Wed</div>
+            <div class="week">Thu</div>
+            <div class="week">Fri</div>
+            <div class="week">Sat</div>
+            <!-- days injected by script.js -->
+          </div>
+        </section>
+
+        <!-- Right panel: Past Events -->
+        <aside class="right-panel" aria-label="Past events">
+          <div class="panel-top">
+            <h2>Past Events</h2>
+            <div class="muted">History for selected month (click an event to view more)</div>
+          </div>
+
+          <!-- Fixed-size, scrollable events list -->
+          <div id="eventsList" class="events-list" aria-live="polite" tabindex="0">
+            <!-- Event cards injected by script.js -->
+          </div>
+
+          <div class="panel-footer muted small">Click an event to view details; click a day to focus its events.</div>
+        </aside>
+      </div>
+
+      <!-- Slide-in detail panel + overlay -->
+      <div id="overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
+      <aside id="detailPanel" class="detail-panel" aria-hidden="true" aria-labelledby="detailTitle">
+        <div class="detail-header">
+          <div>
+            <h3 id="detailTitle">Event Details</h3>
+            <div id="detailMeta" class="muted small"></div>
+          </div>
+          <button id="detailClose" class="detail-close" aria-label="Close details">
+            <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
+          </button>
+        </div>
+
+        <div id="detailBody" class="detail-body" tabindex="0"></div>
+      </aside>
+
+      <!-- Logout Confirmation Modal -->
+      <div id="logoutModal" class="modal" aria-hidden="true" aria-labelledby="logoutModalTitle">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="logoutModalTitle">Confirm Logout</h3>
+            <button id="logoutModalClose" class="modal-close" aria-label="Close">
+              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to log out?</p>
+          </div>
+          <div class="modal-footer">
+            <button id="logoutCancel" class="btn-secondary">Cancel</button>
+            <button id="logoutConfirm" class="btn-primary">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Profile Modal -->
+      <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="profileModalTitle">Profile</h3>
+            <button id="profileModalClose" class="modal-close" aria-label="Close">
+              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="profile-info">
+              <div class="profile-large">O</div>
+              <div class="profile-details">
+                <h4>OSAS Admin</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer muted">© <span id="curYear"></span> Osas Dashboard</footer>
+    </main>
+  </div>
+
+  <script src="script/calendar.js"></script>
+</body>
+</html>

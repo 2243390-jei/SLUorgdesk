@@ -1,0 +1,128 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../style/dashboard.css">
+
+</head>
+
+<body>
+    <div class="app">
+
+
+        <aside class="leftbar" aria-label="Main navigation">
+            <div class="brand">
+                <img src="../Images/Icon.png" alt="SLU Logo" class="logo">
+            </div>
+
+            <nav class="left-nav" aria-label="Sidebar">
+                <a href="dashboard.html" class="circle-btn active" title="Dashboard" aria-label="Dashboard">
+                    <img src="../Images/statisctics.png" alt="Dashboard" class="nav-icon">
+                </a>
+                <a href="orgmanagement.html" class="circle-btn" title="Organization Management"
+                    aria-label="Organization Management">
+                    <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
+                </a>
+                <a href="usermanagement.php" class="circle-btn" title="User Management" aria-label="User Management">
+                    <img src="../Images/osas/user.png" alt="Users" class="nav-icon">
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-area">
+            <header class="header">
+                <div class="greeting">
+                    <h1>Admin Dashboard</h1>
+                    <div class="muted">Overview of system statistics</div>
+                </div>
+
+                <div class="top-actions">
+                    <div class="profile-header">
+                        <button class="profile-circle" id="mobileProfileBtn">A</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="body">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Organizations by School</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="orgsBySchoolChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Users by Role</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="usersByRoleChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Users by School</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="usersBySchoolChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logout Modal -->
+            <div id="logoutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="logoutModalTitle">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="logoutModalTitle">Confirm Logout</h3>
+                        <button id="logoutModalClose" class="modal-close" aria-label="Close">
+                            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to log out?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="logoutCancel" class="btn-secondary">Cancel</button>
+                        <button id="logoutConfirm" class="btn-primary">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Profile Modal -->
+            <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true"
+                aria-labelledby="profileModalTitle">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="profileModalTitle">Profile</h3>
+                        <button id="profileModalClose" class="modal-close" aria-label="Close">
+                            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer muted">© <span id="curYear"></span> Admin Dashboard</footer>
+        </main>
+    </div>
+
+    <script src="../script/dashboard.js" defer></script>
+</body>
+
+</html>
