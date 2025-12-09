@@ -5,37 +5,6 @@ if (empty($_SESSION['logged_in'])) {
     exit;
 }
 ?>
-<!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Submission Details</title>
-
-  <link rel="stylesheet" href="../style/submissionFullDetails.css">
-  <script src="../script/submissionFullDetails.js" defer></script>
-</head>
-
-<body>
-  <main class="main-area">
-    <header class="header">
-      <h1>Submission Details</h1>
-      <p class="muted">Details for selected submission</p>
-    </header>
-
-    <div id="submissionDetails"></div>
-  </main>
-</body>
-
-</html>
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../index.html');
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

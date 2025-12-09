@@ -34,11 +34,11 @@ try {
 
             // Return JSON for client (AJAX or intercepted form submit)
             $role = strtolower($result['data']['role'] ?? '');
-            $redirect = 'organization/submission.html';
+            $redirect = 'organization/submission.php';
             switch ($role) {
-                case 'osas': $redirect = 'osas/calendar.html'; break;
+                case 'osas': $redirect = 'osas/calendar.php'; break;
                 case 'admin': $redirect = 'admin/dashboard.php'; break;
-                case 'organization': $redirect = 'organization/submission.html'; break;
+                case 'organization': $redirect = 'organization/submission.php'; break;
             }
 
             $result['redirect'] = $redirect;

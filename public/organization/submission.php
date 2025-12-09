@@ -23,7 +23,7 @@ if (empty($_SESSION['logged_in'])) {
     </div>
     <nav>
       <ul>
-        <li><a href="submission.html" class="active">Submission</a></li>
+        <li><a href="submission.php" class="active">Submission</a></li>
         <li><a href="history.php">History</a></li>
       </ul>
     </nav>
