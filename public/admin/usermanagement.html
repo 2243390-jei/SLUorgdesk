@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - SLU OrgDesk Admin</title>
-    <link rel="stylesheet" href="../style/usermanagement.css">
+    <link rel="stylesheet" href="styles/usermanagement.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
 </head>
@@ -61,8 +61,6 @@
                             <div class="filter-group" style="margin-bottom:10px;">
                                 <div style="font-weight:600; margin-bottom:6px;">Roles</div>
                                 <button class="filter-item" data-type="role" data-filter="">All Roles</button>
-                                <button class="filter-item" data-type="role"
-                                    data-filter="Organization">Organization</button>
                                 <button class="filter-item" data-type="role" data-filter="OSAS">OSAS</button>
                                 <button class="filter-item" data-type="role" data-filter="Admin">Admin</button>
                             </div>
@@ -136,10 +134,6 @@
                     <i class="fas fa-user-shield"></i>
                     Add OSAS
                 </button>
-                <button class="role-btn" data-role="Organization">
-                    <i class="fas fa-sitemap"></i>
-                    Add Organization
-                </button>
                 <button class="role-btn" data-role="Admin">
                     <i class="fas fa-cog"></i>
                     Add Admin
@@ -172,35 +166,9 @@
                     <label for="role">Role</label>
                     <select id="role" name="role" required disabled>
                         <option value="">Select role</option>
-                        <option value="Organization">Organization</option>
                         <option value="OSAS">OSAS</option>
                         <option value="Admin">Admin</option>
                     </select>
-                </div>
-
-                <!-- Organization-specific fields -->
-                <div class="role-specific-fields" id="organizationFields">
-                    <div class="form-group">
-                        <label for="logoURL">Logo URL</label>
-                        <input type="text" id="logoURL" name="logoURL" placeholder="Enter logo URL">
-                    </div>
-                    <div class="form-group">
-                        <label for="school">School</label>
-                        <select id="school" name="school">
-                            <option value="SAMCIS">SAMCIS</option>
-                            <option value="SEA">SEA</option>
-                            <option value="STELA">STELA</option>
-                            <option value="SOL">SOL</option>
-                            <option value="SOM">SOM</option>
-                            <option value="SONAHBS">SONAHBS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-
-                    </div>
-                    <div class="form-group">
-
-                    </div>
                 </div>
 
                 <!-- OSAS-specific fields -->
@@ -237,7 +205,7 @@
         </div>
     </div>
 
-    <script src="../script/usermanagement.js" defer></script>
+    <script src="script/usermanagement.js" defer></script>
 </body>
 
 </html>
