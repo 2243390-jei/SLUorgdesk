@@ -1,0 +1,113 @@
+<?php
+require_once __DIR__ . '/../models/Submission.php';
+
+/**
+ * Submission Controller
+ */
+class SubmissionController
+{
+    private $submission;
+
+    public function __construct()
+    {
+        $this->submission = new Submission();
+    }
+
+    /**
+     * Get all submissions
+     */
+    public function getAll()
+    {
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+        $data = $this->submission->getAll($limit, $offset);
+        return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * Get submission by ID
+     */
+    public function getById($id)
+    {
+        $data = $this->submission->getById($id);
+        if (!$data) {
+            return ['success' => false, 'error' => 'Submission not found'];
+        }
+        return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * Get submission by event ID
+     */
+    public function getByEventId($eventId)
+    {
+        $data = $this->submission->getByEventId($eventId);
+        if (!$data) {
+            return ['success' => false, 'error' => 'Submission not found'];
+        }
+        return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * Get submissions by organization
+     */
+    public function getByOrganization($orgId)
+    {
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+        $data = $this->submission->getByOrganization($orgId, $limit, $offset);
+        return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * Get submissions by year and semester
+     */
+    public function getByYearSemester($year, $semester)
+    {
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+        $data = $this->submission->getByYearSemester($year, $semester, $limit, $offset);
+        return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * Create submission
+     */
+    public function create($data)
+    {
+        if (empty($data['applicationInfo']) || empty($data['event'])) {
+            return ['success' => false, 'error' => 'Missing required fields'];
+        }
+
+        $id = $this->submission->create($data);
+        return ['success' => true, 'id' => (string)$id];
+    }
+
+    /**
+     * Update submission
+     */
+    public function update($id, $data)
+    {
+        $result = $this->submission->update($id, $data);
+        if (!$result) {
+            return ['success' => false, 'error' => 'Update failed'];
+        }
+        return ['success' => true];
+    }
+
+    /**
+     * Delete submission
+     */
+    public function delete($id)
+    {
+        $result = $this->submission->delete($id);
+        if (!$result) {
+            return ['success' => false, 'error' => 'Delete failed'];
+        }
+        return ['success' => true];
+    }
+}
+?>
