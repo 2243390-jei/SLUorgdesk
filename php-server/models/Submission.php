@@ -138,6 +138,120 @@ class Submission
     }
 
     /**
+     * Get submissions by flexible filters:
+     * $filters = [
+     *   'organizationId' => string,
+     *   'status' => string,
+     *   'search' => string,
+     *   'month' => int (1-12),
+     *   'year' => int (YYYY),
+     *   'date' => 'YYYY-MM-DD'
+     * ]
+     */
+    public function getFiltered($filters = [], $limit = 500, $offset = 0)
+    {
+        $mongoFilter = [];
+        $andClauses = [];
+        $orClauses = [];
+
+        // organizationId: try ObjectId conversion and fallback to string
+        if (!empty($filters['organizationId'])) {
+            $orgId = $filters['organizationId'];
+            $objectId = null;
+            if (is_string($orgId) && preg_match('/^[a-f0-9]{24}$/i', $orgId)) {
+                try {
+                    $objectId = new MongoDB\BSON\ObjectId($orgId);
+                } catch (Exception $e) {
+                    $objectId = null;
+                }
+            }
+
+            $orClauses[] = ['orgInfo.orgId' => $objectId ?? $orgId];
+            $orClauses[] = ['orgInfo.orgId' => $orgId];
+        }
+
+        // status exact match
+        if (!empty($filters['status'])) {
+            $andClauses[] = ['status' => $filters['status']];
+        }
+
+        // search across few text fields using case-insensitive regex
+        if (!empty($filters['search'])) {
+            $s = trim($filters['search']);
+            $regex = new MongoDB\BSON\Regex(preg_quote($s), 'i');
+            $searchOr = [
+                ['orgInfo.name' => $regex],
+                ['orgInfo.acronym' => $regex],
+                ['event.eventName' => $regex],
+                ['event.eventSDG' => $regex],
+            ];
+            $andClauses[] = ['$or' => $searchOr];
+        }
+
+        // month/year filtering on event.eventDate (expecting 'YYYY-MM-DD' or parseable date string)
+        if (!empty($filters['month']) && !empty($filters['year'])) {
+            $m = (int)$filters['month'];
+            $y = (int)$filters['year'];
+            $mm = str_pad($m, 2, '0', STR_PAD_LEFT);
+            $dateRegex = new MongoDB\BSON\Regex("^{$y}-{$mm}", 'i');
+            $andClauses[] = ['event.eventDate' => $dateRegex];
+        }
+
+        // exact day filtering: try string match, regex start, or UTCDateTime range
+        if (!empty($filters['date'])) {
+            $d = $filters['date']; // expect YYYY-MM-DD
+            $dateOr = [];
+
+            // direct string match
+            $dateOr[] = ['event.eventDate' => $d];
+
+            // regex start match (in case stored with time)
+            $dateOr[] = ['event.eventDate' => new MongoDB\BSON\Regex("^" . preg_quote($d), 'i')];
+
+            // also support UTCDateTime stored dates - construct start/end range
+            try {
+                $startTs = strtotime($d . ' 00:00:00');
+                $endTs = strtotime($d . ' 23:59:59');
+                if ($startTs !== false && $endTs !== false) {
+                    $startUTC = new MongoDB\BSON\UTCDateTime($startTs * 1000);
+                    $endUTC = new MongoDB\BSON\UTCDateTime($endTs * 1000);
+                    $dateOr[] = ['event.eventDate' => ['$gte' => $startUTC, '$lte' => $endUTC]];
+                }
+            } catch (Exception $e) {
+                // ignore UTCDateTime construction errors
+            }
+
+            $andClauses[] = ['$or' => $dateOr];
+        }
+
+        // Merge or-clauses into filter if present
+        if (!empty($orClauses)) {
+            $andClauses[] = ['$or' => $orClauses];
+        }
+
+        // Build final mongoFilter
+        if (!empty($andClauses)) {
+            if (count($andClauses) === 1) {
+                $mongoFilter = $andClauses[0];
+            } else {
+                $mongoFilter = ['$and' => $andClauses];
+            }
+        } else {
+            $mongoFilter = []; // match all
+        }
+
+        // options
+        $options = [
+            'skip' => $offset,
+            'limit' => $limit,
+            'sort' => ['submittedAt' => -1]
+        ];
+
+        $cursor = Database::query($this->collection, $mongoFilter, $options);
+        return $this->cursorToArray($cursor);
+    }
+
+    /**
      * Convert BSON cursor to array
      */
     private function cursorToArray($cursor)
