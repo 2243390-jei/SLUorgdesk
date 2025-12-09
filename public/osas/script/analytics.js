@@ -593,12 +593,14 @@ class AnalyticsDashboard {
         this.submissions = [];
         this.organizations = [];
         this.processedData = null;
+        this.debounceTimer = null;
         this.init();
     }
 
     async init() {
         try {
-            await this.loadData();
+            // initial load with no filters
+            await this.loadData({});
             this.renderStats();
             this.renderCharts();
             this.renderOrganizations();
@@ -609,37 +611,35 @@ class AnalyticsDashboard {
         }
     }
 
-    async loadData() {
+    // Accept an optional filters object that is forwarded to the backend
+    async loadData(filters = {}) {
         try {
-            // Load both submissions and organizations in parallel
-            const [submissionsResponse, organizationsResponse] = await Promise.all([
-                fetch(`../../php-server/routes/submissions.php`),
-                fetch(`../../php-server/routes/organizations.php`)
+            // Use backend endpoints with optional filters (no frontend filtering)
+            const [submissions, organizations] = await Promise.all([
+                fetchSubmissions({ limit: 1000, ...filters }), // pass filters to backend
+                fetchOrganization({ limit: 1000 })
             ]);
 
-            if (!submissionsResponse.ok) {
-                throw new Error(`HTTP error! status: ${submissionsResponse.status}`);
-            }
-            if (!organizationsResponse.ok) {
-                throw new Error(`HTTP error! status: ${organizationsResponse.status}`);
-            }
+            this.submissions = submissions || [];
+            this.organizations = organizations || [];
 
-            const submissionsResult = await submissionsResponse.json();
-            const organizationsResult = await organizationsResponse.json();
-
-            this.submissions = submissionsResult.success ? submissionsResult.data : [];
-            this.organizations = organizationsResult.success ? organizationsResult.data : [];
-            
-            console.log('Loaded submissions:', this.submissions);
-            console.log('Loaded organizations:', this.organizations);
-            
-            // Process data by combining both datasets
+            // Process data
             this.processedData = AnalyticsDataProcessor.processSubmissionsData(this.submissions, this.organizations);
-            
-            console.log('Processed data:', this.processedData);
         } catch (error) {
             console.error('Error loading data:', error);
             throw error;
+        }
+    }
+
+    // Reload data with filters and re-render UI
+    async reloadWithFilters(filters = {}) {
+        try {
+            await this.loadData(filters);
+            this.renderStats();
+            this.renderCharts();
+            this.renderOrganizations();
+        } catch (err) {
+            console.error('Failed to reload with filters:', err);
         }
     }
 
@@ -736,38 +736,143 @@ class AnalyticsDashboard {
         });
     }
 
+    // Wire UI controls to call backend with filters and re-render
     setupEventListeners() {
+        // Existing search input and clear button (if present)
         const searchInput = document.getElementById('searchInput');
-        const searchClear = document.getElementById('searchClear');
+        const searchClearBtn = document.getElementById('searchClear');
 
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const orgItems = document.querySelectorAll('.org-item');
-            
-            orgItems.forEach(item => {
-                const orgName = item.querySelector('.org-name').textContent.toLowerCase();
-                item.style.display = orgName.includes(searchTerm) ? 'flex' : 'none';
+        // Optional controls (add these inputs in the HTML if not present):
+        // - <input id="dateFilter" type="date">  (YYYY-MM-DD)
+        // - <select id="orgFilter">...</select>
+        // - <select id="statusFilter">...</select>
+        const dateInput = document.getElementById('dateFilter');
+        const orgSelect = document.getElementById('orgFilter');
+        const statusSelect = document.getElementById('statusFilter');
+
+        // Helper to build filter object from UI controls
+        const buildFilters = () => {
+            const f = {};
+            if (searchInput && searchInput.value.trim()) f.search = searchInput.value.trim();
+            if (dateInput && dateInput.value) f.date = dateInput.value; // YYYY-MM-DD
+            if (orgSelect && orgSelect.value && orgSelect.value !== 'all') f.organizationId = orgSelect.value;
+            if (statusSelect && statusSelect.value && statusSelect.value !== 'all') f.status = statusSelect.value;
+            return f;
+        };
+
+        // Debounced search handler
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = setTimeout(() => {
+                    const filters = buildFilters();
+                    this.reloadWithFilters(filters);
+                }, 350);
             });
-        });
+        }
 
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            document.querySelectorAll('.org-item').forEach(item => {
-                item.style.display = 'flex';
+        if (searchClearBtn) {
+            searchClearBtn.addEventListener('click', () => {
+                if (searchInput) searchInput.value = '';
+                const filters = buildFilters();
+                this.reloadWithFilters(filters);
             });
-        });
+        }
 
-        // Handle window resize
+        if (dateInput) {
+            dateInput.addEventListener('change', () => {
+                const filters = buildFilters();
+                this.reloadWithFilters(filters);
+            });
+        }
+
+        if (orgSelect) {
+            orgSelect.addEventListener('change', () => {
+                const filters = buildFilters();
+                this.reloadWithFilters(filters);
+            });
+        }
+
+        if (statusSelect) {
+            statusSelect.addEventListener('change', () => {
+                const filters = buildFilters();
+                this.reloadWithFilters(filters);
+            });
+        }
+
+        // Window resize message (existing)
         window.addEventListener('resize', () => {
             setTimeout(() => {
                 console.log('Please refresh the page for optimal chart sizing');
             }, 100);
         });
+
+        // Populate org select dropdown if present
+        if (orgSelect) {
+            // Normalize organization _id to string when populating
+            orgSelect.innerHTML = '<option value="all">All organizations</option>';
+            this.organizations.forEach(org => {
+                let id = org._id;
+                if (id && typeof id === 'object' && id.$oid) id = id.$oid;
+                const name = org.acronym || org.name || id;
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = name;
+                orgSelect.appendChild(opt);
+            });
+        }
     }
 
     showError(message) {
         console.error('Dashboard Error:', message);
         alert(`Analytics Dashboard Error: ${message}`);
+    }
+}
+
+// ---------------- Backend fetch helpers (moved filtering to PHP) ----------------
+async function fetchOrganization(opts = {}) {
+    try {
+        const params = new URLSearchParams();
+        if (opts.id) params.append('id', opts.id);
+        if (opts.search) params.append('search', opts.search);
+        if (opts.school) params.append('school', opts.school);
+        if (opts.acronym) params.append('acronym', opts.acronym);
+        if (opts.limit) params.append('limit', opts.limit);
+        if (opts.offset) params.append('offset', opts.offset);
+
+        const url = `../../php-server/routes/organizations.php` + (Array.from(params).length ? `?${params.toString()}` : '');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const json = await res.json();
+        return json.success ? json.data : [];
+    } catch (err) {
+        console.error('Error fetching organizations from backend:', err);
+        return [];
+    }
+}
+
+async function fetchSubmissions(opts = {}) {
+    try {
+        const params = new URLSearchParams();
+        if (opts.organizationId) params.append('organizationId', opts.organizationId);
+        if (opts.status) params.append('status', opts.status);
+        if (opts.search) params.append('search', opts.search);
+        if (opts.month) params.append('month', opts.month); // 1-12
+        if (opts.year) params.append('year', opts.year);
+        if (opts.date) params.append('date', opts.date); // exact day YYYY-MM-DD
+        if (opts.limit) params.append('limit', opts.limit);
+        if (opts.offset) params.append('offset', opts.offset);
+        if (opts.myorg) params.append('myorg', opts.myorg ? '1' : '0');
+
+        const url = `../../php-server/routes/submissions.php` + (Array.from(params).length ? `?${params.toString()}` : '');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const json = await res.json();
+        // Controller returns data already formatted; keep consistent with existing code
+        return json.success ? json.data : [];
+    } catch (err) {
+        console.error('Error fetching submissions from backend:', err);
+        return [];
     }
 }
 
