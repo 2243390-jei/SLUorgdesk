@@ -68,8 +68,8 @@ async function setupManualLogin() {
       switch (role) {
         case "osas": window.location.href = "osas/calendar.html"; break;
         case "admin": window.location.href = "admin/dashboard.html"; break;
-        case "organization": window.location.href = "organization/submission.html"; break;
-        default: window.location.href = "organization/submission.html"; break;
+        case "organization": window.location.href = "organization/submission.php"; break;
+        default: window.location.href = "organization/submission.php"; break;
       }
     } catch (err) {
       return alert("Unable to connect to server. Try again later.");
@@ -189,9 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modal.addEventListener('click', (e) => e.stopPropagation());
 
-    logoutBtn.addEventListener('click', () => {
-      // Session will be cleared by server logout
+      logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('../../php-server/routes/logout.php', { method: 'POST' });
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+      
+      // Clear client-side storage
+      localStorage.clear();
       sessionStorage.clear();
+      
+      // Redirect to login
       window.location.href = '../index.html';
     });
   }

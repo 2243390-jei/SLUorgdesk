@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +27,7 @@
         <nav>
             <ul>
                 <li><a href="submission.html">Submission</a></li>
-                <li><a href="history.html" class="active">History</a></li>
+                <li><a href="history.php" class="active">History</a></li>
             </ul>
         </nav>
         <!-- PROFILE ICON + MODAL -->
