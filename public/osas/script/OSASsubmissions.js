@@ -316,8 +316,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function attachEventListeners() {
-    document.querySelectorAll(".view-details-btn").forEach((btn) => {
+    document.querySelectorAll(".view-details-btn").forEach((btn, index) => {
       btn.addEventListener("click", (e) => {
+        // Find which submission this button belongs to
+        const row = e.target.closest("tr") || e.target.closest(".submission-card");
+        let submissionIndex = -1;
+        
+        // For table rows
+        if (e.target.closest("tr")) {
+          const tbody = document.querySelector("tbody");
+          submissionIndex = Array.from(tbody.querySelectorAll("tr")).indexOf(row);
+        }
+        // For mobile cards
+        else if (e.target.closest(".submission-card")) {
+          const container = document.querySelector(".submissions-mobile");
+          submissionIndex = Array.from(container.querySelectorAll(".submission-card")).indexOf(row);
+        }
+        
+        // Store the submission _id so submissionFullDetails.js fetches the correct submission
+        if (submissionIndex >= 0 && submissions[submissionIndex]) {
+          const submissionId = submissions[submissionIndex]._id;
+          localStorage.setItem("selectedSubmissionId", submissionId);
+        }
+        
         const eventData = JSON.parse(e.target.getAttribute("data-event"));
         localStorage.setItem("selectedEvent", JSON.stringify(eventData));
         window.location.href = "../osas/submissionFullDetails.php";
