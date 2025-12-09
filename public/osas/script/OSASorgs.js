@@ -43,7 +43,7 @@ function renderTable(orgs) {
   orgs.forEach(org => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td><img src="${org.logoUrl}" alt="${org.acronym} logo" class="org-logo"></td>
+      <td><img src="${org.localLogoPath}" alt="${org.acronym} logo" class="org-logo"></td>
       <td>${org.acronym}</td>
       <td>${org.school}</td>
       <td><button class="view-btn">View Submissions</button></td>
