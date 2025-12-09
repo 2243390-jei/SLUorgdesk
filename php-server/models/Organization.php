@@ -21,7 +21,7 @@ class Organization
                 'name' => 1,
                 'acronym' => 1,
                 'school' => 1,
-                'logoUrl' => 1,
+                'localLogoPath' => 1, 
                 'email' => 1,
                 'isWhitelisted' => 1,
                 'createdAt' => 1
@@ -45,7 +45,7 @@ class Organization
                     'name' => 1,
                     'acronym' => 1,
                     'school' => 1,
-                    'logoUrl' => 1,
+                     'localLogoPath' => 1,  
                     'email' => 1,
                     'isWhitelisted' => 1,
                     'members' => 1,
@@ -70,7 +70,7 @@ class Organization
             'name' => $data['name'] ?? null,
             'acronym' => $data['acronym'] ?? null,
             'school' => $data['school'] ?? null,
-            'logoUrl' => $data['logoUrl'] ?? null,
+            'localLogoPath' => $data['localLogoPath'] ?? null,  
             'email' => $data['email'] ?? null,
             'isWhitelisted' => $data['isWhitelisted'] ?? false,
             'createdAt' => new MongoDB\BSON\UTCDateTime(time() * 1000)
