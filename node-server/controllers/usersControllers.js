@@ -35,3 +35,5 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete users', details: err.message })
     }
 }
+
+module.exports = { getAllUsers, createUser, updateUser, deleteUser }
