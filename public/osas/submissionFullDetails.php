@@ -12,7 +12,7 @@ if (empty($_SESSION['logged_in'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/submissionFullDetails.css">
   <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
-  <script src="../script/submissionFullDetails.js" defer></script>
+  <script src="script/submissionFullDetails.js" defer></script>
   <title>Full Details</title>
 </head>
 

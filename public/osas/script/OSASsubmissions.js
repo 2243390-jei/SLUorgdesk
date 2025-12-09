@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- Fetch submissions ---
   try {
-    const response = await fetch(`../php-server/routes/submissions.php?organizationId=${orgId}`);
+    const response = await fetch(`../../php-server/routes/submissions.php?organizationId=${orgId}`);
     const result = await response.json();
     submissions = result.success ? result.data : [];
     

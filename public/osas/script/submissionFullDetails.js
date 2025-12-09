@@ -46,7 +46,7 @@ async function loadSubmissionDetails() {
   }
 
   try {
-    const res = await fetch(`../php-server/routes/submissions.php?event_id=${eventId}`);
+    const res = await fetch(`../../php-server/routes/submissions.php?event_id=${eventId}`);
     const result = await res.json();
 
     console.log("📦 Received data from PHP:", result);

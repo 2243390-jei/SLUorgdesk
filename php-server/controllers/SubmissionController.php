@@ -109,5 +109,48 @@ class SubmissionController
         }
         return ['success' => true];
     }
+
+    /**
+     * Get submissions by flexible filtering (search, status, month/year, organizationId, myorg, date)
+     * Accepts an array of query params ($_GET)
+     */
+    public function getFiltered($queryParams = [])
+    {
+        $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 500; // larger default for calendar
+        $offset = isset($queryParams['offset']) ? (int)$queryParams['offset'] : 0;
+
+        $filters = [];
+        if (!empty($queryParams['organizationId'])) {
+            $filters['organizationId'] = $queryParams['organizationId'];
+        }
+
+        if (!empty($queryParams['status'])) {
+            $filters['status'] = $queryParams['status'];
+        }
+
+        if (!empty($queryParams['search'])) {
+            $filters['search'] = $queryParams['search'];
+        }
+
+        if (!empty($queryParams['month']) && !empty($queryParams['year'])) {
+            $filters['month'] = (int)$queryParams['month'];
+            $filters['year'] = (int)$queryParams['year'];
+        }
+
+        // exact day filter (YYYY-MM-DD)
+        if (!empty($queryParams['date'])) {
+            $filters['date'] = $queryParams['date'];
+        }
+
+        // myorg: when '1', use session organizationId if available
+        if (!empty($queryParams['myorg']) && $queryParams['myorg'] === '1') {
+            if (!empty($_SESSION['user']['organizationId'])) {
+                $filters['organizationId'] = $_SESSION['user']['organizationId'];
+            }
+        }
+
+        $data = $this->submission->getFiltered($filters, $limit, $offset);
+        return ['success' => true, 'data' => $data];
+    }
 }
 ?>

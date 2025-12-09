@@ -73,5 +73,32 @@ class OrganizationController
         }
         return ['success' => true];
     }
+
+    /**
+     * Get organizations by flexible filtering (search, school, acronym, id)
+     * Accepts an array of query params ($_GET)
+     */
+    public function getFiltered($queryParams = [])
+    {
+        $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 100;
+        $offset = isset($queryParams['offset']) ? (int)$queryParams['offset'] : 0;
+
+        $filters = [];
+        if (!empty($queryParams['id'])) {
+            $filters['id'] = $queryParams['id'];
+        }
+        if (!empty($queryParams['search'])) {
+            $filters['search'] = $queryParams['search'];
+        }
+        if (!empty($queryParams['school'])) {
+            $filters['school'] = $queryParams['school'];
+        }
+        if (!empty($queryParams['acronym'])) {
+            $filters['acronym'] = $queryParams['acronym'];
+        }
+
+        $data = $this->org->getFiltered($filters, $limit, $offset);
+        return ['success' => true, 'data' => $data];
+    }
 }
 ?>
