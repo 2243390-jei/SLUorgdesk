@@ -77,14 +77,31 @@ class SubmissionController
      * Create submission
      */
     public function create($data)
-    {
-        if (empty($data['applicationInfo']) || empty($data['event'])) {
-            return ['success' => false, 'error' => 'Missing required fields'];
-        }
+{
+    // List of required fields
+    $requiredFields = ['applicationInfo', 'event'];
+    $missingFields = [];
 
-        $id = $this->submission->create($data);
-        return ['success' => true, 'id' => (string)$id];
+    // Check which fields are missing or empty
+    foreach ($requiredFields as $field) {
+        if (empty($data[$field])) {
+            $missingFields[] = $field;
+        }
     }
+
+    // If any required fields are missing, return them
+    if (!empty($missingFields)) {
+        return [
+            'success' => false,
+            'error' => 'Missing required fields: ' . implode(', ', $missingFields)
+        ];
+    }
+
+    // All required fields are present, proceed with creation
+    $id = $this->submission->create($data);
+    return ['success' => true, 'id' => (string)$id];
+}
+
 
     /**
      * Update submission

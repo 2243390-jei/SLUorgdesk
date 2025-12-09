@@ -260,9 +260,9 @@ function fillModal(sub) {
                 ${(event.supportingDocuments || []).length
                   ? event.supportingDocuments.map(doc => `
                       <a href="${doc}" class="doc-link" target="_blank" onerror="this.classList.add('broken-link')">
-                        <img src="../../images/student_img/history/file_empty.png" alt="Document Icon" width="20" height="20" class="icon">
+                        <img src="../images/student_img/history/file_empty.png" alt="Document Icon" width="20" height="20" class="icon">
                         <span class="doc-name">${doc.split('/').pop()}</span>
-                        <img src="../../images/student_img/history/upload.png" alt="Document Icon" width="16" height="16" class="icon">
+                        <img src="../images/student_img/history/upload.png" alt="Document Icon" width="16" height="16" class="icon">
                       </a>
                     `).join("")
                   : '<span class="no-docs">No supporting documents</span>'}
@@ -272,11 +272,11 @@ function fillModal(sub) {
 
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" id="modalCancel">
-              <img src="../../images/student_img/history/close_modal.png" alt="Close Icon" width="16" height="16" class="icon">
+              <img src="../images/student_img/history/close_modal.png" alt="Close Icon" width="16" height="16" class="icon">
               Close
             </button>
             <button type="submit" class="btn btn-primary">
-              <img src="../../images/student_img/history/save.png" alt="Close Icon" width="16" height="16" class="icon">
+              <img src="../images/student_img/history/save.png" alt="Close Icon" width="16" height="16" class="icon">
               Save Changes
             </button>
           </div>

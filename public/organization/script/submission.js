@@ -167,37 +167,55 @@ document.addEventListener("DOMContentLoaded", function () {
     const eventData = { name, type, date, start, end, venue, attendees, proof, sdgs, desc };
 
     let hiddenContainer = editingIndex !== null
-      ? document.querySelectorAll(".event-hidden-container")[editingIndex]
+      ? document.querySelectorAll(".hidden-event-container")[editingIndex]
       : document.createElement("div");
 
-    hiddenContainer.className = "event-hidden-container";
+    hiddenContainer.className = "hidden-event-container";
     hiddenContainer.style.display = "none";
     hiddenContainer.innerHTML = "";
 
-    const addHidden = (n, v) => {
+    const addHidden = (className, value) => {
       const inp = document.createElement("input");
       inp.type = "hidden";
-      inp.name = n;
-      inp.value = v;
+      inp.className = className;
+      inp.value = value;
       hiddenContainer.appendChild(inp);
     };
 
-    addHidden("events[][name]", name);
-    addHidden("events[][type]", type);
-    addHidden("events[][date]", date);
-    addHidden("events[][start]", start);
-    addHidden("events[][end]", end);
-    addHidden("events[][venue]", venue);
-    addHidden("events[][attendees]", attendees);
-    addHidden("events[][proof]", proof);
-    addHidden("events[][desc]", desc);
-    sdgs.forEach(s => addHidden("events[][sdgs][]", s));
+    addHidden("event-name", name);
+    addHidden("event-type", type);
+    addHidden("event-date", date);
+    addHidden("start-time", start);
+    addHidden("end-time", end);
+    addHidden("event-venue", venue);
+    addHidden("event-attendees", attendees);
+    addHidden("event-proof", proof);
+    addHidden("event-desc", desc);
+    
+    // Store SDG checkboxes as hidden values
+    const sdgContainer = document.createElement("div");
+    sdgContainer.className = "event-sdg-hidden";
+    sdgContainer.style.display = "none";
+    sdgs.forEach(s => {
+      const cbInput = document.createElement("input");
+      cbInput.type = "hidden";
+      cbInput.value = s;
+      cbInput.className = "event-sdg-value";
+      sdgContainer.appendChild(cbInput);
+    });
+    hiddenContainer.appendChild(sdgContainer);
 
     const modalFileInput = document.getElementById("modalFileInput");
     if (modalFileInput.files.length) {
       const clone = modalFileInput.cloneNode(true);
-      clone.name = "events[][files][]";
-      hiddenContainer.appendChild(clone);
+      clone.className = "event-file-hidden";
+      Array.from(clone.files).forEach(file => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "hidden";
+        fileInput.className = "event-file-hidden";
+        fileInput.value = `/uploads/${file.name}`;
+        hiddenContainer.appendChild(fileInput);
+      });
     }
 
     if (editingIndex === null) {
@@ -340,5 +358,145 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Trigger on page load (in case pre-filled)
     updateEndYear();
+  }
+
+  /* -----------------------------------------------------------------
+   *  8. FORM SUBMISSION HANDLER
+   * ----------------------------------------------------------------- */
+  const submissionForm = document.getElementById("submissionForm");
+  if (submissionForm) {
+    submissionForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Get session user to determine organization
+      let sessionUser = null;
+      try {
+        const res = await fetch("../../php-server/routes/users.php?session=me");
+        const data = await res.json();
+        if (data.success) sessionUser = data.data;
+      } catch (err) {
+        console.error("Failed to fetch session user:", err);
+      }
+
+      if (!sessionUser || !sessionUser.organizationId) {
+        alert("Error: Could not determine your organization. Please log in again.");
+        return;
+      }
+
+      // Collect form data
+      const startYear = parseInt(document.getElementById("startYear").value) || new Date().getFullYear();
+      const endYear = startYear + 1;
+      const academicYear = `${startYear}-${endYear}`;
+
+      const submissionData = {
+        applicationInfo: {
+          applicantName: document.querySelector('input[name="applicant_name"]').value || "",
+          email: document.querySelector('input[name="applicant_email"]').value || sessionUser.email || "",
+          position: document.querySelector('input[name="applicant_position"]').value || ""
+        },
+        orgInfo: {
+          orgId: sessionUser.organizationId,
+          name: document.querySelector('input[name="org_name"]').value || "",
+          acronym: document.querySelector('input[name="org_acronym"]').value || "",
+          email: document.querySelector('input[name="org_email"]').value || ""
+        },
+        academicYear: academicYear,
+        semester: document.getElementById("semester").value || "",
+        events: [],
+        additionalNote: document.querySelector('textarea[name="add_note"]').value || "",
+        confirmAccuracy: document.querySelector('input[name="confirm"]').checked || false
+      };
+
+      // Collect all event data (hidden inputs stored in form)
+      const hiddenContainers = submissionForm.querySelectorAll(".hidden-event-container");
+      hiddenContainers.forEach(container => {
+        const sdgValues = Array.from(container.querySelectorAll('.event-sdg-value')).map(inp => inp.value);
+        const eventData = {
+          eventName: container.querySelector('.event-name')?.value || "",
+          eventType: container.querySelector('.event-type')?.value || "",
+          eventDate: container.querySelector('.event-date')?.value || "",
+          startTime: container.querySelector('.start-time')?.value || "",
+          endTime: container.querySelector('.end-time')?.value || "",
+          eventVenue: container.querySelector('.event-venue')?.value || "",
+          eventDescription: container.querySelector('.event-desc')?.value || "",
+          attendance: parseInt(container.querySelector('.event-attendees')?.value || 0),
+          eventProof: container.querySelector('.event-proof')?.value || "",
+          eventSDG: sdgValues,
+          supportingDocuments: Array.from(container.querySelectorAll('.event-file-hidden')).map(f => f.value)
+        };
+        submissionData.events.push(eventData);
+      });
+
+      // If no events, use inline form
+      if (submissionData.events.length === 0) {
+        const inlineContainer = document.getElementById("inlineEventForm");
+        const eventData = {
+          eventName: inlineContainer.querySelector('#eventName')?.value || "",
+          eventType: inlineContainer.querySelector('#eventType')?.value || "",
+          eventDate: inlineContainer.querySelector('#eventDate')?.value || "",
+          startTime: inlineContainer.querySelector('#startTime')?.value + " " + inlineContainer.querySelector('#startPeriod')?.value || "",
+          endTime: inlineContainer.querySelector('#endTime')?.value + " " + inlineContainer.querySelector('#endPeriod')?.value || "",
+          eventVenue: inlineContainer.querySelector('#eventVenue')?.value || "",
+          eventDescription: inlineContainer.querySelector('#eventDesc')?.value || "",
+          attendance: parseInt(inlineContainer.querySelector('#eventAttendees')?.value || 0),
+          eventProof: inlineContainer.querySelector('#eventProof')?.value || "",
+          eventSDG: Array.from(inlineContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
+          supportingDocuments: []
+        };
+        
+        // Collect inline file paths if any
+        const inlineFileInput = inlineContainer.querySelector('.drop-zone-input');
+        if (inlineFileInput && inlineFileInput.files.length > 0) {
+          Array.from(inlineFileInput.files).forEach(file => {
+            eventData.supportingDocuments.push(`/uploads/${file.name}`);
+          });
+        }
+
+        if (eventData.eventName || eventData.eventDate) {
+          submissionData.events.push(eventData);
+        }
+      }
+
+      // Validate required fields
+      if (!submissionData.semester) {
+        alert("Please select a semester.");
+        return;
+      }
+
+      if (submissionData.events.length === 0) {
+        alert("Please add at least one event.");
+        return;
+      }
+
+      if (!submissionData.confirmAccuracy) {
+        alert("Please confirm that the information is accurate.");
+        return;
+      }
+
+      // Send to server
+      try {
+        const response = await fetch("../../php-server/routes/submissions.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submissionData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Submission successful! Your form has been submitted.");
+          submissionForm.reset();
+          // Redirect to history or refresh
+          setTimeout(() => {
+            window.location.href = "history.php";
+          }, 1000);
+        } else {
+          alert("Submission failed: " + (result.error || "Unknown error"));
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        alert("Failed to submit form. Please try again later.");
+      }
+    });
   }
 });

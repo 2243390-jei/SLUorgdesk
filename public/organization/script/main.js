@@ -1,9 +1,7 @@
-const USERS_API = "php-server/routes/users.php"
-
 // Fetch session user from server (secure server-side validation)
 async function getSessionUser() {
   try {
-    const response = await fetchWithTimeout(USERS_API + "?session=me");
+    const response = await fetchWithTimeout("../../php-server/routes/users.php" + "?session=me");
     const data = await response.json();
     return data.success ? data.data : null;
   } catch (err) {
@@ -44,7 +42,7 @@ async function setupManualLogin() {
     }
 
     try {
-      const resp = await fetchWithTimeout(USERS_API, {
+      const resp = await fetchWithTimeout("php-server/routes/users.php", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -55,9 +53,9 @@ async function setupManualLogin() {
       });
 
       if (!resp.ok) throw new Error(`Server error (${resp.status})`);
-      
+
       const result = await resp.json();
-      
+
       if (!result.success) {
         return alert(result.error || "Authentication failed.");
       }
@@ -137,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // If organization role, fetch logo from database
   if ((user.role || "").toLowerCase() === "organization") {
     try {
-      const resp = await fetch("../php-server/routes/organizations.php");
+      const resp = await fetch("../../php-server/routes/organizations.php");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const result = await resp.json();
       const orgs = result.success ? result.data : [];
@@ -148,9 +146,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           org._id === user.organizationId
       );
 
-      if (orgMatch && orgMatch.logoUrl) {
-        console.log("test");
-        navbarProfilePic.src = orgMatch.logoUrl;
+      if (orgMatch && (orgMatch.logoUrl || orgMatch.localLogoPath)) {
+        const logo = orgMatch.logoUrl || orgMatch.localLogoPath;
+        console.log("Organization matched:", orgMatch, "Using logo:", logo);
+        navbarProfilePic.src = logo;
         navbarProfilePic.style.borderRadius = "0"; // keep square logos
         navbarProfilePic.style.objectFit = "cover";
         return;
@@ -161,16 +160,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   console.log("No profile picture found, using default.");
-  navbarProfilePic.src = "../images/student_img/profile.png";
+  navbarProfilePic.src = "../../images/student_img/profile.png";
   navbarProfilePic.style.borderRadius = "50%";
 });
 
 
 document.addEventListener("DOMContentLoaded", () => {
   const profilePic = document.getElementById('nav-profile-pic');
-  const modal      = document.getElementById('profileModal');
-  const logoutBtn  = document.getElementById('logoutBtn');
-  const cancelBtn  = document.getElementById('cancelBtn');
+  const modal = document.getElementById('profileModal');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
 
   if (window.innerWidth > 767 && profilePic && modal && logoutBtn && cancelBtn) {
     profilePic.addEventListener('click', (e) => {
@@ -189,17 +188,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modal.addEventListener('click', (e) => e.stopPropagation());
 
-      logoutBtn.addEventListener('click', async () => {
+    logoutBtn.addEventListener('click', async () => {
       try {
         await fetch('../../php-server/routes/logout.php', { method: 'POST' });
       } catch (err) {
         console.error('Logout error:', err);
       }
-      
+
       // Clear client-side storage
       localStorage.clear();
       sessionStorage.clear();
-      
+
       // Redirect to login
       window.location.href = '../../index.php';
     });
