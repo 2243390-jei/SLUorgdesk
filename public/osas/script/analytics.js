@@ -815,7 +815,7 @@ function showProfileModal() {
     
     // Add logout event listener
     document.getElementById('profileLogoutBtn').addEventListener('click', () => {
-        window.location.href = "../index.html";
+        window.location.href = "../../index.php";
     });
 }
 
@@ -826,7 +826,7 @@ function hideProfileModal() {
 
 // Logout function
 function performLogout() {
-    window.location.href = "../index.html";
+    window.location.href = "../../index.php";
 }
 
 // Event Listeners

@@ -701,8 +701,8 @@ function hideProfileModal() {
 
 // Logout function
 function performLogout() {
-  // Redirect to index.html instead of login.html
-  window.location.href = "../index.html";
+  // Redirect to ../index.php instead of login.html
+  window.location.href = "../../index.php";
 }
 
 // Update mobile profile modal content
@@ -729,7 +729,7 @@ function showProfileModal() {
   
   // Add direct logout event listener
   document.getElementById('profileLogoutBtn').addEventListener('click', () => {
-    window.location.href = "../index.html";
+    window.location.href = "../../index.php";
   });
 }
 
