@@ -66,10 +66,10 @@ async function setupManualLogin() {
       alert(`Login successful, welcome ${result.data.name || result.data.email}!`);
 
       switch (role) {
-        case "osas": window.location.href = "osas/calendar.html"; break;
-        case "admin": window.location.href = "admin/dashboard.html"; break;
-        case "organization": window.location.href = "organization/submission.html"; break;
-        default: window.location.href = "organization/submission.html"; break;
+        case "osas": window.location.href = "osas/calendar.php"; break;
+        case "admin": window.location.href = "admin/dashboard.php"; break;
+        case "organization": window.location.href = "organization/submission.php"; break;
+        default: window.location.href = "organization/submission.php"; break;
       }
     } catch (err) {
       return alert("Unable to connect to server. Try again later.");
@@ -104,11 +104,11 @@ function handleCredentialResponse(response) {
 
   if (email.includes("@slu.edu.ph")) {
     if (/^\d+@slu\.edu\.ph$/.test(email)) {
-      window.location.href = "organization/submission.html";
+      window.location.href = "organization/submission.php";
     } else if (email.startsWith("osas@")) {
-      window.location.href = "osas/dashboard.html";
+      window.location.href = "osas/dashboard.php";
     } else if (email.startsWith("admin@")) {
-      window.location.href = "admin/dashboard.html";
+      window.location.href = "admin/dashboard.php";
     } else {
       alert("Unrecognized SLU account type.");
     }
@@ -189,9 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modal.addEventListener('click', (e) => e.stopPropagation());
 
-    logoutBtn.addEventListener('click', () => {
-      // Session will be cleared by server logout
+      logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('../../php-server/routes/logout.php', { method: 'POST' });
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+      
+      // Clear client-side storage
+      localStorage.clear();
       sessionStorage.clear();
+      
+      // Redirect to login
       window.location.href = '../index.html';
     });
   }

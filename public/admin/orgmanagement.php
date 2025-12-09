@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -7,8 +14,8 @@
   <title>Admin Organization Management</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="styles/orgmanagement.css">
-  <script src="script/orgmanagement.js" defer></script>
+  <link rel="stylesheet" href="../style/orgmanagement.css">
+  <script src="../script/orgmanagement.js" defer></script>
 </head>
 
 <body>
@@ -19,13 +26,13 @@
       </div>
 
       <nav class="left-nav">
-        <a href="../admin/dashboard.html" class="circle-btn">
+        <a href="../admin/dashboard.php" class="circle-btn">
           <img src="../Images/statisctics.png" alt="" height="16" width="16">
         </a>
-        <a href="../admin/orgmanagement.html" class="circle-btn active">
+        <a href="../admin/orgmanagement.php" class="circle-btn active">
           <img src="../Images/osas/group.png" alt="" height="16" width="16">
         </a>
-        <a href="../admin/usermanagement.html" class="circle-btn">
+        <a href="../admin/usermanagement.php" class="circle-btn">
           <img src="../Images/osas/user.png" alt="" height="16" width="16">
         </a>
       </nav>

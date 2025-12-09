@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,8 +23,8 @@
     </div>
     <nav>
       <ul>
-        <li><a href="submission.html" class="active">Submission</a></li>
-        <li><a href="history.html">History</a></li>
+        <li><a href="submission.php" class="active">Submission</a></li>
+        <li><a href="history.php">History</a></li>
       </ul>
     </nav>
         <div id="profileContainer" class="profile-icon">
@@ -176,7 +183,7 @@
               <label><input type="checkbox" value="8"> 8. Decent Work & Economic Growth</label>
               <label><input type="checkbox" value="9"> 9. Industry, Innovation & Infrastructure</label>
               <label><input type="checkbox" value="10"> 10. Reduced Inequalities</label>
-              <label><input type="checkbox" value="11"> 11. Sustainable Cities & Communities</label>
+              <label><input type="checkbox" value="11"> 11. Sustainable Cities and Communities</label>
               <label><input type="checkbox" value="12"> 12. Responsible Consumption & Production</label>
               <label><input type="checkbox" value="13"> 13. Climate Action</label>
               <label><input type="checkbox" value="14"> 14. Life Below Water</label>
@@ -313,7 +320,7 @@
             <label><input type="checkbox" value="8"> 8. Decent Work & Economic Growth</label>
             <label><input type="checkbox" value="9"> 9. Industry, Innovation & Infrastructure</label>
             <label><input type="checkbox" value="10"> 10. Reduced Inequalities</label>
-            <label><input type="checkbox" value="11"> 11. Sustainable Cities & Communities</label>
+            <label><input type="checkbox" value="11"> 11. Sustainable Cities and Communities</label>
             <label><input type="checkbox" value="12"> 12. Responsible Consumption & Production</label>
             <label><input type="checkbox" value="13"> 13. Climate Action</label>
             <label><input type="checkbox" value="14"> 14. Life Below Water</label>

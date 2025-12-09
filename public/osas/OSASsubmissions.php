@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (empty($_SESSION['logged_in'])) {
+    header('Location: ../index.html');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,19 +23,19 @@
       </div>
 
       <nav class="left-nav" role="navigation" aria-label="Sidebar">
-        <a href="../osas/calendar.html">
+        <a href="../osas/calendar.php">
           <button class="circle-btn" title="Calendar" aria-label="Calendar">
             <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
           </button>
         </a>
 
-        <a href="../osas/orgs.html">
+        <a href="../osas/orgs.php">
           <button class="circle-btn active" title="Organizations" aria-label="Organizations">
             <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
           </button>
         </a>
         
-        <a href="../osas/analytics.html">
+        <a href="../osas/analytics.php">
           <button class="circle-btn" title="Analytics" aria-label="Analytics">
             <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
           </button>
