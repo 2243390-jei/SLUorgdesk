@@ -96,13 +96,28 @@ class Submission
      */
     public function create($data)
     {
+        // Handle the events array - store the first event or all events depending on structure
+        $events = $data['events'] ?? [];
+        
+        // If sending multiple events, store as array; if single, store as object
+        // For now, store all events details as provided
+        $eventData = [];
+        if (is_array($events) && !empty($events)) {
+            // If there's only one event, store it as a single object; otherwise as array
+            if (count($events) === 1) {
+                $eventData = $events[0];
+            } else {
+                $eventData = $events;
+            }
+        }
+
         $document = [
             'applicationInfo' => $data['applicationInfo'] ?? [],
             'orgInfo' => $data['orgInfo'] ?? [],
             'academicYear' => $data['academicYear'] ?? null,
             'semester' => $data['semester'] ?? null,
-            'event' => $data['event'] ?? [],
-            'documentUploads' => $data['documentUploads'] ?? [],
+            'event' => $eventData,  // Store event details properly
+            'revisionComment' => $data['revisionComment'] ?? $data['additionalNote'] ?? '',
             'status' => $data['status'] ?? 'pending',
             'submittedAt' => new MongoDB\BSON\UTCDateTime(time() * 1000)
         ];

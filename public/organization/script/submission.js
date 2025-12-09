@@ -403,7 +403,7 @@ document.addEventListener("DOMContentLoaded", function () {
         academicYear: academicYear,
         semester: document.getElementById("semester").value || "",
         events: [],
-        additionalNote: document.querySelector('textarea[name="add_note"]').value || "",
+        revisionComment: document.querySelector('textarea[name="add_note"]').value || "",
         confirmAccuracy: document.querySelector('input[name="confirm"]').checked || false
       };
 
@@ -412,6 +412,7 @@ document.addEventListener("DOMContentLoaded", function () {
       hiddenContainers.forEach(container => {
         const sdgValues = Array.from(container.querySelectorAll('.event-sdg-value')).map(inp => inp.value);
         const eventData = {
+          id: `E${Date.now()}`, // Generate unique event ID
           eventName: container.querySelector('.event-name')?.value || "",
           eventType: container.querySelector('.event-type')?.value || "",
           eventDate: container.querySelector('.event-date')?.value || "",
@@ -431,6 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (submissionData.events.length === 0) {
         const inlineContainer = document.getElementById("inlineEventForm");
         const eventData = {
+          id: `E${Date.now()}`, // Generate unique event ID
           eventName: inlineContainer.querySelector('#eventName')?.value || "",
           eventType: inlineContainer.querySelector('#eventType')?.value || "",
           eventDate: inlineContainer.querySelector('#eventDate')?.value || "",

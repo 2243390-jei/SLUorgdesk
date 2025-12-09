@@ -77,30 +77,38 @@ class SubmissionController
      * Create submission
      */
     public function create($data)
-{
-    // List of required fields
-    $requiredFields = ['applicationInfo', 'event'];
-    $missingFields = [];
+    {
+        // List of required fields
+        $requiredFields = ['applicationInfo', 'orgInfo', 'academicYear', 'semester', 'events'];
+        $missingFields = [];
 
-    // Check which fields are missing or empty
-    foreach ($requiredFields as $field) {
-        if (empty($data[$field])) {
-            $missingFields[] = $field;
+        // Check which fields are missing or empty
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                $missingFields[] = $field;
+            }
         }
-    }
 
-    // If any required fields are missing, return them
-    if (!empty($missingFields)) {
-        return [
-            'success' => false,
-            'error' => 'Missing required fields: ' . implode(', ', $missingFields)
-        ];
-    }
+        // If any required fields are missing, return them
+        if (!empty($missingFields)) {
+            return [
+                'success' => false,
+                'error' => 'Missing required fields: ' . implode(', ', $missingFields)
+            ];
+        }
 
-    // All required fields are present, proceed with creation
-    $id = $this->submission->create($data);
-    return ['success' => true, 'id' => (string)$id];
-}
+        // Validate that events is an array with at least one event
+        if (!is_array($data['events']) || count($data['events']) === 0) {
+            return [
+                'success' => false,
+                'error' => 'At least one event is required'
+            ];
+        }
+
+        // All required fields are present, proceed with creation
+        $id = $this->submission->create($data);
+        return ['success' => true, 'id' => (string)$id];
+    }
 
 
     /**
