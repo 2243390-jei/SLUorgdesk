@@ -1,4 +1,4 @@
-const USERS_API = "../../php-server/routes/users.php"
+const USERS_API = "../php-server/routes/users.php"
 
 // Fetch session user from server (secure server-side validation)
 async function getSessionUser() {
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // If organization role, fetch logo from database
   if ((user.role || "").toLowerCase() === "organization") {
     try {
-      const resp = await fetch("../../php-server/routes/organizations.php");
+      const resp = await fetch("../php-server/routes/organizations.php");
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const result = await resp.json();
       const orgs = result.success ? result.data : [];
