@@ -1,52 +1,25 @@
-// Load event details from localStorage (if redirected from OSASsubmissions)
-const storedEvent = localStorage.getItem("selectedEvent");
-if (storedEvent) {
-  const e = JSON.parse(storedEvent);
-
-  document.getElementById("eventName").textContent = e.eventName || "N/A";
-  document.getElementById("eventType").textContent = e.eventType || "N/A";
-  document.getElementById("eventDate").textContent = e.eventDate || "N/A";
-  document.getElementById("startTime").textContent = e.startTime || "N/A";
-  document.getElementById("endTime").textContent = e.endTime || "N/A";
-  document.getElementById("eventVenue").textContent = e.eventVenue || "N/A";
-  document.getElementById("attendance").textContent = e.attendance || "N/A";
-  document.getElementById("eventSDG").textContent = Array.isArray(e.eventSDG)
-    ? e.eventSDG.join(", ")
-    : e.eventSDG || "None";
-  document.getElementById("eventProof").href = e.eventProof || "#";
-
-  const docsList = document.getElementById("supportingDocumentsList");
-  if (Array.isArray(e.supportingDocuments) && e.supportingDocuments.length > 0) {
-    docsList.innerHTML = e.supportingDocuments
-      .map(doc => `<li><a href="${doc}" target="_blank">${doc.split('/').pop() || 'View Document'}</a></li>`)
-      .join("");
-  } else {
-    docsList.innerHTML = "<li>No additional documents</li>";
-  }
-
-  // Save the event_id temporarily to query PHP
-  if (e.id) localStorage.setItem("selectedEventId", e.id);
-
-  localStorage.removeItem("selectedEvent");
-}
+// Always fetch from backend using submission _id to ensure correct data
+// Clear stale localStorage entries from previous visits
+localStorage.removeItem("selectedEvent");
+localStorage.removeItem("selectedEventId");
 
 // Fetch submission details from PHP backend
 async function loadSubmissionDetails() {
   const params = new URLSearchParams(window.location.search);
-  let eventId = params.get("event_id");
+  let submissionId = params.get("id");
 
-  // Fallback: use stored event_id if URL param missing
-  if (!eventId) eventId = localStorage.getItem("selectedEventId");
+  // Fallback: use stored submission id from OSASsubmissions.js
+  if (!submissionId) submissionId = localStorage.getItem("selectedSubmissionId");
 
-  console.log("🔍 Event ID from URL or localStorage:", eventId);
+  console.log("🔍 Submission ID from URL or localStorage:", submissionId);
 
-  if (!eventId) {
+  if (!submissionId) {
     document.body.innerHTML = "<p style='padding: 20px; text-align: center;'>No submission selected.</p>";
     return;
   }
 
   try {
-    const res = await fetch(`../../php-server/routes/submissions.php?event_id=${eventId}`);
+    const res = await fetch(`../../php-server/routes/submissions.php?id=${encodeURIComponent(submissionId)}`);
     const result = await res.json();
 
     console.log("📦 Received data from PHP:", result);
@@ -62,6 +35,13 @@ async function loadSubmissionDetails() {
       document.body.innerHTML = "<p style='padding: 20px; text-align: center;'>No matching submission found.</p>";
       return;
     }
+
+      // Store current submission id globally for use when submitting revision comments
+      if (submission._id) {
+        window.currentSubmissionId = submission._id;
+        // also persist temporarily in localStorage as fallback
+        localStorage.setItem('currentSubmissionId', submission._id);
+      }
 
     const org = submission.orgInfo || {};
     const app = submission.applicationInfo || {};
@@ -206,19 +186,62 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Here you would typically send the comment to your backend
-    // For now, we'll just show a success message
-    console.log("Comment submitted:", comment);
-    
-    if (window.innerWidth <= 768) {
-      showMobileAlert("Comment submitted successfully!");
-    } else {
-      alert("Comment submitted successfully!\n\n" + comment);
+    // Determine submission id (from global or localStorage)
+    const submissionId = window.currentSubmissionId || localStorage.getItem('currentSubmissionId');
+    if (!submissionId) {
+      console.error('No submission id available for updating revisionComment');
+      if (window.innerWidth <= 768) showMobileAlert('Unable to submit comment: missing submission id.');
+      else alert('Unable to submit comment: missing submission id.');
+      return;
     }
-    
-    // Clear and close modal
-    commentBox.value = "";
-    closeModalFunc();
+
+    submitComment.disabled = true;
+    submitComment.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`../../php-server/routes/submissions.php?id=${encodeURIComponent(submissionId)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ revisionComment: comment })
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        console.error('Failed to save revision comment:', result);
+        const msg = result?.error || 'Failed to save comment';
+        if (window.innerWidth <= 768) showMobileAlert(msg);
+        else alert(msg);
+        return;
+      }
+
+      // Success — optionally update UI or persist
+      console.log('Revision comment saved');
+      if (window.innerWidth <= 768) showMobileAlert('Comment submitted successfully!');
+      else alert('Comment submitted successfully!');
+
+      // Clear and close modal
+      commentBox.value = '';
+      closeModalFunc();
+
+      // Optionally update local view: store revisionComment locally
+      try {
+        if (window.currentSubmissionId && window.currentSubmissionId === submissionId) {
+          // reflect change in page if needed
+          const existing = document.getElementById('revisionCommentDisplay');
+          if (existing) existing.textContent = comment;
+        }
+      } catch (e) {
+        // ignore UI update errors
+      }
+
+    } catch (error) {
+      console.error('Error submitting revision comment:', error);
+      if (window.innerWidth <= 768) showMobileAlert('Error submitting comment.');
+      else alert('Error submitting comment.');
+    } finally {
+      submitComment.disabled = false;
+      submitComment.textContent = 'Submit Comment';
+    }
   });
 
   // Handle Enter key in comment box (Ctrl+Enter to submit)
