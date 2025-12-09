@@ -16,12 +16,24 @@ try {
     $orgs = [];
     foreach ($cursor as $document) {
         $doc = (array)$document;
+        
+        // Get the localLogoPath if it exists, otherwise create a default path based on acronym
+        $localLogoPath = $doc['localLogoPath'] ?? '';
+        
+        // If localLogoPath doesn't exist in database, create a default one
+        if (empty($localLogoPath) && isset($doc['acronym'])) {
+            $acronym = $doc['acronym'];
+            // Create default path based on acronym
+            $localLogoPath = "../Images/orgs/" . $acronym . ".jpg";
+        }
+        
         $orgs[] = [
             "_id" => (string)$doc['_id'],
             "name" => $doc['name'] ?? "",
             "acronym" => $doc['acronym'] ?? "",
             "school" => $doc['school'] ?? "",
             "logoUrl" => $doc['logoUrl'] ?? "",
+            "localLogoPath" => $localLogoPath,  // ADDED THIS LINE
             "email" => $doc['email'] ?? "",
             "isWhitelisted" => $doc['isWhitelisted'] ?? false
         ];
