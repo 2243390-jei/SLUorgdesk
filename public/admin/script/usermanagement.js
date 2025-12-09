@@ -111,14 +111,8 @@ async function initialize() {
         userTableBody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
         userCardList.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">Error loading users</div>';
     }
-
-    // Initial render for mobile/desktop - force both to render
     renderUserCardsOrTable();
-    
-    // More frequent viewport checking
     window.addEventListener('resize', renderUserCardsOrTable);
-    
-    // Initial viewport state
     currentViewport = isMobile() ? 'mobile' : 'desktop';
 }
 
@@ -300,9 +294,6 @@ function openUserFormModal(role) {
     hideAllRoleSpecificFields();
     
     switch(role) {
-        case 'Organization':
-            document.getElementById('organizationFields').classList.add('show');
-            break;
         case 'OSAS':
             document.getElementById('osasFields').classList.add('show');
             break;
@@ -337,11 +328,6 @@ function openEditModal(userId) {
     hideAllRoleSpecificFields();
     
     switch(user.role) {
-        case 'Organization':
-            document.getElementById('organizationFields').classList.add('show');
-            document.getElementById('logoURL').value = user.logoURL || '';
-            document.getElementById('school').value = user.school || '';
-            break;
         case 'OSAS':
             document.getElementById('osasFields').classList.add('show');
             break;
