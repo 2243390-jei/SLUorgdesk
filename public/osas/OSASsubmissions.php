@@ -5,37 +5,6 @@ if (empty($_SESSION['logged_in'])) {
     exit;
 }
 ?>
-<!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OSAS Submissions</title>
-
-  <link rel="stylesheet" href="../style/OSASsubmissions.css">
-  <script src="../script/OSASsubmissions.js" defer></script>
-</head>
-
-<body>
-  <main class="main-area">
-    <header class="header">
-      <h1>Submissions</h1>
-      <p class="muted">View OSAS submissions</p>
-    </header>
-
-    <div id="submissionsList"></div>
-  </main>
-</body>
-
-</html>
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../index.html');
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,19 +23,19 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <nav class="left-nav" role="navigation" aria-label="Sidebar">
-        <a href="../osas/calendar.html">
+        <a href="../osas/calendar.php">
           <button class="circle-btn" title="Calendar" aria-label="Calendar">
             <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
           </button>
         </a>
 
-        <a href="../osas/orgs.html">
+        <a href="../osas/orgs.php">
           <button class="circle-btn active" title="Organizations" aria-label="Organizations">
             <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
           </button>
         </a>
         
-        <a href="../osas/analytics.html">
+        <a href="../osas/analytics.php">
           <button class="circle-btn" title="Analytics" aria-label="Analytics">
             <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
           </button>

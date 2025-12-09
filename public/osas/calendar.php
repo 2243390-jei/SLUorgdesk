@@ -7,37 +7,6 @@ if (empty($_SESSION['logged_in'])) {
 ?>
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar</title>
-
-  <link rel="stylesheet" href="../style/calendar.css">
-  <script src="../script/calendar.js" defer></script>
-</head>
-
-<body>
-  <main class="main-area">
-    <header class="header">
-      <h1>Calendar</h1>
-      <p class="muted">Event calendar</p>
-    </header>
-
-    <div id="calendarWrap"></div>
-  </main>
-</body>
-
-</html>
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../index.html');
-    exit;
-}
-?>
-<!doctype html>
-<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -54,15 +23,15 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <nav class="left-nav" aria-label="Sidebar">
-        <button class="circle-btn active" title="Calendar" aria-label="Calendar" onclick="location.href='../osas/calendar.html'">
+        <button class="circle-btn active" title="Calendar" aria-label="Calendar" onclick="location.href='../osas/calendar.php'">
           <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
         </button>
 
-        <button class="circle-btn" title="Organizations" aria-label="Organizations" onclick="location.href='../osas/orgs.html'">
+        <button class="circle-btn" title="Organizations" aria-label="Organizations" onclick="location.href='../osas/orgs.php'">
           <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
         </button>
 
-        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="location.href='../osas/analytics.html'">
+        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="location.href='../osas/analytics.php'">
           <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
         </button>
         

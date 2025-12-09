@@ -5,37 +5,6 @@ if (empty($_SESSION['logged_in'])) {
     exit;
 }
 ?>
-<!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizations</title>
-
-  <link rel="stylesheet" href="../style/OSASorgs.css">
-  <script src="../script/OSASorgs.js" defer></script>
-</head>
-
-<body>
-  <main class="main-area">
-    <header class="header">
-      <h1>Organizations</h1>
-      <p class="muted">Browse all registered student organizations</p>
-    </header>
-
-    <div id="orgList"></div>
-  </main>
-</body>
-
-</html>
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../index.html');
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,15 +23,15 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <nav class="left-nav" aria-label="Sidebar">
-        <button class="circle-btn" title="Calendar" aria-label="Calendar" onclick="window.location.href='../osas/calendar.html'">
+        <button class="circle-btn" title="Calendar" aria-label="Calendar" onclick="window.location.href='../osas/calendar.php'">
           <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
         </button>
 
-        <button class="circle-btn active" title="Organizations" aria-label="Organizations" onclick="window.location.href='../osas/orgs.html'">
+        <button class="circle-btn active" title="Organizations" aria-label="Organizations" onclick="window.location.href='../osas/orgs.php'">
           <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
         </button>
         
-        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="window.location.href='../osas/analytics.html'">
+        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="window.location.href='../osas/analytics.php'">
           <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
         </button>
 

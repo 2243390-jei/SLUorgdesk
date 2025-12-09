@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const backButton = document.getElementById("backButton");
   if (backButton) {
     backButton.addEventListener("click", () => {
-      window.location.href = "../osas/orgs.html";
+      window.location.href = "../osas/orgs.php";
     });
   }
 
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       btn.addEventListener("click", (e) => {
         const eventData = JSON.parse(e.target.getAttribute("data-event"));
         localStorage.setItem("selectedEvent", JSON.stringify(eventData));
-        window.location.href = "../osas/submissionFullDetails.html";
+        window.location.href = "../osas/submissionFullDetails.php";
       });
     });
   }

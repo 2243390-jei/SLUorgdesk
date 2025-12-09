@@ -49,9 +49,9 @@ function renderTable(orgs) {
       <td><button class="view-btn">View Submissions</button></td>
     `;
 
-    // Redirection to go to OSASsubmissions.html using org ID and orgName when the button is clicked
+    // Redirection to go to OSASsubmissions.php using org ID and orgName when the button is clicked
     row.querySelector(".view-btn").addEventListener("click", () => {
-      window.location.href = `../osas/OSASsubmissions.html?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
+      window.location.href = `../osas/OSASsubmissions.php?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
     });
 
     tableBody.appendChild(row);
