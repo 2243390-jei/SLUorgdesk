@@ -6,7 +6,8 @@ const getAllUsers = async (req, res) => {
         const offset = req.query.offset ? parseInt(req.query.offset) : 0
 
         const users = await User.find()
-            .select('_id name email role studentId school isActive createdAt')
+            .select('_id name email role organization isActive createdAt')
+            .populate('organization', 'name')
             .skip(offset)
             .limit(limit)
             .lean()

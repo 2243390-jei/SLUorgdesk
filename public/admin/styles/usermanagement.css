@@ -481,61 +481,6 @@ tr:hover {
     transform: scale(1);
   }
 }
-
-/* Pagination Controls */
-.pagination-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #e1e8ed;
-}
-
-#pagination button {
-  min-width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--deep-blue);
-  font-size: 14px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-#pagination button:hover {
-  background: #f8f9fa;
-}
-
-#pagination button.active-page {
-  background: var(--accent);
-  color: white;
-}
-
-/* Rows per page styling */
-.rows-per-page {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.rows-per-page label {
-  font-size: 14px;
-  color: #666;
-}
-
-.rows-per-page select {
-  padding: 4px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
 /* Card Layout for Mobile */
 .card-list {
   display: none;

@@ -140,7 +140,8 @@ function filterUsers() {
         const matchesSearch = user.name.toLowerCase().includes(currentFilters.search.toLowerCase()) ||
                             user.email.toLowerCase().includes(currentFilters.search.toLowerCase());
         const matchesRole = !currentFilters.role || user.role === currentFilters.role;
-        const matchesSchool = !currentFilters.school || user.school === currentFilters.school;
+        const orgName = user.organization?.name || user.organization || '';
+        const matchesSchool = !currentFilters.school || orgName === currentFilters.school;
         return matchesSearch && matchesRole && matchesSchool;
     });
 }
@@ -158,7 +159,7 @@ function updateTable() {
             <td>${user.name}</td>
             <td>${user.email}</td>
             <td>${user.role}</td>
-            <td>${user.school || '-'}</td>
+            <td>${user.organization?.name || user.organization || '-'}</td>
             <td>
                 <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
                     ${user.isActive ? 'Active' : 'Inactive'}
@@ -229,7 +230,7 @@ function renderUserCards() {
             </div>
             <div class="card-meta">
                 <span><b>Role:</b> ${user.role}</span>
-                <span><b>School:</b> ${user.school || '-'}</span>
+                <span><b>Organization:</b> ${user.organization?.name || user.organization || '-'}</span>
                 <span><b>Status:</b> ${user.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <div class="card-actions">
