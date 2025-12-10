@@ -71,7 +71,8 @@ body {
   position: fixed;
   height: 100vh;
   z-index: 1000;
-  overflow-y: auto;
+  /* keep nav static and avoid internal scroll creating layout overflow */
+  overflow-y: hidden;
 }
 
 .logo { 
@@ -931,25 +932,256 @@ body {
 }
 
 .btn-logout {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  background: rgba(231, 76, 60, 0.1);
+  /* do not force full width; keep compact */
+  width: auto;
+  background: rgba(231, 76, 60, 0.08);
   color: var(--danger);
-  border: 1px solid rgba(231, 76, 60, 0.2);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: 600;
+  border: 1px solid rgba(231, 76, 60, 0.18);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+  font-size: 13px;
 }
 
+/* make sure hover keeps same compact size */
 .btn-logout:hover {
-  background: rgba(231, 76, 60, 0.2);
+  background: rgba(231, 76, 60, 0.14);
   transform: translateY(-1px);
 }
 
+/* keep the footer area pinned to the bottom of the sidebar */
+.sidebar-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* inside expanded sidebar: make logout full-width and match nav-item styling */
+.leftbar.sidebar-expanded .sidebar-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  margin-top: auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* ensure the logout button fills the menu width like other items */
+.leftbar.sidebar-expanded .btn-logout {
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(231,76,60,0.08);
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  font-weight: 700;
+  justify-content: flex-start; /* aligns icon + label like nav items */
+  box-shadow: none;
+}
+
+/* keep logout icon at the same size as other menu icons */
+.leftbar.sidebar-expanded .btn-logout img,
+.leftbar.sidebar-expanded .btn-logout .menu-icon,
+.leftbar.sidebar-expanded .btn-logout .nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+/* label styling to match nav items */
+.leftbar.sidebar-expanded .btn-logout .menu-label {
+  flex: 1;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* New expanded sidebar styles (overrides compact circular nav) */
+.leftbar.sidebar-expanded {
+  width: 220px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
+  background: var(--sidebar-bg);
+  box-shadow: 2px 0 12px rgba(0,0,0,0.14);
+}
+
+.leftbar.sidebar-expanded .sidebar-top {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#e74c3c,#c0392b);
+  color: #fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:18px;
+  box-shadow: 0 6px 18px rgba(231,76,60,0.25);
+}
+
+.profile-text .admin-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  letter-spacing: 0.6px;
+}
+
+.profile-text .admin-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+}
+
+/* Sidebar menu */
+.sidebar-menu {
+  margin-top: 10px;
+  flex: 1;
+}
+
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: all .16s ease;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  background: transparent;
+  position: relative;
+}
+
+.nav-item .menu-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+  filter: brightness(0) invert(1);
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.03);
+  transform: translateX(3px);
+}
+
+.nav-item.active {
+  background: rgba(37,99,235,0.12);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+  transform: none;
+}
+
+/* thin accent bar on left of active item */
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  background: linear-gradient(180deg,#60a5fa,#2563eb);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* Footer logout button styling (matches menu) */
+.sidebar-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: rgba(231,76,60,0.08);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* adjust main area margin to compensate wider sidebar */
+.main-area {
+  margin-left: 220px; /* override previous 92px */
+}
+
+/* Responsive: collapse back to original compact nav on small screens */
+@media (max-width: 768px) {
+  .leftbar.sidebar-expanded {
+    width: 100%;
+    height: 70px;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 10px;
+  }
+
+  .sidebar-profile, .sidebar-menu, .sidebar-footer {
+    display: none;
+  }
+
+  .main-area {
+    margin-left: 0;
+    margin-bottom: 70px;
+  }
+}
 @media (max-width: 1024px) {
   .body {
     flex-direction: column;
@@ -1267,34 +1499,34 @@ body {
 @media (min-width: 1440px) {
   .main-area {
     padding: 24px;
-  }
-  
-  .calendar-grid {
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+} .calendar-grid {
     min-height: 650px;
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}   min-height: 110px;
   }
-  
-  .day {
-    min-height: 110px;
+@keyframes fadeIn {
+  from {s-list {
+    opacity: 0;px;
   }
-  
-  .events-list {
-    height: 580px;
-  }
-}
-
-.loading {
-  opacity: 0.7;
+  to {
+    opacity: 1;
+  }ading {
+} opacity: 0.7;
   pointer-events: none;
-}
-
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #f3f3f3;
+@keyframes scaleIn {
+  from {
+    opacity: 0; {
+    transform: scale(0.9);
+  }osition: absolute;
+  to { 50%;
+    opacity: 1;
+    transform: scale(1);
+  }ight: 20px;
+} border: 2px solid #f3f3f3;
   border-top: 2px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -1323,4 +1555,45 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Tighten logout button and force small icon size */
+.sidebar-footer .btn-logout,
+.leftbar .btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;        /* prevent full-width stretching */
+  max-width: 200px;
+  background: rgba(231,76,60,0.08);
+  color: var(--danger);
+  border: 1px solid rgba(231,76,60,0.18);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Force the image/icon inside logout to be small and not stretch */
+.sidebar-footer .btn-logout .menu-icon,
+.leftbar .btn-logout img,
+.btn-logout .menu-icon,
+.circle-btn.logout-btn .nav-icon {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+/* Ensure the footer area stays pinned and compact */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
