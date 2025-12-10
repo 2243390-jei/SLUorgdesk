@@ -12,8 +12,9 @@ if (empty($_SESSION['logged_in'])) {
   <meta charset="UTF-8">
   <title>Admin Organization Management</title>
   <link rel="stylesheet" href="styles/adminmain.css">
-  <!-- <link rel="stylesheet" href="styles/orgmanagement.css"> -->
-  <script src="script/orgmanagement.js"></script>
+  <link rel="stylesheet" href="styles/orgmanagement.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="./script/orgmanagement.js" defer></script>
 </head>
 
 <body>
@@ -81,37 +82,39 @@ if (empty($_SESSION['logged_in'])) {
         </div>
       </div>
 
-      <div class="card-list" id="orgCardList"></div>
-      <table class="org-table">
-        <thead>
-          <tr>
-            <th>Logo</th>
-            <th>Organization</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>School</th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody id="orgTableBody"></tbody>
-      </table>
+      <div class="bottom-actions">
+        <div class="card-list" id="orgCardList"></div>
+        <table class="org-table">
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Organization</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>School</th>
+              <th> </th>
+            </tr>
+          </thead>
+          <tbody id="orgTableBody"></tbody>
+        </table>
 
-      <div class="pagination-controls">
-        <div class="rows-per-page">
-          <label>
-            Rows per page:
-            <select id="rowsPerPage">
-              <option value="5">5</option>
-              <option value="10" selected>10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-          </label>
-        </div>
-        <div id="pagination">
-          <button class="pagination-btn prev" aria-label="Previous page">«</button>
-          <div class="page-numbers" role="list"></div>
-          <button class="pagination-btn next" aria-label="Next page">»</button>
+        <div class="pagination-controls">
+          <div class="rows-per-page">
+            <label>
+              Rows per page:
+              <select id="rowsPerPage">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </label>
+          </div>
+          <div id="pagination">
+            <button class="pagination-btn prev" aria-label="Previous page">«</button>
+            <div class="page-numbers" role="list"></div>
+            <button class="pagination-btn next" aria-label="Next page">»</button>
+          </div>
         </div>
       </div>
 
@@ -119,6 +122,63 @@ if (empty($_SESSION['logged_in'])) {
 
   </main>
 
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h3>Are you sure you want to delete this organization?</h3>
+      <div class="modal-buttons">
+        <button id="confirmYes" class="confirm-btn">Yes</button>
+        <button id="confirmCancel" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editConfirmModal" class="createorg-modal">
+    <div class="createorg-modal-content small-confirm">
+      <h3>Are you sure you want to edit this organization?</h3>
+      <div class="createorg-modal-actions">
+        <button id="confirmEditYes" class="btn-outlined">Yes</button>
+        <button id="confirmEditCancel" class="reset-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addOrgModal" class="createorg-modal">
+    <div class="createorg-modal-content">
+      <h2 id="orgFormTitle">Add Organization</h2>
+
+      <form id="createOrgForm">
+        <div class="createorg-modal-row">
+          <label>Organization Name</label>
+          <input type="text" id="orgName" placeholder="Enter organization name" required>
+        </div>
+
+        <div class="createorg-modal-row">
+          <label>Acronym</label>
+          <input type="text" id="orgAcronym" placeholder="Enter acronym" required>
+        </div>
+
+        <div class="createorg-modal-row">
+          <label>Official Email</label>
+          <input type="email" id="orgEmail" placeholder="Enter official email" required>
+        </div>
+
+        <div class="createorg-modal-row">
+          <label>School</label>
+          <input type="text" id="orgSchool" placeholder="Enter school" required>
+        </div>
+
+        <div class="createorg-modal-row">
+          <label>Logo URL</label>
+          <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo">
+        </div>
+
+        <div class="createorg-modal-actions">
+          <button type="submit" class="btn-outlined">Save</button>
+          <button type="button" id="cancelCreateOrg" class="reset-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 
 </html>

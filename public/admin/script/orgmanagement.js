@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterToggle = document.getElementById("filterToggle");
   const filterMenu = document.getElementById("filterMenu");
   const rowsPerPageSelect = document.getElementById("rowsPerPage");
-  const paginationDiv = document.getElementById("pagination");
   const curYear = document.getElementById("curYear");
   const orgCardList = document.getElementById("orgCardList");
 
@@ -21,13 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const orgFormTitle = document.getElementById("orgFormTitle");
 
   const confirmModal = document.getElementById("confirmModal");
-  const confirmTitle = document.getElementById("confirmTitle");
   const confirmYes = document.getElementById("confirmYes");
   const confirmCancel = document.getElementById("confirmCancel");
-
   const editConfirmModal = document.getElementById("editConfirmModal");
-  const confirmEditYes = document.getElementById("confirmEditYes");
-  const confirmEditCancel = document.getElementById("confirmEditCancel");
 
   let organizations = [];
   let filteredData = [];
@@ -37,7 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let orgToDelete = null;
   let orgToEdit = null;
 
-  curYear.textContent = new Date().getFullYear();
+  if (curYear) {
+    curYear.textContent = new Date().getFullYear();
+  }
 
   function checkViewportChange() {
     const nowMobile = isMobile();
@@ -273,7 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function openDeleteModal(orgId) {
     orgToDelete = orgId;
     confirmModal.style.display = "flex";
-    confirmTitle.textContent = "Are you sure you want to delete this organization?";
   }
 
   function closeDeleteModal() {
