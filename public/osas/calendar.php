@@ -20,17 +20,17 @@ if (empty($_SESSION['logged_in'])) {
     <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">A</div>
+          <div class="avatar">O</div>
           <div class="profile-text">
-            <div class="admin-title">ADMIN</div>
-            <div class="admin-sub muted">Admin Name</div>
+            <div class="admin-title">OSAS</div>
+            <div class="admin-sub muted"></div>
           </div>
         </div>
       </div>
 
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
-          <li class="nav-item active" onclick="location.href='../osas/dashboard.php'">
+          <li class="nav-item active" onclick="location.href='../osas/calendar.php'">
             <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
@@ -60,15 +60,8 @@ if (empty($_SESSION['logged_in'])) {
           <div class="muted">Here's what happened this month</div>
         </div>
 
-        <div class="top-actions">
-          <div class="search-wrap">
-            <input id="searchInput" type="search" placeholder="Search past events..." aria-label="Search past events">
-            <button id="searchClear" title="Clear" aria-label="Clear search">x</button>
-          </div>
-          <!-- Profile moved to header -->
-          <div class="profile-header">
-            <div class="profile-circle" id="mobileProfileBtn">O</div>
-          </div>
+        <div id="header-logo" class="header-logo">
+          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" class="logo-img">
         </div>
       </header>
 
@@ -115,7 +108,16 @@ if (empty($_SESSION['logged_in'])) {
         <aside class="right-panel" aria-label="Past events">
           <div class="panel-top">
             <h2>Past Events</h2>
-            <div class="muted">History for selected month (click an event to view more)</div>
+          </div>
+
+          <!-- Search moved to top of panel -->
+          <div class="search-wrap panel-search">
+            <input 
+              id="searchInput" 
+              type="search" 
+              placeholder="Search past events..." 
+              aria-label="Search past events">
+            <button id="searchClear" class="search-clear-btn" title="Clear" aria-label="Clear search">×</button>
           </div>
 
           <!-- Fixed-size, scrollable events list -->
@@ -158,26 +160,6 @@ if (empty($_SESSION['logged_in'])) {
           <div class="modal-footer">
             <button id="logoutCancel" class="btn-secondary">Cancel</button>
             <button id="logoutConfirm" class="btn-primary">Logout</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mobile Profile Modal -->
-      <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 id="profileModalTitle">Profile</h3>
-            <button id="profileModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="profile-info">
-              <div class="profile-large">O</div>
-              <div class="profile-details">
-                <h4>OSAS Admin</h4>
-              </div>
-            </div>
           </div>
         </div>
       </div>

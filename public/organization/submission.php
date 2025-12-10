@@ -1,12 +1,13 @@
 <?php
 session_start();
 if (empty($_SESSION['logged_in'])) {
-    header('Location: ../../index.php');
-    exit;
+  header('Location: ../../index.php');
+  exit;
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,7 @@ if (empty($_SESSION['logged_in'])) {
       <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
     </div>
     <button id="hamburgerBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" type="button">
-     
+
     </button>
     <nav>
       <ul>
@@ -31,17 +32,17 @@ if (empty($_SESSION['logged_in'])) {
         <li><a href="history.php">History</a></li>
       </ul>
     </nav>
-        <div id="profileContainer" class="profile-icon">
-            <img id="nav-profile-pic" src="../images/student_img/profile.png" alt="Profile">
+    <div id="profileContainer" class="profile-icon">
+      <img id="nav-profile-pic" src="../images/student_img/profile.png" alt="Profile">
 
-            <div class="profile-modal" id="profileModal" style="display: none;">
-                <div class="profile-modal-content">
-                    <button class="logout-btn" id="logoutBtn">Logout</button>
-                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
-                </div>
-            </div>
+      <div class="profile-modal" id="profileModal" style="display: none;">
+        <div class="profile-modal-content">
+          <button class="logout-btn" id="logoutBtn">Logout</button>
+          <button class="cancel-btn" id="cancelBtn">Cancel</button>
         </div>
-</header>
+      </div>
+    </div>
+  </header>
 
   <section class="submission-hero">
     <div class="submission-hero-text">
@@ -59,18 +60,24 @@ if (empty($_SESSION['logged_in'])) {
         <h3 class="form-section-title">Organization Information</h3>
 
         <div class="form-group">
+          <!-- TODO: Kenneth: added readonly -->
           <label>Complete Name of Organization or Publication <span class="required">*</span></label>
-          <input type="text" name="org_name" placeholder="Your answer" required>
+          <input type="text" name="org_name" placeholder="Your answer" required readonly>
         </div>
 
         <div class="form-row">
+
+          <!-- TODO: Kenneth: added readonly -->
           <div class="form-group">
             <label>Acronym or Short Name of Organization</label>
-            <input type="text" name="org_acronym" placeholder="Your answer">
+            <!-- Pwede niyo palitan yung readonly as disabled if ever ayaw ni maam -->
+            <input type="text" name="org_acronym" placeholder="Your answer" readonly>
           </div>
+
+          <!-- TODO: Kenneth: added readonly -->
           <div class="form-group">
             <label>Official SLU Institutional Email of Organization</label>
-            <input type="email" name="org_email" placeholder="Your answer">
+            <input type="email" name="org_email" placeholder="Your answer" readonly>
           </div>
         </div>
 
@@ -85,9 +92,20 @@ if (empty($_SESSION['logged_in'])) {
           </div>
         </div>
 
+        <!-- TODO: Kenneth: Iniba ko yung input element to select element for drop box
+         Pa check rin if tama yung position -->
         <div class="form-group">
           <label>Position of Applicant in the Student Group</label>
-          <input type="text" name="applicant_position" placeholder="Your answer">
+          <!-- <input type="text" name="applicant_position" placeholder="Your answer"> -->
+          <select name="applicant_position">
+            <option value="" disabled selected>Select your position</option>
+            <option value="President">President</option>
+            <option value="Vice President">Vice President</option>
+            <option value="Secretary">Secretary</option>
+            <option value="Treasurer">Treasurer</option>
+            <option value="Member">Member</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
 
         <h3 class="form-section-title">Academic Year Information</h3>
@@ -133,17 +151,26 @@ if (empty($_SESSION['logged_in'])) {
             <label>Event Date <span class="required">*</span></label>
             <input type="date" id="eventDate" required>
           </div>
+
+
+          <!-- TODO: Kenneth: added a span element para sa error  -->
           <div class="form-row">
             <div class="form-group time-group">
               <label for="startTime">Start Time <span class="required">*</span></label>
               <input type="time" id="startTime" name="start_time" required>
+              <!-- TODO: ito mga bai -->
+              <span id="startTimeError" class="error"></span>
             </div>
+
+            <!-- TODO: Kenneth: added a span element para sa error  -->
             <div class="form-group time-group">
               <label for="endTime">End Time <span class="required">*</span></label>
               <input type="time" id="endTime" name="end_time" required>
+              <!-- TODO: ito mga bai -->
+               <span id="endTimeError" class="error"></span>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>Venue</label>
             <input type="text" id="eventVenue" placeholder="Your answer">

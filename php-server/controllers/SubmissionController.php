@@ -5,44 +5,55 @@ class SubmissionController {
     private $submission;
 
     public function __construct() {
+        // Initialize submission model
         $this->submission = new Submission();
     }
 
     public function getAll() {
+        // Get pagination params with defaults
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+        // Fetch all submissions
         return ['success' => true, 'data' => $this->submission->getAll($limit, $offset)];
     }
 
     public function getById($id) {
+        // Fetch submission by ID
         $data = $this->submission->getById($id);
         return $data ? ['success' => true, 'data' => $data] : ['success' => false, 'error' => 'Submission not found'];
     }
 
     public function getByOrganization($orgId) {
+        // Get pagination params with defaults
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+        // Fetch submissions for organization
         return ['success' => true, 'data' => $this->submission->getByOrganization($orgId, $limit, $offset)];
     }
 
     public function create($data) {
+        // Define required fields
         $required = ['applicationInfo', 'orgInfo', 'academicYear', 'semester', 'events'];
         $missing = [];
         
+        // Check for missing required fields
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 $missing[] = $field;
             }
         }
         
+        // Return error if any required fields are missing
         if (!empty($missing)) {
             return ['success' => false, 'error' => 'Missing: ' . implode(', ', $missing)];
         }
 
+        // Validate events array is not empty
         if (!is_array($data['events']) || empty($data['events'])) {
             return ['success' => false, 'error' => 'At least one event is required'];
         }
 
+        // Create submission in database
         $id = $this->submission->create($data);
         return ['success' => true, 'id' => (string)$id];
     }
@@ -52,9 +63,12 @@ class SubmissionController {
         return $result ? ['success' => true] : ['success' => false, 'error' => 'Update failed'];
     }
 
-    public function delete($id) {
-        $result = $this->submission->delete($id);
-        return $result ? ['success' => true] : ['success' => false, 'error' => 'Delete failed'];
+    public function getByYearSemester($year, $semester) {
+        // Get pagination params with defaults
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+        // Fetch submissions by academic year and semester
+        return ['success' => true, 'data' => $this->submission->getByYearSemester($year, $semester, $limit, $offset)];
     }
 
     public function getFiltered($queryParams = []) {

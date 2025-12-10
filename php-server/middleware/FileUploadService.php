@@ -8,33 +8,36 @@ class FileUploadService
 
     public function __construct()
     {
+        // Create base upload directory if it doesn't exist
         if (!is_dir($this->baseUploadDir)) {
             mkdir($this->baseUploadDir, 0755, true);
         }
     }
 
-    /**
-     * Main upload method
-     */
     public function uploadFiles($files, $orgAcronym, $submissionId = null)
     {
+        // Initialize results array
         $results = [
             'success' => [],
             'errors'  => [],
             'paths'   => []
         ];
 
+        // Return empty results if no files provided
         if (!is_array($files) || empty($files)) {
             return $results;
         }
 
+        // Create organization folder
         $orgFolder = $this->createOrgFolder($orgAcronym);
         if (!$orgFolder) {
             $results['errors'][] = 'Failed to create organization folder';
             return $results;
         }
 
+        // Set upload directory to organization folder
         $uploadDir = $orgFolder;
+        // Create submission folder if submission ID provided
         if ($submissionId) {
             $submissionFolder = $orgFolder . '/' . $submissionId;
             if (!is_dir($submissionFolder) && !mkdir($submissionFolder, 0755, true)) {
@@ -44,43 +47,58 @@ class FileUploadService
             $uploadDir = $submissionFolder;
         }
 
+        // Normalize files array format
         $filesArray = $this->normalizeFilesArray($files);
+        // Upload each file
         foreach ($filesArray as $file) {
+            // Upload single file and collect results
             $uploadResult = $this->uploadSingleFile($file, $uploadDir, $orgAcronym, $submissionId);
 
             if ($uploadResult['success']) {
+                // Store successful upload filename and path
                 $results['success'][] = $uploadResult['filename'];
                 $results['paths'][]   = $uploadResult['path'];
             } else {
+                // Store upload error message
                 $results['errors'][]  = $uploadResult['error'];
             }
         }
 
+        // Return upload results
         return $results;
     }
 
     private function createOrgFolder($orgAcronym)
     {
+        // Sanitize organization acronym
         $orgAcronym = preg_replace('/[^a-zA-Z0-9_-]/', '', $orgAcronym) ?: 'unknown';
+        // Build organization folder path
         $orgFolder  = $this->baseUploadDir . '/' . strtolower($orgAcronym);
 
+        // Create folder if it doesn't exist
         if (!is_dir($orgFolder)) {
             mkdir($orgFolder, 0755, true);
         }
 
+        // Return folder path or false if creation failed
         return is_dir($orgFolder) ? $orgFolder : false;
     }
 
     private function normalizeFilesArray($files)
     {
+        // Initialize normalized array
         $normalized = [];
 
+        // Process each file input
         foreach ($files as $fileData) {
+            // Handle multiple files from single input
             if (is_array($fileData['name'])) {
-                // Multiple files
+                // Process each file in array
                 foreach ($fileData['name'] as $i => $name) {
+                    // Skip if no file uploaded
                     if ($fileData['error'][$i] === UPLOAD_ERR_NO_FILE) continue;
 
+                    // Build normalized file data
                     $normalized[] = [
                         'name'     => $name,
                         'type'     => $fileData['type'][$i],
@@ -90,29 +108,34 @@ class FileUploadService
                     ];
                 }
             } else {
-                // Single file
+                // Handle single file input
                 if ($fileData['error'] !== UPLOAD_ERR_NO_FILE) {
                     $normalized[] = $fileData;
                 }
             }
         }
+        // Return normalized files array
         return $normalized;
     }
 
     private function uploadSingleFile($file, $uploadDir, $orgAcronym, $submissionId = null)
     {
+        // Check for upload errors
         if ($file['error'] !== UPLOAD_ERR_OK) {
             return ['success' => false, 'error' => $this->getUploadErrorMessage($file['error'])];
         }
 
+        // Validate file type and size
         $validation = $this->validateFile($file);
         if (!$validation['valid']) {
             return ['success' => false, 'error' => $validation['error']];
         }
 
+        // Generate unique filename to prevent duplicates
         $filename = $this->generateUniqueFilename($file['name'], $uploadDir);
         $filepath = $uploadDir . '/' . $filename;
 
+        // Move uploaded file to destination
         if (!move_uploaded_file($file['tmp_name'], $filepath)) {
             return ['success' => false, 'error' => 'Failed to save file: ' . $file['name']];
         }
@@ -136,49 +159,61 @@ class FileUploadService
      */
     private function generateUniqueFilename($originalName, $uploadDir)
     {
+        // Extract file extension and name
         $ext  = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $name = pathinfo($originalName, PATHINFO_FILENAME);
 
-        // Sanitize name
+        // Sanitize filename characters
         $name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $name);
-        $name = preg_replace('/_+/', '_', $name);   // collapse multiple _
+        // Collapse multiple underscores
+        $name = preg_replace('/_+/', '_', $name);
+        // Remove leading/trailing underscores
         $name = trim($name, '_');
+        // Use default name if empty
         $name = $name ?: 'file';
 
-        // Limit length
+        // Limit filename length
         if (strlen($name) > 100) {
             $name = substr($name, 0, 100);
         }
 
-        $datePrefix = date('Y-m-d_H-i-s'); // 2025-12-11_14-30-25
+        // Create date-time prefix for unique filenames
+        $datePrefix = date('Y-m-d_H-i-s');
 
+        // Initialize counter for duplicate prevention
         $counter  = 0;
         $filename = "{$datePrefix}_{$name}.{$ext}";
 
+        // Check for existing files and add counter if needed
         while (file_exists($uploadDir . '/' . $filename)) {
             $counter++;
             $filename = "{$datePrefix}_{$name}_{$counter}.{$ext}";
         }
 
+        // Return unique filename
         return $filename;
     }
 
     private function validateFile($file)
     {
+        // Check if file size exceeds limit
         if ($file['size'] > $this->maxFileSize) {
             return ['valid' => false, 'error' => 'File too large (max 50MB)'];
         }
 
+        // Check if file extension is allowed
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $this->allowedExtensions)) {
             return ['valid' => false, 'error' => "File type not allowed: {$ext}"];
         }
 
+        // Return success if validation passes
         return ['valid' => true];
     }
 
     private function getUploadErrorMessage($code)
     {
+        // Map error codes to human-readable messages
         $messages = [
             UPLOAD_ERR_INI_SIZE   => 'File exceeds server limit',
             UPLOAD_ERR_FORM_SIZE => 'File exceeds form limit',
@@ -189,49 +224,8 @@ class FileUploadService
             UPLOAD_ERR_EXTENSION => 'Upload stopped by extension',
         ];
 
+        // Return error message or generic message
         return $messages[$code] ?? 'Unknown upload error';
-    }
-
-    // ──────────────────────────────────────────────────────────────
-    // Delete & List methods (unchanged, just cleaned up a bit)
-    // ──────────────────────────────────────────────────────────────
-
-    public function deleteSubmissionFiles($orgAcronym, $submissionId)
-    {
-        $orgAcronym = preg_replace('/[^a-zA-Z0-9_-]/', '', $orgAcronym);
-        $folder = $this->baseUploadDir . '/' . strtolower($orgAcronym) . '/' . $submissionId;
-
-        if (!is_dir($folder)) return true;
-
-        return $this->deleteDirectory($folder);
-    }
-
-    private function deleteDirectory($dir)
-    {
-        if (!is_dir($dir)) return false;
-
-        foreach (array_diff(scandir($dir), ['.', '..']) as $item) {
-            $path = $dir . '/' . $item;
-            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
-        }
-        return rmdir($dir);
-    }
-
-    public function getSubmissionFiles($orgAcronym, $submissionId)
-    {
-        $orgAcronym = preg_replace('/[^a-zA-Z0-9_-]/', '', $orgAcronym);
-        $folder = $this->baseUploadDir . '/' . strtolower($orgAcronym) . '/' . $submissionId;
-
-        if (!is_dir($folder)) return [];
-
-        $files = array_diff(scandir($folder), ['.', '..']);
-        $paths = [];
-
-        foreach ($files as $file) {
-            $paths[] = '/uploads/' . strtolower($orgAcronym) . '/' . $submissionId . '/' . $file;
-        }
-
-        return $paths;
     }
 }
 ?>
