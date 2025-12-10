@@ -85,6 +85,81 @@ body {
   margin-bottom: 8px;
 }
 
+/* Add to OSASsubmissions.css */
+
+/* Logo container styling */
+#header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px; /* Space between filter button and logo */
+}
+
+#header-logo img {
+  width: 150px;
+  height: 75px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Adjust header-right to properly space elements */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Adjust filter-container to have proper spacing */
+.filter-container {
+  position: relative;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .header-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  #header-logo {
+    margin-left: 0;
+    margin-top: 10px;
+    order: 4; /* Make logo appear last on mobile */
+    align-self: center;
+  }
+  
+  #header-logo img {
+    width: 120px;
+    height: 60px;
+  }
+  
+  .org-name-display {
+    order: 1;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .search-container {
+    order: 2;
+    width: 100%;
+  }
+  
+  .filter-container {
+    order: 3;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  #header-logo img {
+    width: 100px;
+    height: 50px;
+  }
+}
+
 .left-nav { 
   display: flex; 
   flex-direction: column; 

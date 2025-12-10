@@ -83,9 +83,10 @@ if (empty($_SESSION['logged_in'])) {
               </div>
             </div>
           </div>
-         
-          <div class="profile-header">
-            <button class="profile-circle" id="mobileProfileBtn">O</button>
+          
+          <!-- SLU OrgDesk Logo on the right side -->
+          <div id="header-logo">
+            <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
           </div>
         </div>
       </header>

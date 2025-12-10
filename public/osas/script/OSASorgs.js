@@ -12,10 +12,6 @@ const logoutModalClose = document.getElementById('logoutModalClose');
 const logoutCancel = document.getElementById('logoutCancel');
 const logoutConfirm = document.getElementById('logoutConfirm');
 
-const mobileProfileBtn = document.getElementById('mobileProfileBtn');
-const profileModal = document.getElementById('profileModal');
-const profileModalClose = document.getElementById('profileModalClose');
-
 async function loadOrganizations() {
   try {
     const response = await fetch("../../php-server/routes/organizations.php");
@@ -183,7 +179,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// ========== LOGOUT AND PROFILE MODAL FUNCTIONALITY ==========
+// ========== LOGOUT MODAL FUNCTIONALITY ==========
 
 // Show logout confirmation modal
 function showLogoutModal() {
@@ -197,51 +193,17 @@ function hideLogoutModal() {
   logoutModal.setAttribute('aria-hidden', 'true');
 }
 
-// Show profile modal (mobile)
-function showProfileModal() {
-  profileModal.classList.add('show');
-  profileModal.setAttribute('aria-hidden', 'false');
-  
-  // Update modal content with direct logout button
-  const modalContent = `
-    <div class="profile-info">
-      <div class="profile-large">O</div>
-      <div class="profile-details">
-        <h4>Hello, OSAS</h4>
-        <div class="profile-logout">
-          <button id="profileLogoutBtn" class="btn-logout">
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  profileModal.querySelector('.modal-body').innerHTML = modalContent;
-  
-  // Add direct logout event listener
-  document.getElementById('profileLogoutBtn').addEventListener('click', () => {
-    window.location.href = "../../index.php";
-  });
-}
-
-// Hide profile modal (mobile)
-function hideProfileModal() {
-  profileModal.classList.remove('show');
-  profileModal.setAttribute('aria-hidden', 'true');
-}
-
 // Logout function
 function performLogout() {
   // Redirect to ../index.php instead of login.html
-   try {
-        fetch('../../php-server/routes/logout.php', { method: 'POST' });
-      } catch (err) {
-        console.error('Logout error:', err);
-      }
+  try {
+    fetch('../../php-server/routes/logout.php', { method: 'POST' });
+  } catch (err) {
+    console.error('Logout error:', err);
+  }
 
-      // Redirect to login
-      window.location.href = '../../index.php';
+  // Redirect to login
+  window.location.href = '../../index.php';
 }
 
 // Event listeners for logout functionality
@@ -250,20 +212,10 @@ logoutModalClose.addEventListener('click', hideLogoutModal);
 logoutCancel.addEventListener('click', hideLogoutModal);
 logoutConfirm.addEventListener('click', performLogout);
 
-// Event listeners for mobile profile modal
-mobileProfileBtn.addEventListener('click', showProfileModal);
-profileModalClose.addEventListener('click', hideProfileModal);
-
-// Close modals when clicking on overlay
+// Close logout modal when clicking on overlay
 logoutModal.addEventListener('click', (e) => {
   if (e.target === logoutModal) {
     hideLogoutModal();
-  }
-});
-
-profileModal.addEventListener('click', (e) => {
-  if (e.target === profileModal) {
-    hideProfileModal();
   }
 });
 
