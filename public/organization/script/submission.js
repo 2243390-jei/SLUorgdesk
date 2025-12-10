@@ -987,8 +987,7 @@ document.addEventListener("DOMContentLoaded", function () {
    *  10. TIME INPUT BUTTON-LIKE BEHAVIOR
    *      Make time inputs open picker when clicked anywhere
    * ----------------------------------------------------------------- */
-  const startTimeInput = document.getElementById("startTime");
-  const endTimeInput = document.getElementById("endTime");
+
 
   [startTimeInput, endTimeInput].forEach(input => {
     if (input) {
