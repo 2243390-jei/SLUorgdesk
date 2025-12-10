@@ -532,7 +532,36 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmAccuracy: document.querySelector('input[name="confirm"]').checked || false
       };
 
-      // Collect all event data (hidden inputs stored in form)
+      // Collect inline event form data (default event)
+      const inlineContainer = document.getElementById("inlineEventForm");
+      const inlineEventData = {
+        id: `E${Date.now()}`, // Generate unique event ID
+        eventName: inlineContainer.querySelector('#eventName')?.value || "",
+        eventType: inlineContainer.querySelector('#eventType')?.value || "",
+        eventDate: inlineContainer.querySelector('#eventDate')?.value || "",
+        // If inline uses native time inputs (HH:MM), convert to 12-hour with AM/PM
+        startTime: (function(){
+          const v = inlineContainer.querySelector('#startTime')?.value || "";
+          return v ? convert24To12(v) : "";
+        })(),
+        endTime: (function(){
+          const v = inlineContainer.querySelector('#endTime')?.value || "";
+          return v ? convert24To12(v) : "";
+        })(),
+        eventVenue: inlineContainer.querySelector('#eventVenue')?.value || "",
+        eventDescription: inlineContainer.querySelector('#eventDesc')?.value || "",
+        attendance: parseInt(inlineContainer.querySelector('#eventAttendees')?.value || 0),
+        eventProof: inlineContainer.querySelector('#eventProof')?.value || "",
+        eventSDG: getInlineSDGs(),
+        supportingDocuments: []
+      };
+
+      // Add inline event if it has at least an event name or date
+      if (inlineEventData.eventName || inlineEventData.eventDate) {
+        submissionData.events.push(inlineEventData);
+      }
+
+      // Collect all event data from modal (hidden inputs stored in form)
       const hiddenContainers = submissionForm.querySelectorAll(".hidden-event-container");
       hiddenContainers.forEach(container => {
         const sdgValues = Array.from(container.querySelectorAll('.event-sdg-value')).map(inp => inp.value);
@@ -552,36 +581,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         submissionData.events.push(eventData);
       });
-
-      // If no events, use inline form
-      if (submissionData.events.length === 0) {
-        const inlineContainer = document.getElementById("inlineEventForm");
-        const eventData = {
-          id: `E${Date.now()}`, // Generate unique event ID
-          eventName: inlineContainer.querySelector('#eventName')?.value || "",
-          eventType: inlineContainer.querySelector('#eventType')?.value || "",
-          eventDate: inlineContainer.querySelector('#eventDate')?.value || "",
-          // If inline uses native time inputs (HH:MM), convert to 12-hour with AM/PM
-          startTime: (function(){
-            const v = inlineContainer.querySelector('#startTime')?.value || "";
-            return v ? convert24To12(v) : "";
-          })(),
-          endTime: (function(){
-            const v = inlineContainer.querySelector('#endTime')?.value || "";
-            return v ? convert24To12(v) : "";
-          })(),
-          eventVenue: inlineContainer.querySelector('#eventVenue')?.value || "",
-          eventDescription: inlineContainer.querySelector('#eventDesc')?.value || "",
-          attendance: parseInt(inlineContainer.querySelector('#eventAttendees')?.value || 0),
-          eventProof: inlineContainer.querySelector('#eventProof')?.value || "",
-          eventSDG: getInlineSDGs(),
-          supportingDocuments: []
-        };
-
-        if (eventData.eventName || eventData.eventDate) {
-          submissionData.events.push(eventData);
-        }
-      }
 
       // Validate required fields
       if (!submissionData.semester) {
@@ -606,26 +605,41 @@ document.addEventListener("DOMContentLoaded", function () {
       submitBtn.textContent = "Submitting...";
 
       try {
-        // Step 1: Create submission first
-        const createResponse = await fetch("../../php-server/routes/submissions.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(submissionData)
-        });
+        // Step 1: Create a separate submission for each event
+        const submissionIds = [];
+        for (const event of submissionData.events) {
+          const singleEventSubmission = {
+            applicationInfo: submissionData.applicationInfo,
+            orgInfo: submissionData.orgInfo,
+            academicYear: submissionData.academicYear,
+            semester: submissionData.semester,
+            events: [event],  // Single event per submission
+            revisionComment: submissionData.revisionComment,
+            confirmAccuracy: submissionData.confirmAccuracy
+          };
 
-        const createResult = await createResponse.json();
+          const createResponse = await fetch("../../php-server/routes/submissions.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(singleEventSubmission)
+          });
 
-        if (!createResult.success) {
-          throw new Error(createResult.error || "Failed to create submission");
+          const createResult = await createResponse.json();
+
+          if (!createResult.success) {
+            throw new Error(createResult.error || "Failed to create submission");
+          }
+
+          submissionIds.push(createResult.id);
         }
 
-        const submissionId = createResult.id;
-
-        // Step 2: Upload files if any exist
-        const fileUploadResult = await uploadSubmissionFiles(submissionId, orgAcronym);
-        
-        if (!fileUploadResult.success && fileUploadResult.hasFiles) {
-          throw new Error("File upload failed: " + (fileUploadResult.error || "Unknown error"));
+        // Step 2: Upload files if any exist (using the first submission ID as reference)
+        if (submissionIds.length > 0) {
+          const fileUploadResult = await uploadSubmissionFiles(submissionIds[0], orgAcronym);
+          
+          if (!fileUploadResult.success && fileUploadResult.hasFiles) {
+            throw new Error("File upload failed: " + (fileUploadResult.error || "Unknown error"));
+          }
         }
 
         // Success!
