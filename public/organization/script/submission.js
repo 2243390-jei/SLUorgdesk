@@ -1,5 +1,50 @@
 //Submission JS
 document.addEventListener("DOMContentLoaded", function () {
+  // Function to calculate Philippine academic year and semester
+  function getPhilippineAcademicInfo() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // 1-12
+
+    // Philippine academic calendar: June to May
+    // 1st Semester: June to November
+    // 2nd Semester: December to May
+    let startYear, endYear, semester;
+
+    if (currentMonth >= 6) {
+      // June onwards = 1st Semester
+      startYear = currentYear;
+      endYear = currentYear + 1;
+      semester = "1st Semester";
+    } else {
+      // January to May = 2nd Semester
+      startYear = currentYear - 1;
+      endYear = currentYear;
+      semester = "2nd Semester";
+    }
+
+    return { startYear, endYear, semester };
+  }
+
+  // Auto-fill academic year and semester
+  function autoFillAcademicInfo() {
+    const { startYear, endYear, semester } = getPhilippineAcademicInfo();
+
+    const startYearInput = document.querySelector('#startYear');
+    const endYearInput = document.querySelector('#endYear');
+    const semesterSelect = document.querySelector('#semester');
+
+    if (startYearInput && !startYearInput.value) {
+      startYearInput.value = startYear;
+    }
+    if (endYearInput && !endYearInput.value) {
+      endYearInput.value = endYear;
+    }
+    if (semesterSelect && !semesterSelect.value) {
+      semesterSelect.value = semester;
+    }
+  }
+
   //Autofill Form Data
   async function autofillOrgData() {
     try {
@@ -31,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
   
-  // Autofill on page load
+  // Auto-fill on page load
+  autoFillAcademicInfo();
   autofillOrgData();
 
   /* -----------------------------------------------------------------
@@ -153,15 +199,57 @@ document.addEventListener("DOMContentLoaded", function () {
   /* -----------------------------------------------------------------
    *  3. HELPERS
    * ----------------------------------------------------------------- */
+  
+  // Map SDG numbers to full descriptions
+  const SDG_DESCRIPTIONS = {
+    "1": "1. No Poverty",
+    "2": "2. Zero Hunger",
+    "3": "3. Good Health & Well-being",
+    "4": "4. Quality Education",
+    "5": "5. Gender Equality",
+    "6": "6. Clean Water & Sanitation",
+    "7": "7. Affordable & Clean Energy",
+    "8": "8. Decent Work & Economic Growth",
+    "9": "9. Industry, Innovation & Infrastructure",
+    "10": "10. Reduced Inequalities",
+    "11": "11. Sustainable Cities and Communities",
+    "12": "12. Responsible Consumption & Production",
+    "13": "13. Climate Action",
+    "14": "14. Life Below Water",
+    "15": "15. Life on Land",
+    "16": "16. Peace, Justice & Strong Institutions",
+    "17": "17. Partnerships for the Goals"
+  };
+  
   const getSDGs = () => {
     const boxes = document.querySelectorAll('#eventModal input[type="checkbox"]:checked');
-    return Array.from(boxes).map(b => b.value);
+    return Array.from(boxes).map(b => SDG_DESCRIPTIONS[b.value] || b.value);
+  };
+  
+  const getInlineSDGs = () => {
+    const inlineContainer = document.getElementById("inlineEventForm");
+    const boxes = inlineContainer.querySelectorAll('input[type="checkbox"]:checked');
+    return Array.from(boxes).map(b => SDG_DESCRIPTIONS[b.value] || b.value);
   };
 
   const formatTime = (timeInput, periodSelect) => {
     const t = timeInput.value.trim();
     const p = periodSelect.value;
     return t ? `${t} ${p}` : "";
+  };
+
+  // Convert 24-hour HH:MM (from <input type="time">) to 12-hour with AM/PM
+  const convert24To12 = (time24) => {
+    if (!time24) return "";
+    // time24 expected like "14:30" or "09:05"
+    const parts = time24.split(":");
+    if (parts.length < 2) return time24;
+    let hour = parseInt(parts[0], 10);
+    const minute = parts[1];
+    const period = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    return `${hour}:${minute} ${period}`;
   };
 
   const clearModalFields = () => {
@@ -238,15 +326,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     hiddenContainer.appendChild(sdgContainer);
 
+    // Store file references (actual files will be uploaded separately)
     const modalFileInput = document.getElementById("modalFileInput");
-    if (modalFileInput.files.length) {
-      const clone = modalFileInput.cloneNode(true);
-      clone.className = "event-file-hidden";
-      Array.from(clone.files).forEach(file => {
+    if (modalFileInput && modalFileInput.files.length) {
+      Array.from(modalFileInput.files).forEach(file => {
         const fileInput = document.createElement("input");
         fileInput.type = "hidden";
         fileInput.className = "event-file-hidden";
-        fileInput.value = `/uploads/${file.name}`;
+        // We'll store placeholder; actual paths set after upload
+        fileInput.value = file.name;
         hiddenContainer.appendChild(fileInput);
       });
     }
@@ -323,7 +411,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll('#eventModal input[type="checkbox"]').forEach(c => c.checked = false);
     data.sdgs.forEach(s => {
-      const cb = document.querySelector(`#eventModal input[value="${s}"]`);
+      // Extract the number from the full description (e.g., "4. Quality Education" → "4")
+      const match = s.match(/^(\d+)/);
+      const sdgNumber = match ? match[1] : s;
+      const cb = document.querySelector(`#eventModal input[value="${sdgNumber}"]`);
       if (cb) cb.checked = true;
     });
 
@@ -420,6 +511,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const startYear = parseInt(document.getElementById("startYear").value) || new Date().getFullYear();
       const endYear = startYear + 1;
       const academicYear = `${startYear}-${endYear}`;
+      const orgAcronym = document.querySelector('input[name="org_acronym"]').value || "unknown";
 
       const submissionData = {
         applicationInfo: {
@@ -469,23 +561,22 @@ document.addEventListener("DOMContentLoaded", function () {
           eventName: inlineContainer.querySelector('#eventName')?.value || "",
           eventType: inlineContainer.querySelector('#eventType')?.value || "",
           eventDate: inlineContainer.querySelector('#eventDate')?.value || "",
-          startTime: inlineContainer.querySelector('#startTime')?.value + " " + inlineContainer.querySelector('#startPeriod')?.value || "",
-          endTime: inlineContainer.querySelector('#endTime')?.value + " " + inlineContainer.querySelector('#endPeriod')?.value || "",
+          // If inline uses native time inputs (HH:MM), convert to 12-hour with AM/PM
+          startTime: (function(){
+            const v = inlineContainer.querySelector('#startTime')?.value || "";
+            return v ? convert24To12(v) : "";
+          })(),
+          endTime: (function(){
+            const v = inlineContainer.querySelector('#endTime')?.value || "";
+            return v ? convert24To12(v) : "";
+          })(),
           eventVenue: inlineContainer.querySelector('#eventVenue')?.value || "",
           eventDescription: inlineContainer.querySelector('#eventDesc')?.value || "",
           attendance: parseInt(inlineContainer.querySelector('#eventAttendees')?.value || 0),
           eventProof: inlineContainer.querySelector('#eventProof')?.value || "",
-          eventSDG: Array.from(inlineContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
+          eventSDG: getInlineSDGs(),
           supportingDocuments: []
         };
-        
-        // Collect inline file paths if any
-        const inlineFileInput = inlineContainer.querySelector('.drop-zone-input');
-        if (inlineFileInput && inlineFileInput.files.length > 0) {
-          Array.from(inlineFileInput.files).forEach(file => {
-            eventData.supportingDocuments.push(`/uploads/${file.name}`);
-          });
-        }
 
         if (eventData.eventName || eventData.eventDate) {
           submissionData.events.push(eventData);
@@ -508,30 +599,123 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Send to server
+      // Show loading state
+      const submitBtn = submissionForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
       try {
-        const response = await fetch("../../php-server/routes/submissions.php", {
+        // Step 1: Create submission first
+        const createResponse = await fetch("../../php-server/routes/submissions.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(submissionData)
         });
 
-        const result = await response.json();
+        const createResult = await createResponse.json();
 
-        if (result.success) {
-          alert("Submission successful! Your form has been submitted.");
-          submissionForm.reset();
-          // Redirect to history or refresh
-          setTimeout(() => {
-            window.location.href = "history.php";
-          }, 1000);
-        } else {
-          alert("Submission failed: " + (result.error || "Unknown error"));
+        if (!createResult.success) {
+          throw new Error(createResult.error || "Failed to create submission");
         }
+
+        const submissionId = createResult.id;
+
+        // Step 2: Upload files if any exist
+        const fileUploadResult = await uploadSubmissionFiles(submissionId, orgAcronym);
+        
+        if (!fileUploadResult.success && fileUploadResult.hasFiles) {
+          throw new Error("File upload failed: " + (fileUploadResult.error || "Unknown error"));
+        }
+
+        // Success!
+        alert("Submission successful! Your form has been submitted.");
+        submissionForm.reset();
+        
+        // Redirect to history
+        setTimeout(() => {
+          window.location.href = "history.php";
+        }, 1000);
+
       } catch (err) {
         console.error("Submission error:", err);
-        alert("Failed to submit form. Please try again later.");
+        alert("Submission failed: " + err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     });
+  }
+
+  /* -----------------------------------------------------------------
+   *  9. FILE UPLOAD HELPER
+   * ----------------------------------------------------------------- */
+  async function uploadSubmissionFiles(submissionId, orgAcronym) {
+    try {
+      const inlineContainer = document.getElementById("inlineEventForm");
+      const inlineFileInput = inlineContainer.querySelector('.drop-zone-input');
+
+      // Collect all files from inline and modal forms
+      const allFiles = new FormData();
+      allFiles.append('submissionId', submissionId);
+      allFiles.append('orgAcronym', orgAcronym);
+
+      let hasFiles = false;
+      const addedFiles = new Set(); // Track file names to prevent duplicates
+
+      // Add inline form files (from single event form at top)
+      if (inlineFileInput && inlineFileInput.files.length > 0) {
+        Array.from(inlineFileInput.files).forEach(file => {
+          const fileKey = file.name + file.size; // Unique key
+          if (!addedFiles.has(fileKey)) {
+            allFiles.append('files[]', file);
+            addedFiles.add(fileKey);
+            hasFiles = true;
+          }
+        });
+      }
+
+      // Add modal form files (from "Add Another Event" modal only)
+      const modalFileInput = document.getElementById('modalFileInput');
+      if (modalFileInput && modalFileInput.files.length > 0) {
+        Array.from(modalFileInput.files).forEach(file => {
+          const fileKey = file.name + file.size; // Unique key
+          if (!addedFiles.has(fileKey)) {
+            allFiles.append('files[]', file);
+            addedFiles.add(fileKey);
+            hasFiles = true;
+          }
+        });
+      }
+
+      if (!hasFiles) {
+        return { success: true, hasFiles: false };
+      }
+
+      // Upload files
+      const uploadResponse = await fetch("../../php-server/routes/upload.php", {
+        method: "POST",
+        body: allFiles
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResult.success) {
+        return { 
+          success: false, 
+          hasFiles: true,
+          error: uploadResult.message || "File upload failed"
+        };
+      }
+
+      return { success: true, hasFiles: true, files: uploadResult.paths };
+
+    } catch (err) {
+      console.error("File upload error:", err);
+      return { 
+        success: false, 
+        hasFiles: true,
+        error: err.message
+      };
+    }
   }
 });

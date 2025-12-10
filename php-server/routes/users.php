@@ -31,17 +31,13 @@ try {
             if (isset($_GET['id'])) {
                 $response = $controller->getById($_GET['id']);
             } elseif (isset($_GET['role'])) {
-                // Only admin can filter by role
-                AuthMiddleware::requireRole('Admin');
+                // OSAS can filter by role
+                AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByRole($_GET['role']);
             } elseif (isset($_GET['email'])) {
-                // Only admin can search by email
-                AuthMiddleware::requireRole('Admin');
+                // OSAS can search by email
+                AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByEmail($_GET['email']);
-            } else {
-                // Only admin can get all users
-                AuthMiddleware::requireRole('Admin');
-                $response = $controller->getAll();
             }
         }
     } elseif ($method === 'POST') {
@@ -59,8 +55,8 @@ try {
                 $_SESSION['logged_in'] = true;
             }
         } else {
-            // User creation requires admin role
-            AuthMiddleware::requireRole('admin');
+            // User creation requires OSAS role
+            AuthMiddleware::requireRole('OSAS');
             $response = $controller->create($data);
         }
     } elseif ($method === 'PUT') {
@@ -70,21 +66,13 @@ try {
         if (!isset($_GET['id'])) {
             $response = ['success' => false, 'error' => 'ID required'];
         } else {
-            // Users can only update their own profile, admins can update anyone
-            if ($user['role'] !== 'Admin' && $_GET['id'] !== (string)$user['_id']) {
+            // Users can only update their own profile, OSAS can update anyone
+            if ($user['role'] !== 'OSAS' && $_GET['id'] !== (string)$user['_id']) {
                 $response = ['success' => false, 'error' => 'Unauthorized: Cannot update another user'];
             } else {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $response = $controller->update($_GET['id'], $data);
             }
-        }
-    } elseif ($method === 'DELETE') {
-        // Only admin can delete users
-        AuthMiddleware::requireRole('Admin');
-        if (!isset($_GET['id'])) {
-            $response = ['success' => false, 'error' => 'ID required'];
-        } else {
-            $response = $controller->delete($_GET['id']);
         }
     }
 } catch (Exception $e) {

@@ -14,18 +14,6 @@ class UserController
     }
 
     /**
-     * Get all users
-     */
-    public function getAll()
-    {
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
-        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-        $data = $this->user->getAll($limit, $offset);
-        return ['success' => true, 'data' => $data];
-    }
-
-    /**
      * Get user by ID
      */
     public function getById($id)
@@ -59,43 +47,6 @@ class UserController
             return ['success' => false, 'error' => 'User not found'];
         }
         return ['success' => true, 'data' => $data];
-    }
-
-    /**
-     * Create user
-     */
-    public function create($data)
-    {
-        if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
-            return ['success' => false, 'error' => 'Missing required fields'];
-        }
-
-        $id = $this->user->create($data);
-        return ['success' => true, 'id' => (string)$id];
-    }
-
-    /**
-     * Update user
-     */
-    public function update($id, $data)
-    {
-        $result = $this->user->update($id, $data);
-        if (!$result) {
-            return ['success' => false, 'error' => 'Update failed'];
-        }
-        return ['success' => true];
-    }
-
-    /**
-     * Delete user
-     */
-    public function delete($id)
-    {
-        $result = $this->user->delete($id);
-        if (!$result) {
-            return ['success' => false, 'error' => 'Delete failed'];
-        }
-        return ['success' => true];
     }
 
     /**

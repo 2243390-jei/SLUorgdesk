@@ -614,28 +614,33 @@ canvas {
 }
 
 .btn-logout {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-  border: 1px solid rgba(231, 76, 60, 0.2);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: 600; 
+  /* do not force full width; keep compact */
+  width: auto;
+  background: rgba(231, 76, 60, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(231, 76, 60, 0.18);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+  font-size: 13px;
 }
 
+/* make sure hover keeps same compact size */
 .btn-logout:hover {
-  background: rgba(231, 76, 60, 0.2);
+  background: rgba(231, 76, 60, 0.14);
   transform: translateY(-1px);
 }
 
 /* --- Sidebar: match calendar layout and sizing --- */
 .leftbar.sidebar-expanded {
-  width: 260px;                /* wider like calendar */
+  width: 260px;
+  /* wider like calendar */
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -648,30 +653,164 @@ canvas {
   height: 100vh;
   z-index: 1000;
   background: var(--sidebar-bg);
-  box-shadow: 2px 0 12px rgba(0,0,0,0.14);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.14);
   overflow: visible;
 }
 
 /* profile */
-.sidebar-profile { display:flex; align-items:center; gap:12px; }
-.avatar { width:64px; height:64px; border-radius:999px; background: linear-gradient(135deg,#e74c3c,#c0392b); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:0 6px 18px rgba(231,76,60,0.25); }
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-.profile-text .admin-title { font-weight:700; font-size:14px; color:#fff; }
-.profile-text .admin-sub { font-size:13px; color: rgba(255,255,255,0.75); }
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 6px 18px rgba(231, 76, 60, 0.25);
+}
+
+.profile-text .admin-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+
+.profile-text .admin-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
 
 /* menu */
-.sidebar-menu { margin-top: 12px; flex:1; }
-.sidebar-menu ul { list-style:none; padding:0; margin-top:200px; display:flex; flex-direction:column; gap:10px; }
-.nav-item { display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:10px; color: rgba(255,255,255,0.95); cursor:pointer; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; position:relative; transition: all .14s ease; background: transparent; font-family: "Bebas Neue", sans-serif; }
-.nav-item .menu-icon { width:24px; height:24px; object-fit:contain; filter: none; }
-.nav-item:hover { background: rgba(255,255,255,0.03); transform: translateX(3px); }
-.nav-item.active { background: linear-gradient(180deg, rgba(59,130,246,0.12), rgba(37,99,235,0.06)); box-shadow:0 6px 18px rgba(37,99,235,0.06); transform:none; }
-.nav-item.active::before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:6px; background: linear-gradient(180deg,#60a5fa,#2563eb); border-top-right-radius:4px; border-bottom-right-radius:4px; }
+.sidebar-menu {
+  margin-top: 12px;
+  flex: 1;
+}
 
-/* logout footer */
-.sidebar-footer { margin-top:auto; padding-top:8px; border-top:1px solid rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; }
-.btn-logout { width:100% !important; display:flex; align-items:center; gap:12px; padding:12px; border-radius:10px; background: rgba(231,76,60,0.08); color: rgba(255,255,255,0.95); font-weight:700; text-transform:uppercase; justify-content:flex-start; border:none; }
-.btn-logout .menu-icon { width:24px; height:24px; object-fit:contain; }
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  position: relative;
+  transition: all .14s ease;
+  background: transparent;
+  font-family: "Inter", sans-serif;
+}
+
+.nav-item .menu-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: none;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(3px);
+}
+
+.nav-item.active {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.06));
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.06);
+  transform: none;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* keep the footer area pinned to the bottom of the sidebar */
+.sidebar-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* inside expanded sidebar: make logout full-width and match nav-item styling */
+.leftbar.sidebar-expanded .sidebar-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* ensure the logout button fills the menu width like other items */
+.leftbar.sidebar-expanded .btn-logout {
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(231, 76, 60, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  font-weight: 700;
+  justify-content: flex-start;
+  /* aligns icon + label like nav items */
+  box-shadow: none;
+}
+
+/* keep logout icon at the same size as other menu icons */
+.leftbar.sidebar-expanded .btn-logout img,
+.leftbar.sidebar-expanded .btn-logout .menu-icon,
+.leftbar.sidebar-expanded .btn-logout .nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+/* label styling to match nav items */
+.leftbar.sidebar-expanded .btn-logout .menu-label {
+  flex: 1;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ensure all sidebar images/icons are consistent */
 .leftbar .menu-icon,
@@ -799,4 +938,45 @@ canvas {
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Tighten logout button and force small icon size */
+.sidebar-footer .btn-logout,
+.leftbar .btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  max-width: 200px;
+  background: rgba(231, 76, 60, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(231, 76, 60, 0.18);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Force the image/icon inside logout to be small and not stretch */
+.sidebar-footer .btn-logout .menu-icon,
+.leftbar .btn-logout img,
+.btn-logout .menu-icon,
+.circle-btn.logout-btn .nav-icon {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+/* Ensure the footer area stays pinned and compact */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,4 +1,5 @@
 <?php
+
 // Start session for this route
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../controllers/SubmissionController.php';
@@ -64,26 +65,35 @@ try {
             $response = $controller->create($data);
         }
     } elseif ($method === 'PUT') {
-        // Only admin/OSAS can update submissions
-        AuthMiddleware::requireAdminOrOsas();
+        // Users can update their own organization's submissions, admin/OSAS can update any
         if (!isset($_GET['id'])) {
             $response = ['success' => false, 'error' => 'ID required'];
         } else {
-            $data = json_decode(file_get_contents('php://input'), true);
-            $response = $controller->update($_GET['id'], $data);
-        }
-    } elseif ($method === 'DELETE') {
-        // Only admin can delete submissions
-        AuthMiddleware::requireRole('Admin');
-        if (!isset($_GET['id'])) {
-            $response = ['success' => false, 'error' => 'ID required'];
-        } else {
-            $response = $controller->delete($_GET['id']);
+            // If not admin/OSAS, verify the submission belongs to their organization
+            if ($user['role'] !== 'Admin' && $user['role'] !== 'OSAS') {
+                $submissionData = $controller->getById($_GET['id']);
+                // Check both organizationId and orgInfo.orgId fields for organization matching
+                $submissionOrgId = null;
+                if (isset($submissionData['data']['organizationId'])) {
+                    $submissionOrgId = $submissionData['data']['organizationId'];
+                } elseif (isset($submissionData['data']['orgInfo']['orgId'])) {
+                    $submissionOrgId = $submissionData['data']['orgInfo']['orgId'];
+                }
+                
+                if (!$submissionData['success'] || $submissionOrgId !== $user['organizationId']) {
+                    $response = ['success' => false, 'error' => 'Unauthorized: Cannot update submissions from another organization'];
+                } else {
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    $response = $controller->update($_GET['id'], $data);
+                }
+            } else {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->update($_GET['id'], $data);
+            }
         }
     }
 } catch (Exception $e) {
     $response = ['success' => false, 'error' => $e->getMessage()];
 }
-
 echo json_encode($response);
 ?>

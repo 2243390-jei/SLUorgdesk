@@ -7,6 +7,7 @@ const searchInput = document.getElementById("searchInput");
 const academicYearFilter = document.getElementById("academicYearFilter");
 const semesterFilter = document.getElementById("semesterFilter");
 const modalEditBtn = document.getElementById("modalEditBtn");
+let isEditMode = false;
 
 // ======================================================
 // Fetch helper
@@ -162,10 +163,16 @@ function renderCards(subs) {
         </div>
         <div class="event-details">
           <h4>${event.eventName || "Untitled Event"}</h4>
+          <div class="event-description">${(event.eventDescription || "").slice(0, 180)}${(event.eventDescription || "").length>180? '...':''}</div>
           <div class="event-meta">
             <span class="icon-calendar">${eventDate}</span>
             <span class="icon-location">${event.eventVenue || "-"}</span>
             <span class="icon-user">${app.applicantName || "-"}</span>
+          </div>
+          <div class="meta-badges">
+            ${event.eventType ? `<span class="badge">${event.eventType}</span>` : ''}
+            ${event.attendance ? `<span class="badge">Attendance: ${event.attendance}</span>`: ''}
+            ${(event.supportingDocuments || []).length ? `<span class="badge docs-badge"><strong>${event.supportingDocuments.length}</strong> file${event.supportingDocuments.length !== 1 ? 's' : ''}</span>` : ''}
           </div>
         </div>
         <div class="submission-footer">
@@ -200,75 +207,119 @@ function fillModal(sub) {
 
   modal.innerHTML = `
     <div class="modal-content">
-    <div class="modal-header">
-      <h2>
-        <img src="../images/student_img/history/book.png" alt="Books Icon" width="24" height="24" class="icon">
-        ${org.name || "Unknown Organization"} 
-        <span class="org-acronym">${org.acronym ? `(${org.acronym})` : ""}</span>
-      </h2>
+      <div class="modal-header">
+        <h2>
+          <img src="../images/student_img/history/book.png" alt="Books Icon" width="24" height="24" class="icon">
+          ${org.name || "Unknown Organization"}
+          <span class="org-acronym">${org.acronym ? `(${org.acronym})` : ""}</span>
+        </h2>
 
-      <!-- close button INSIDE header so it stays with the sticky header -->
-      <button class="modal-close" id="modalClose" aria-label="Close">
-        <span class="icon-close" aria-hidden="true"></span>
-      </button>
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          <span class="icon-close" aria-hidden="true"></span>
+        </button>
 
-      <div class="modal-subheader">
-        <img src="../images/student_img/history/calendar_blank.png" alt="Calendar Icon" width="16" height="16" class="icon">
-        ${sub.academicYear || "-"} | ${sub.semester || "-"}
+        <div class="modal-subheader">
+          <img src="../images/student_img/history/calendar_blank.png" alt="Calendar Icon" width="16" height="16" class="icon">
+          ${sub.academicYear || "-"} | ${sub.semester || "-"}
+        </div>
       </div>
-    </div>
 
       <div class="modal-body">
         <form id="editEventForm">
+
+          <div class="modal-section info-grid">
+            <div>
+              <h3>Organization Info</h3>
+              <div class="detail-line"><strong>Name:</strong> ${org.name || '-'}</div>
+              <div class="detail-line"><strong>Acronym:</strong> ${org.acronym || '-'}</div>
+              <div class="detail-line"><strong>Org Email:</strong> ${org.email || '-'}</div>
+            </div>
+
+            <div>
+              <h3>Applicant</h3>
+              <div class="detail-line"><strong>Name:</strong> ${app.applicantName || '-'}</div>
+              <div class="detail-line"><strong>Email:</strong> ${app.email || '-'}</div>
+              <div class="detail-line"><strong>Position:</strong> ${app.position || '-'}</div>
+            </div>
+          </div>
+
           <div class="modal-section">
-            <h3>
-              <div class="section-header">
-                <img src="../images/student_img/history/clock.png" alt="Clock Icon" width="20" height="20" class="icon">
-                Event Details
-                <span class="section-status">
-                <img src="../images/student_img/history/notes.png" alt="Notes Icon" width="12" height="12" class="icon">
-                  Editable
-                </span>
-              </div>
-            </h3>
-            
+            <h3>Event Details</h3>
+
             <div class="detail-group">
               <label class="detail-label">Event Name</label>
-              <input type="text" class="detail-input" name="eventName" value="${event.eventName || ""}" required>
+              <input type="text" class="detail-input" name="eventName" value="${event.eventName || ""}" readonly required>
             </div>
 
             <div class="detail-group">
               <label class="detail-label">Description</label>
-              <textarea class="detail-input detail-textarea" name="eventDescription" required>${event.eventDescription || ""}</textarea>
+              <textarea class="detail-input detail-textarea" name="eventDescription" readonly required>${event.eventDescription || ""}</textarea>
+            </div>
+
+            <div class="info-grid">
+              <div class="detail-group">
+                <label class="detail-label">Date</label>
+                <input type="date" class="detail-input" name="eventDate" value="${event.eventDate ? new Date(event.eventDate).toISOString().split('T')[0] : ""}" readonly required>
+              </div>
+              <div class="detail-group">
+                <label class="detail-label">Venue</label>
+                <input type="text" class="detail-input" name="eventVenue" value="${event.eventVenue || ""}" readonly required>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="detail-group time-group">
+                <label class="detail-label">Start Time</label>
+                <input type="text" class="detail-input" value="${event.startTime || '-'}" readonly>
+              </div>
+              <div class="detail-group time-group">
+                <label class="detail-label">End Time</label>
+                <input type="text" class="detail-input" value="${event.endTime || '-'}" readonly>
+              </div>
             </div>
 
             <div class="detail-group">
-              <label class="detail-label">Date</label>
-              <input type="date" class="detail-input" name="eventDate" value="${event.eventDate ? new Date(event.eventDate).toISOString().split('T')[0] : ""}" required>
+              <label class="detail-label">Event Type</label>
+              <input type="text" class="detail-input" value="${event.eventType || '-'}" readonly>
             </div>
 
             <div class="detail-group">
-              <label class="detail-label">Venue</label>
-              <input type="text" class="detail-input" name="eventVenue" value="${event.eventVenue || ""}" required>
+              <label class="detail-label">Attendance</label>
+              <input type="text" class="detail-input" value="${event.attendance || '-'}" readonly>
             </div>
 
             <div class="detail-group">
-              <label class="detail-label">
-                    <img src="../images/student_img/history/file.png" alt="File Icon" width="16" height="16" class="icon">
-                Supporting Documents
-              </label>
+              <label class="detail-label">Event Proof</label>
+              ${event.eventProof ? `<a href="${event.eventProof}" target="_blank" class="event-proof-link">Open proof / evidence</a>` : '<div class="no-docs">No event proof link</div>'}
+            </div>
+
+            <div class="detail-group">
+              <label class="detail-label">SDG Alignment</label>
+              <div class="sdg-tags">${(event.eventSDG || []).length ? (event.eventSDG || []).map(sdg => `<span class="sdg-tag">${sdg}</span>`).join('') : '<span class="no-docs">None specified</span>'}</div>
+            </div>
+
+            <div class="detail-group">
+              <label class="detail-label">Supporting Documents</label>
               <div class="document-links">
                 ${(event.supportingDocuments || []).length
-                  ? event.supportingDocuments.map(doc => `
-                      <a href="${doc}" class="doc-link" target="_blank" onerror="this.classList.add('broken-link')">
-                        <img src="../images/student_img/history/file_empty.png" alt="Document Icon" width="20" height="20" class="icon">
-                        <span class="doc-name">${doc.split('/').pop()}</span>
-                        <img src="../images/student_img/history/upload.png" alt="Document Icon" width="16" height="16" class="icon">
-                      </a>
+                  ? event.supportingDocuments.map((doc, idx) => `
+                      <div class="doc-item">
+                        <button type="button" class="doc-preview-btn" onclick="toggleDocumentPreview(${idx})" title="View file">${doc.split('/').pop()}</button>
+                        <div class="doc-preview-container" id="doc-preview-${idx}" style="display:none;">
+                          <div class="doc-preview-content">
+                            ${getDocumentPreviewHTML(doc)}
+                            <button type="button" class="doc-close-btn" onclick="toggleDocumentPreview(${idx})">✕</button>
+                          </div>
+                        </div>
+                      </div>
                     `).join("")
                   : '<span class="no-docs">No supporting documents</span>'}
               </div>
             </div>
+          </div>
+
+          <div class="modal-section">
+            <h3>Revision / Notes</h3>
+            <div class="detail-line">${sub.revisionComment || '<span class="no-docs">No revision comments</span>'}</div>
           </div>
 
           <div class="form-actions">
@@ -276,8 +327,12 @@ function fillModal(sub) {
               <img src="../images/student_img/history/close_modal.png" alt="Close Icon" width="16" height="16" class="icon">
               Close
             </button>
-            <button type="submit" class="btn btn-primary">
-              <img src="../images/student_img/history/save.png" alt="Close Icon" width="16" height="16" class="icon">
+            <button type="button" class="btn btn-primary" id="modalEditBtn">
+              <img src="../images/student_img/history/edit.png" alt="Edit Icon" width="16" height="16" class="icon">
+              Edit Submission
+            </button>
+            <button type="submit" class="btn btn-primary save-btn" id="modalSaveBtn" style="display:none;">
+              <img src="../images/student_img/history/save.png" alt="Save Icon" width="16" height="16" class="icon">
               Save Changes
             </button>
           </div>
@@ -290,49 +345,132 @@ function fillModal(sub) {
   document.getElementById("modalClose").addEventListener("click", () => {
     modal.style.display = "none";
   });
+  setupEditToggle();
 }
 
 window.addEventListener("click", e => {
   if (e.target === modal) modal.style.display = "none";
 });
 
-// Handle form submission
-modal.addEventListener("submit", async (e) => {
-  if (e.target.id !== "editEventForm") return;
-  e.preventDefault();
-
-  const form = e.target;
-  const formData = new FormData(form);
+// Toggle edit mode
+const setupEditToggle = () => {
+  const editBtn = document.getElementById('modalEditBtn');
+  const saveBtn = document.getElementById('modalSaveBtn');
+  const modalContent = document.querySelector('.modal-content');
+  const form = document.getElementById('editEventForm');
   
-  try {
-    const updatedEvent = {
-      eventName: formData.get("eventName"),
-      eventDescription: formData.get("eventDescription"),
-      eventDate: formData.get("eventDate"),
-      eventVenue: formData.get("eventVenue")
-    };
-
-    // Update the submission in memory
-    const submissionIndex = allSubmissions.findIndex(s => s._id === currentEditingId);
-    if (submissionIndex >= 0) {
-      allSubmissions[submissionIndex].event = {
-        ...allSubmissions[submissionIndex].event,
-        ...updatedEvent
-      };
-    }
-
-    // Refresh the cards display
-    renderCards(allSubmissions);
-    
-    // Close modal
-    modal.style.display = "none";
-    
-    // Show success message
-    alert("Changes saved successfully!");
-  } catch (error) {
-    alert("Error saving changes: " + error.message);
+  if (editBtn) {
+    editBtn.addEventListener('click', () => {
+      isEditMode = true;
+      const inputs = modal.querySelectorAll('.detail-input');
+      
+      inputs.forEach(input => {
+        input.readOnly = false;
+        input.classList.add('editing');
+      });
+      
+      // Toggle button visibility
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'inline-flex';
+      
+      // Scroll to top of modal
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+    });
   }
-});
+  
+  if (saveBtn && form) {
+    saveBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Get form data
+      const eventName = form.querySelector('[name="eventName"]').value;
+      const eventDescription = form.querySelector('[name="eventDescription"]').value;
+      const eventDate = form.querySelector('[name="eventDate"]').value;
+      const eventVenue = form.querySelector('[name="eventVenue"]').value;
+      
+      // Validate inputs
+      if (!eventName.trim() || !eventDescription.trim() || !eventDate || !eventVenue.trim()) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      try {
+        // Send update to backend
+        fetch('../../php-server/routes/submissions.php?id=' + currentEditingId, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            event: {
+              eventName: eventName,
+              eventDescription: eventDescription,
+              eventDate: eventDate,
+              eventVenue: eventVenue
+            }
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the submission in memory
+            const submissionIndex = allSubmissions.findIndex(s => s._id === currentEditingId);
+            if (submissionIndex >= 0) {
+              allSubmissions[submissionIndex].event = {
+                ...allSubmissions[submissionIndex].event,
+                eventName: eventName,
+                eventDescription: eventDescription,
+                eventDate: eventDate,
+                eventVenue: eventVenue
+              };
+            }
+
+            // Refresh the cards display
+            renderCards(allSubmissions);
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'success-message';
+            successMsg.innerHTML = '<span>✓</span> Edited successfully!';
+            document.body.appendChild(successMsg);
+            
+            // Auto-remove message and close modal
+            setTimeout(() => {
+              successMsg.classList.add('fade-out');
+              setTimeout(() => {
+                successMsg.remove();
+                modal.style.display = "none";
+                isEditMode = false;
+                
+                // Reset all inputs to readonly
+                const inputs = modal.querySelectorAll('.detail-input');
+                inputs.forEach(input => {
+                  input.readOnly = true;
+                  input.classList.remove('editing');
+                });
+                
+                // Reset button visibility
+                editBtn.style.display = 'inline-flex';
+                saveBtn.style.display = 'none';
+              }, 300);
+            }, 1500);
+          } else {
+            alert('Error: ' + (data.error || 'Failed to save changes'));
+          }
+        })
+        .catch(error => {
+          alert('Error saving changes: ' + error.message);
+        });
+        
+      } catch (error) {
+        alert('Error saving changes: ' + error.message);
+      }
+    });
+  }
+};
 
 // Handle cancel button
 modal.addEventListener("click", (e) => {
@@ -340,3 +478,37 @@ modal.addEventListener("click", (e) => {
     modal.style.display = "none";
   }
 });
+
+// ======================================================
+// File Preview Functions
+// ======================================================
+window.toggleDocumentPreview = function(idx) {
+  const container = document.getElementById(`doc-preview-${idx}`);
+  if (container) {
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+window.getDocumentPreviewHTML = function(docPath) {
+  const fileName = docPath.split('/').pop();
+  const fileExt = fileName.split('.').pop().toLowerCase();
+  const viewableTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp'];
+  
+  // Convert /uploads/... to relative path from public folder
+  let accessPath = docPath;
+  if (docPath.startsWith('/uploads/')) {
+    accessPath = '../../uploads' + docPath.substring(8); // Remove '/uploads' and add relative path
+  }
+  
+  if (viewableTypes.includes(fileExt)) {
+    if (fileExt === 'pdf') {
+      return `<embed src="${accessPath}" type="application/pdf" class="doc-embed" />`;
+    } else {
+      return `<img src="${accessPath}" alt="${fileName}" class="doc-embed-image" />`;
+    }
+  } else if (['zip', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'ppt', 'pptx'].includes(fileExt)) {
+    return `<div class="doc-not-viewable"><p>This file type cannot be previewed.</p><a href="${accessPath}" download="${fileName}" class="download-link">Download ${fileName}</a></div>`;
+  } else {
+    return `<div class="doc-not-viewable"><p>Preview not available for this file type.</p><a href="${accessPath}" download="${fileName}" class="download-link">Download ${fileName}</a></div>`;
+  }
+};

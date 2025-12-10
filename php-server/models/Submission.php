@@ -118,7 +118,6 @@ class Submission
             'semester' => $data['semester'] ?? null,
             'event' => $eventData,  // Store event details properly
             'revisionComment' => $data['revisionComment'] ?? $data['additionalNote'] ?? '',
-            'status' => $data['status'] ?? 'pending',
             'submittedAt' => new MongoDB\BSON\UTCDateTime(time() * 1000)
         ];
 
@@ -126,14 +125,56 @@ class Submission
     }
 
     /**
+     * Update submission file paths after upload
+     * @param string $id - Submission ID
+     * @param array $filePaths - Array of file paths to add to supportingDocuments
+     */
+    public function addFilePaths($id, $filePaths)
+    {
+        try {
+            $objectId = new MongoDB\BSON\ObjectId($id);
+            
+            // If storing single event as object, update the event object
+            // Otherwise update the first event in array
+            $updateData = [
+                '$push' => [
+                    'event.supportingDocuments' => ['$each' => $filePaths]
+                ]
+            ];
+            
+            return Database::update($this->collection, ['_id' => $objectId], $updateData);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Update submission
+     * Preserves existing fields while only updating the ones provided in $data
      */
     public function update($id, $data)
     {
         try {
             $objectId = new MongoDB\BSON\ObjectId($id);
-            $data['updatedAt'] = new MongoDB\BSON\UTCDateTime(time() * 1000);
-            return Database::update($this->collection, ['_id' => $objectId], $data);
+            
+            // Build update document using dot notation to preserve existing fields
+            $updateDoc = ['$set' => []];
+            $updateDoc['$set']['updatedAt'] = new MongoDB\BSON\UTCDateTime(time() * 1000);
+            
+            // Use dot notation for nested updates to preserve other event fields
+            foreach ($data as $key => $value) {
+                if ($key === 'event' && is_array($value)) {
+                    // For event object, use dot notation to update only provided fields
+                    foreach ($value as $eventKey => $eventValue) {
+                        $updateDoc['$set']["event.{$eventKey}"] = $eventValue;
+                    }
+                } else {
+                    // For top-level fields, update directly
+                    $updateDoc['$set'][$key] = $value;
+                }
+            }
+            
+            return Database::update($this->collection, ['_id' => $objectId], $updateDoc);
         } catch (Exception $e) {
             return false;
         }

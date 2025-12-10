@@ -17,28 +17,40 @@ if (empty($_SESSION['logged_in'])) {
 </head>
 <body>
   <div class="app">
-     <aside class="leftbar" aria-label="Main navigation">
-      <div class="brand">
-        <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
+    <!-- Left circular sidebar - copied from analytics.php -->
+    <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
+      <div class="sidebar-top">
+        <div class="sidebar-profile">
+          <div class="avatar">A</div>
+          <div class="profile-text">
+            <div class="admin-title">ADMIN</div>
+            <div class="admin-sub muted">Admin Name</div>
+          </div>
+        </div>
       </div>
 
-      <nav class="left-nav" aria-label="Sidebar">
-        <button class="circle-btn" title="Calendar" aria-label="Calendar" onclick="window.location.href='../osas/calendar.php'">
-          <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
-        </button>
-
-        <button class="circle-btn active" title="Organizations" aria-label="Organizations" onclick="window.location.href='../osas/orgs.php'">
-          <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
-        </button>
-        
-        <button class="circle-btn" title="Analytics" aria-label="Analytics" onclick="window.location.href='../osas/analytics.php'">
-          <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
-        </button>
-
-        <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
-          <img src="../Images/osas/logout.png" alt="Logout" class="nav-icon">
-        </button>
+      <nav class="sidebar-menu" aria-label="Sidebar">
+        <ul>
+          <li class="nav-item" onclick="location.href='../osas/calendar.php'">
+            <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
+            <span class="menu-label">CALENDAR</span>
+          </li>
+          <li class="nav-item active" onclick="location.href='../osas/orgs.php'">
+            <img src="../Images/osas/group.png" alt="" class="menu-icon">
+            <span class="menu-label">ORG MANAGEMENT</span>
+          </li>
+          <li class="nav-item" onclick="location.href='../osas/analytics.php'">
+            <img src="../Images/osas/statistics.png" alt="" class="menu-icon">
+            <span class="menu-label">ANALYTICS</span>
+          </li>
+        </ul>
       </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
+          <span class="menu-label">Logout</span>
+        </button>
+      </div>
     </aside>
     
     <main class="main-area">
