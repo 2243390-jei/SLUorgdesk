@@ -8,13 +8,164 @@
 /* TOP ACTIONS - Organization Management */
 .top-actions {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
   margin-bottom: 20px;
+  justify-content: flex-end; /* right-align controls */
 }
+
+/* Add button (blue) */
+.add-org-header-btn {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.08s ease;
+}
+.add-org-header-btn:hover { background-color: #1f4fc4; transform: translateY(-1px); }
+
+/* Search + filter wrapper */
+.search-wrap {
+  position: relative; /* anchor dropdown */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* match usermanagement gap */
+  width: 360px;
+}
+
+/* Search input styling (match usermanagement) */
+.search-wrap input[type="search"] {
+  flex: 1;
+  padding: 12px 40px 12px 16px; /* match usermanagement spacing */
+  border-radius: 10px;
+  border: 1px solid #e1e8ed;
+  background: white;
+  box-shadow: 0 2px 8px rgba(10, 20, 30, 0.04);
+  font-size: 14px;
+}
+
+/* Clear button: inline, hidden until input has value */
+.search-wrap { position: relative; }
+
+#searchClear {
+  position: absolute; /* overlay inside the search input so it doesn't add layout gap */
+  right: 44px; /* sits inside input's padding area (input has 40px right padding) */
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.search-wrap.has-value #searchClear { opacity: 1; pointer-events: auto; }
+#searchClear::after { /* removed duplicate visual '✕' to avoid double-X */ }
+/* Show our custom clear icon */
+#searchClear::after { content: '✕'; color: #6b7280; font-size: 13px; }
+
+/* Hide native browser search clear buttons to avoid double 'x' */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+input::-ms-clear, input::-ms-reveal { display: none; width: 0; height: 0; }
+
+/* Filter button aligned to the right of the search (no overlap) */
+#filterToggle {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-left: 0; /* keep tight with search input like usermanagement */
+  padding: 6px; /* same inner spacing as usermanagement */
+  cursor: pointer;
+}
+#filterToggle img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: none;
+  pointer-events: none;
+}
+#filterToggle:hover { background: #1f4fc4; }
 
 .hidden {
   display: none;
+}
+
+/* Filter dropdown menu (positioned relative to the search wrapper) */
+.filter-menu {
+  position: absolute;
+  top: 50px;
+  right: 0; /* anchor under the filter button (right edge) */
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 160px;
+  z-index: 10;
+}
+
+.filter-menu.hidden {
+  display: none;
+}
+
+.filter-item {
+  border: none;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-item:hover {
+  background: #eef2f7;
+}
+
+.filter-item.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.filter-clear {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#clearFilterBtn {
+  background-color: #f44336;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
+
+#clearFilterBtn:hover {
+  background-color: #d32f2f;
 }
 
 /* Bottom Actions Container */
@@ -69,7 +220,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.65); /* stronger backdrop for better contrast */
   z-index: 1000;
 }
 
@@ -106,7 +257,7 @@
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.65); /* stronger backdrop */
   z-index: 2000;
 }
 
@@ -179,7 +330,7 @@
 /* Modal Buttons */
 .modal-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 12px;
   margin-top: 24px;
 }
@@ -203,6 +354,24 @@
 
 .confirm-btn:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Danger button for destructive actions */
+.danger-btn {
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+  min-width: 100px;
+  height: 40px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.danger-btn:hover {
+  background-color: #dc2626;
   transform: translateY(-1px);
 }
 
@@ -323,10 +492,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: 0.2s;
 }
 
 .card-actions .action-icon:hover {
   background: #2563eb;
   color: #fff;
 }
+

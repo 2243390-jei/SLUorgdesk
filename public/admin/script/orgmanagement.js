@@ -19,6 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const createOrgForm = document.getElementById("createOrgForm");
   const orgFormTitle = document.getElementById("orgFormTitle");
 
+  // helper to toggle clear button visibility
+  function updateClearVisibility() {
+    const wrapper = document.querySelector('.search-wrap');
+    if (!wrapper || !searchInput) return;
+    if (searchInput.value && searchInput.value.trim() !== '') wrapper.classList.add('has-value');
+    else wrapper.classList.remove('has-value');
+  }
+
   const confirmModal = document.getElementById("confirmModal");
   const confirmYes = document.getElementById("confirmYes");
   const confirmCancel = document.getElementById("confirmCancel");
@@ -123,35 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Patch renderTable to also call renderCards on mobile
+  // Replace renderTable with the full updateTable-style flow from usermanagement
   function renderTable() {
-    console.log('Rendering table, isMobile:', isMobile());
-    
-    // First, ensure proper display states
-    const tableContainer = orgTableBody.closest('table');
-    if (tableContainer) {
-      tableContainer.style.display = isMobile() ? 'none' : '';
-    }
-    
-    if (orgCardList) {
-      orgCardList.style.display = isMobile() ? 'flex' : 'none';
-    }
-
-    orgTableBody.innerHTML = "";
-    if (!filteredData.length) {
-      orgTableBody.innerHTML = `<tr><td colspan="6">No organizations found.</td></tr>`;
-      if (orgCardList) {
-        orgCardList.innerHTML = `<div style='text-align:center;color:#888;padding:20px;'>No organizations found.</div>`;
-      }
-      return;
-    }
-    
+    // Build paginated table rows from filteredData (same flow as usermanagement.updateTable)
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    const pageData = filteredData.slice(start, end);
-    pageData.forEach((org) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
+    const paginatedOrgs = filteredData.slice(start, end);
+
+    // Render table rows as innerHTML for simplicity and parity with usermanagement
+    orgTableBody.innerHTML = paginatedOrgs.map(org => `
+      <tr>
         <td><img src="${org.localLogoPath || "../Images/default-logo.png"}" alt="${org.name}" class="org-logo"></td>
         <td class="org-name">${org.name || "N/A"}</td>
         <td class="org-email">${org.email || "N/A"}</td>
@@ -161,71 +151,81 @@ document.addEventListener("DOMContentLoaded", () => {
           <button class="action-icon edit-btn" data-id="${org._id}" onclick="openEditModal('${org._id}')"><i class="fas fa-edit"></i></button>
           <button class="action-icon delete-btn" data-id="${org._id}" onclick="openDeleteModal('${org._id}')"><i class="fas fa-trash"></i></button>
         </td>
-      `;
-      orgTableBody.appendChild(row);
-    });
-    
+      </tr>
+    `).join('');
+
+    // Handle mobile vs desktop display (same behaviour as previous implementation)
+    if (!orgCardList) return;
+
     if (isMobile()) {
+      orgCardList.style.display = 'flex';
+      if (orgTableBody.parentElement && orgTableBody.parentElement.parentElement) {
+        orgTableBody.parentElement.parentElement.style.display = 'none';
+      }
+      // Render cards for mobile view
       renderCards();
+    } else {
+      orgCardList.style.display = 'none';
+      if (orgTableBody.parentElement && orgTableBody.parentElement.parentElement) {
+        orgTableBody.parentElement.parentElement.style.display = '';
+      }
     }
+
+    // Update pagination controls (uses the copied updatePagination function)
+    updatePagination(totalPages);
   }
 
+  // Provide an adapter so the copied pagination functions can call into the
+  // existing renderTable/renderPagination flow.
+  function updateTable() {
+    renderTable();
+  }
+
+  // Exact pagination function copied from usermanagement.js
+  function updatePagination(totalPages) {
+    const pagination = document.getElementById('pagination');
+    let html = '';
+
+    if (totalPages > 1) {
+        html += `<button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+        html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                html += `<button onclick="changePage(${i})" class="${currentPage === i ? 'active-page' : ''}">${i}</button>`;
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                html += '<span>...</span>';
+            }
+        }
+
+        html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+        html += `<button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
+    }
+
+    pagination.innerHTML = html;
+  }
+
+  // Exact function copied from usermanagement.js (uses updateTable adapter)
+  function changePage(page) {
+    currentPage = page;
+    updateTable();
+  }
+
+  // Expose changePage globally so inline onclick handlers work
+  window.changePage = changePage;
+
+  // Exact handler copied from usermanagement.js
+  function handleRowsPerPageChange(event) {
+    rowsPerPage = parseInt(event.target.value);
+    currentPage = 1;
+    updateTable();
+  }
+
+  // Wrapper to keep existing call sites working — computes totalPages then
+  // delegates to the copied updatePagination function.
   function renderPagination() {
-    const pageNumbers = document.querySelector('.page-numbers');
-    const prevBtn = document.querySelector('.pagination-btn.prev');
-    const nextBtn = document.querySelector('.pagination-btn.next');
-    
-    if (!pageNumbers || !prevBtn || !nextBtn) return;
-    
-    pageNumbers.innerHTML = "";
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    
-    if (totalPages <= 1) {
-      prevBtn.style.visibility = 'hidden';
-      nextBtn.style.visibility = 'hidden';
-      return;
-    }
-
-    prevBtn.style.visibility = 'visible';
-    nextBtn.style.visibility = 'visible';
-    
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-        renderPagination();
-      }
-    });
-    
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.addEventListener('click', () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-        renderPagination();
-      }
-    });
-
-    const maxVisiblePages = 10;
-    let startPage = Math.max(1, Math.min(currentPage - Math.floor(maxVisiblePages / 2), totalPages - maxVisiblePages + 1));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.className = i === currentPage ? "active-page" : "";
-      btn.addEventListener("click", () => {
-        currentPage = i;
-        renderTable();
-        renderPagination();
-      });
-      pageNumbers.appendChild(btn);
-    }
+    updatePagination(totalPages);
   }
 
   // Edit modal functions
@@ -469,6 +469,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = 1;
     renderTable();
     renderPagination();
+    updateClearVisibility();
   });
 
   // Filter Menu Toggle
@@ -512,14 +513,11 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = 1;
     renderTable();
     renderPagination();
+    updateClearVisibility();
+    searchInput.focus();
   });
 
-  rowsPerPageSelect.addEventListener("change", () => {
-    rowsPerPage = parseInt(rowsPerPageSelect.value);
-    currentPage = 1;
-    renderTable();
-    renderPagination();
-  });
+  rowsPerPageSelect.addEventListener("change", handleRowsPerPageChange);
 
   // Close modal when clicking outside
   window.addEventListener("click", (event) => {

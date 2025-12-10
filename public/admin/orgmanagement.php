@@ -62,12 +62,12 @@ if (empty($_SESSION['logged_in'])) {
         <button id="addOrgBtn" class="add-org-header-btn">+ Add Organization</button>
 
         <div class="search-wrap">
-          <button id="filterToggle" title="Filter">
-            <img src="../Images/osas/filter.png" alt="filter-icon" class="" height="16" width="16">
-          </button>
-
           <input type="search" id="searchInput" placeholder="Search">
           <button id="searchClear" title="Clear search"></button>
+
+          <button id="filterToggle" title="Filter">
+            <img src="../Images/osas/filter.png" alt="filter-icon" class="">
+          </button>
 
           <div id="filterMenu" class="filter-menu hidden">
             <button class="filter-item" data-filter="SEA">SEA</button>
@@ -126,7 +126,7 @@ if (empty($_SESSION['logged_in'])) {
     <div class="modal-content">
       <h3>Are you sure you want to delete this organization?</h3>
       <div class="modal-buttons">
-        <button id="confirmYes" class="confirm-btn">Yes</button>
+        <button id="confirmYes" class="danger-btn">Yes</button>
         <button id="confirmCancel" class="cancel-btn">Cancel</button>
       </div>
     </div>

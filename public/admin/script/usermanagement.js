@@ -18,6 +18,7 @@ const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
 const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
 const filterToggle = document.getElementById('filterToggle');
 const filterMenu = document.querySelector('.filter-menu');
 const rowsPerPageSelect = document.getElementById('rowsPerPage');
@@ -32,6 +33,19 @@ document.addEventListener('DOMContentLoaded', initialize);
 addUserBtn.addEventListener('click', openUserFormModal);
 userForm.addEventListener('submit', handleSubmit);
 searchInput.addEventListener('input', handleSearch);
+// show/hide clear button
+if (searchInput) {
+    searchInput.addEventListener('input', () => updateClearVisibility());
+}
+if (searchClear) {
+    searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        currentFilters.search = '';
+        updateClearVisibility();
+        currentPage = 1;
+        updateTable();
+    });
+}
 filterToggle.addEventListener('click', toggleFilterMenu);
 document.getElementById('clearFilterBtn').addEventListener('click', clearFilters);
 rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
@@ -134,6 +148,13 @@ function filterUsers() {
         const matchesSchool = !currentFilters.school || orgName === currentFilters.school;
         return matchesSearch && matchesRole && matchesSchool;
     });
+}
+
+function updateClearVisibility() {
+    const wrapper = document.querySelector('.search-wrap');
+    if (!wrapper || !searchInput) return;
+    if (searchInput.value && searchInput.value.trim() !== '') wrapper.classList.add('has-value');
+    else wrapper.classList.remove('has-value');
 }
 
 // Update table with filtered and paginated data
