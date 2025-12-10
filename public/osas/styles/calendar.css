@@ -1375,8 +1375,8 @@ body {
   .search-wrap input[type="search"] {
     padding: 10px 36px 10px 12px;
     font-size: 14px;
-  }
 }
+
 
 @media (max-width: 480px) {
   .main-area {
