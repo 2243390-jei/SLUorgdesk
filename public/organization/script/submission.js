@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function autoFillAcademicInfo() {
     const { startYear, endYear, semester } = getPhilippineAcademicInfo();
 
-    const startYearInput = document.querySelector('#startYear');
-    const endYearInput = document.querySelector('#endYear');
-    const semesterSelect = document.querySelector('#semester');
+    const startYearInput = document.querySelector("#startYear");
+    const endYearInput = document.querySelector("#endYear");
+    const semesterSelect = document.querySelector("#semester");
 
     if (startYearInput && !startYearInput.value) {
       startYearInput.value = startYear;
@@ -49,25 +49,38 @@ document.addEventListener("DOMContentLoaded", function () {
   async function autofillOrgData() {
     try {
       // Get session user to get organization ID
-      const sessionRes = await fetch("../../php-server/routes/users.php?session=me");
+      const sessionRes = await fetch(
+        "../../php-server/routes/users.php?session=me"
+      );
       const sessionData = await sessionRes.json();
-      
-      if (sessionData.success && sessionData.data && sessionData.data.organizationId) {
+
+      if (
+        sessionData.success &&
+        sessionData.data &&
+        sessionData.data.organizationId
+      ) {
         const orgId = sessionData.data.organizationId;
-        
+
         // Fetch organization details
-        const res = await fetch("../../php-server/routes/organizations.php?id=" + orgId);
+        const res = await fetch(
+          "../../php-server/routes/organizations.php?id=" + orgId
+        );
         const result = await res.json();
-        
+
         if (result.success && result.data) {
           // Handle both array and single object responses
           const org = Array.isArray(result.data) ? result.data[0] : result.data;
-          
+
           if (org) {
             // Autofill organization fields
-            if (org.name) document.querySelector('input[name="org_name"]').value = org.name;
-            if (org.acronym) document.querySelector('input[name="org_acronym"]').value = org.acronym;
-            if (org.email) document.querySelector('input[name="org_email"]').value = org.email;
+            if (org.name)
+              document.querySelector('input[name="org_name"]').value = org.name;
+            if (org.acronym)
+              document.querySelector('input[name="org_acronym"]').value =
+                org.acronym;
+            if (org.email)
+              document.querySelector('input[name="org_email"]').value =
+                org.email;
           }
         }
       }
@@ -75,10 +88,165 @@ document.addEventListener("DOMContentLoaded", function () {
       console.warn("Could not autofill organization data:", err);
     }
   }
-  
+
   // Auto-fill on page load
   autoFillAcademicInfo();
   autofillOrgData();
+
+  // TODO: Kenneth: added time validation
+  /* -----------------------------------------------------------------
+   *  TIME VALIDATION - Start Time (7:30 AM min) and End Time (5:30 PM max)
+   * ----------------------------------------------------------------- */
+  const startTimeInput = document.getElementById("startTime");
+  const endTimeInput = document.getElementById("endTime");
+
+  // TODO: Change 1
+  const startTimeError = document.getElementById("startTimeError");
+  const endTimeError = document.getElementById("endTimeError");
+
+  if (startTimeInput && endTimeInput) {
+    // TODO: Change 2
+    // Show error below input
+    function showError(input, errorElement, message) {
+      input.setCustomValidity(message);
+      errorElement.textContent = message;
+    }
+
+    // TODO: Change 3
+    function clearError(input, errorElement) {
+      input.setCustomValidity("");
+      errorElement.textContent = "";
+    }
+
+    // Validate Start Time (must be >= 7:30 AM)
+    function validateStartTime() {
+      const startTime = startTimeInput.value;
+      if (!startTime) {
+        // TODO: change 4
+        clearError(startTimeInput, startTimeError);
+        return true;
+      }
+
+      const [hours, minutes] = startTime.split(":").map(Number);
+      const startMinutes = hours * 60 + minutes;
+      const minStartMinutes = 7 * 60 + 30; // 7:30 AM = 450 minutes
+
+      if (startMinutes < minStartMinutes) {
+        // TODO: Change 5
+        showError(
+          startTimeInput,
+          startTimeError,
+          "Start time must be at or after 7:30 AM"
+        );
+
+        startTimeInput.setCustomValidity(
+          "Start time must be at or after 7:30 AM"
+        );
+        return false;
+      }
+      // TODO; Change 6
+      clearError(startTimeInput, startTimeError);
+      startTimeInput.setCustomValidity("");
+      return true;
+    }
+
+    // Validate End Time (must be <= 5:30 PM)
+    function validateEndTime() {
+      const endTime = endTimeInput.value;
+      if (!endTime) {
+        // TODO: Change 7
+        clearError(endTimeInput, endTimeError);
+        return true;
+      }
+      const [hours, minutes] = endTime.split(":").map(Number);
+      const endMinutes = hours * 60 + minutes;
+      const maxEndMinutes = 17 * 60 + 30; // 5:30 PM = 1050 minutes
+
+      // TODO: Change 8
+      if (endMinutes > maxEndMinutes) {
+        showError(
+          endTimeInput,
+          endTimeError,
+          "End time must be at or before 5:30 PM"
+        );
+
+        endTimeInput.setCustomValidity("End time must be at or before 5:30 PM");
+        console.log("Kenneth debugs: End time must be at or before 5:30 PM");
+        return false;
+      }
+
+      // TODO: Change 9
+      clearError(endTimeInput, endTimeError);
+      endTimeInput.setCustomValidity("");
+      return true;
+    }
+
+    // Validate that End Time is after Start Time
+    function validateTimeRange() {
+      const startTime = startTimeInput.value;
+      const endTime = endTimeInput.value;
+
+      if (!startTime || !endTime) return true;
+
+      const [startHours, startMinutes] = startTime.split(":").map(Number);
+      const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+      const startTotalMinutes = startHours * 60 + startMinutes;
+      const endTotalMinutes = endHours * 60 + endMinutes;
+
+      if (endTotalMinutes <= startTotalMinutes) {
+        // TODO: Change 10
+        showError(
+          endTimeInput,
+          endTimeError,
+          "End time must be after start time"
+        );
+        endTimeInput.setCustomValidity("End time must be after start time");
+        return false;
+      }
+
+      // TODO: Change 11
+      clearError(endTimeInput, endTimeError);
+      endTimeInput.setCustomValidity("");
+      return true;
+    }
+
+    // Add event listeners for time validation
+
+    // START TIME Event listeners
+    // TODO; Change 12
+    startTimeInput.addEventListener("input", () => {
+      validateStartTime();
+      validateTimeRange();
+    });
+
+    startTimeInput.addEventListener("change", function () {
+      validateStartTime();
+      validateTimeRange();
+    });
+
+    startTimeInput.addEventListener("blur", function () {
+      validateStartTime();
+      validateTimeRange();
+    });
+
+    // END TIME Event listeners
+    // TODO: Change 13
+    endTimeInput.addEventListener("input", () => {
+      validateEndTime();
+      validateTimeRange();
+    });
+
+    endTimeInput.addEventListener("change", function () {
+      validateEndTime();
+      validateTimeRange();
+    });
+
+    endTimeInput.addEventListener("blur", function () {
+      validateEndTime();
+      validateTimeRange();
+    });
+  }
 
   /* -----------------------------------------------------------------
    *  1. FILE DROP ZONES (inline + modal) – REMOVABLE FILES, NO ACCIDENTAL PICKER
@@ -107,17 +275,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const render = () => {
       preview.innerHTML = "";
       if (!files.length) {
-        preview.innerHTML = '<p style="margin:0;color:#888;">No files selected.</p>';
+        preview.innerHTML =
+          '<p style="margin:0;color:#888;">No files selected.</p>';
         return;
       }
-      
+
       files.forEach((f, i) => {
         const item = document.createElement("div");
         item.className = "file-preview-item";
 
         const name = document.createElement("span");
         name.className = "file-name";
-        name.textContent = f.name.length > 20 ? f.name.slice(0,17)+"..." : f.name;
+        name.textContent =
+          f.name.length > 20 ? f.name.slice(0, 17) + "..." : f.name;
         name.title = f.name;
 
         const rm = document.createElement("button");
@@ -125,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
         rm.textContent = "×";
         rm.className = "remove-file";
         rm.setAttribute("title", "Remove " + f.name);
-        
+
         rm.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -142,32 +312,43 @@ document.addEventListener("DOMContentLoaded", function () {
     // ---- sync with <input> ------------------------------------------------
     const sync = () => {
       const dt = new DataTransfer();
-      files.forEach(f => dt.items.add(f));
+      files.forEach((f) => dt.items.add(f));
       input.files = dt.files;
     };
 
     // ---- drag-and-drop ----------------------------------------------------
-    const prevent = e => { e.preventDefault(); e.stopPropagation(); };
-    ["dragenter","dragover","dragleave","drop"].forEach(ev => dropZone.addEventListener(ev, prevent));
+    const prevent = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((ev) =>
+      dropZone.addEventListener(ev, prevent)
+    );
 
-    ["dragenter","dragover"].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.add("dragover")));
-    ["dragleave","drop"].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.remove("dragover")));
+    ["dragenter", "dragover"].forEach((ev) =>
+      dropZone.addEventListener(ev, () => dropZone.classList.add("dragover"))
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      dropZone.addEventListener(ev, () => dropZone.classList.remove("dragover"))
+    );
 
-    dropZone.addEventListener("drop", e => {
-      const newFiles = Array.from(e.dataTransfer.files).filter(f =>
+    dropZone.addEventListener("drop", (e) => {
+      const newFiles = Array.from(e.dataTransfer.files).filter((f) =>
         /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
       );
       files.push(...newFiles);
-      render(); sync();
+      render();
+      sync();
     });
 
     // ---- file input change ------------------------------------------------
     input.addEventListener("change", () => {
-      const newFiles = Array.from(input.files).filter(f =>
+      const newFiles = Array.from(input.files).filter((f) =>
         /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
       );
       files.push(...newFiles);
-      render(); sync();
+      render();
+      sync();
     });
 
     render(); // initial empty state
@@ -176,11 +357,11 @@ document.addEventListener("DOMContentLoaded", function () {
   /* -----------------------------------------------------------------
    *  2. MODAL CONTROLS
    * ----------------------------------------------------------------- */
-  const modal       = document.getElementById("eventModal");
-  const openBtn     = document.getElementById("openEventModalBtn");
-  const closeBtn    = document.getElementById("closeEventModal");
-  const cancelBtn   = document.getElementById("modalCancelBtn");
-  const saveBtn     = document.getElementById("modalSaveEventBtn");
+  const modal = document.getElementById("eventModal");
+  const openBtn = document.getElementById("openEventModalBtn");
+  const closeBtn = document.getElementById("closeEventModal");
+  const cancelBtn = document.getElementById("modalCancelBtn");
+  const saveBtn = document.getElementById("modalSaveEventBtn");
   const previewList = document.getElementById("eventListPreview");
 
   let editingIndex = null;
@@ -191,45 +372,53 @@ document.addEventListener("DOMContentLoaded", function () {
     clearModalFields();
   };
 
-  const closeModal = () => { modal.style.display = "none"; };
+  const closeModal = () => {
+    modal.style.display = "none";
+  };
   closeBtn.onclick = closeModal;
   cancelBtn.onclick = closeModal;
-  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
 
   /* -----------------------------------------------------------------
    *  3. HELPERS
    * ----------------------------------------------------------------- */
-  
+
   // Map SDG numbers to full descriptions
   const SDG_DESCRIPTIONS = {
-    "1": "1. No Poverty",
-    "2": "2. Zero Hunger",
-    "3": "3. Good Health & Well-being",
-    "4": "4. Quality Education",
-    "5": "5. Gender Equality",
-    "6": "6. Clean Water & Sanitation",
-    "7": "7. Affordable & Clean Energy",
-    "8": "8. Decent Work & Economic Growth",
-    "9": "9. Industry, Innovation & Infrastructure",
-    "10": "10. Reduced Inequalities",
-    "11": "11. Sustainable Cities and Communities",
-    "12": "12. Responsible Consumption & Production",
-    "13": "13. Climate Action",
-    "14": "14. Life Below Water",
-    "15": "15. Life on Land",
-    "16": "16. Peace, Justice & Strong Institutions",
-    "17": "17. Partnerships for the Goals"
+    1: "1. No Poverty",
+    2: "2. Zero Hunger",
+    3: "3. Good Health & Well-being",
+    4: "4. Quality Education",
+    5: "5. Gender Equality",
+    6: "6. Clean Water & Sanitation",
+    7: "7. Affordable & Clean Energy",
+    8: "8. Decent Work & Economic Growth",
+    9: "9. Industry, Innovation & Infrastructure",
+    10: "10. Reduced Inequalities",
+    11: "11. Sustainable Cities and Communities",
+    12: "12. Responsible Consumption & Production",
+    13: "13. Climate Action",
+    14: "14. Life Below Water",
+    15: "15. Life on Land",
+    16: "16. Peace, Justice & Strong Institutions",
+    17: "17. Partnerships for the Goals",
   };
-  
+
   const getSDGs = () => {
-    const boxes = document.querySelectorAll('#eventModal input[type="checkbox"]:checked');
-    return Array.from(boxes).map(b => SDG_DESCRIPTIONS[b.value] || b.value);
+    const boxes = document.querySelectorAll(
+      '#eventModal input[type="checkbox"]:checked'
+    );
+    return Array.from(boxes).map((b) => SDG_DESCRIPTIONS[b.value] || b.value);
   };
-  
+
   const getInlineSDGs = () => {
     const inlineContainer = document.getElementById("inlineEventForm");
-    const boxes = inlineContainer.querySelectorAll('input[type="checkbox"]:checked');
-    return Array.from(boxes).map(b => SDG_DESCRIPTIONS[b.value] || b.value);
+    const boxes = inlineContainer.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+    return Array.from(boxes).map((b) => SDG_DESCRIPTIONS[b.value] || b.value);
   };
 
   const formatTime = (timeInput, periodSelect) => {
@@ -253,15 +442,25 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const clearModalFields = () => {
-    ["modalEventName","modalEventType","modalEventVenue","modalEventAttendees",
-     "modalEventProof","modalEventDesc"].forEach(id => document.getElementById(id).value = "");
+    [
+      "modalEventName",
+      "modalEventType",
+      "modalEventVenue",
+      "modalEventAttendees",
+      "modalEventProof",
+      "modalEventDesc",
+    ].forEach((id) => (document.getElementById(id).value = ""));
     document.getElementById("modalEventDate").value = "";
     document.getElementById("modalStartTime").value = "";
     document.getElementById("modalEndTime").value = "";
-    document.querySelectorAll('#eventModal input[type="checkbox"]').forEach(c => c.checked = false);
+    document
+      .querySelectorAll('#eventModal input[type="checkbox"]')
+      .forEach((c) => (c.checked = false));
     const modalInput = document.getElementById("modalFileInput");
     modalInput.value = "";
-    const modalPrev = modalInput.closest(".drop-zone").querySelector(".file-preview-container");
+    const modalPrev = modalInput
+      .closest(".drop-zone")
+      .querySelector(".file-preview-container");
     if (modalPrev) modalPrev.innerHTML = "<p>No files selected.</p>";
   };
 
@@ -269,27 +468,45 @@ document.addEventListener("DOMContentLoaded", function () {
    *  4. SAVE / UPDATE EVENT
    * ----------------------------------------------------------------- */
   saveBtn.onclick = () => {
-    const name      = document.getElementById("modalEventName").value.trim();
-    const type      = document.getElementById("modalEventType").value.trim();
-    const date      = document.getElementById("modalEventDate").value;
-    const start     = formatTime(document.getElementById("modalStartTime"), document.getElementById("modalStartPeriod"));
-    const end       = formatTime(document.getElementById("modalEndTime"),   document.getElementById("modalEndPeriod"));
-    const venue     = document.getElementById("modalEventVenue").value.trim();
+    const name = document.getElementById("modalEventName").value.trim();
+    const type = document.getElementById("modalEventType").value.trim();
+    const date = document.getElementById("modalEventDate").value;
+    const start = formatTime(
+      document.getElementById("modalStartTime"),
+      document.getElementById("modalStartPeriod")
+    );
+    const end = formatTime(
+      document.getElementById("modalEndTime"),
+      document.getElementById("modalEndPeriod")
+    );
+    const venue = document.getElementById("modalEventVenue").value.trim();
     const attendees = document.getElementById("modalEventAttendees").value;
-    const proof     = document.getElementById("modalEventProof").value.trim();
-    const sdgs      = getSDGs();
-    const desc      = document.getElementById("modalEventDesc").value.trim();
+    const proof = document.getElementById("modalEventProof").value.trim();
+    const sdgs = getSDGs();
+    const desc = document.getElementById("modalEventDesc").value.trim();
 
     if (!name || !date || !start || !end) {
       alert("Event Name, Date, Start Time and End Time are required.");
       return;
     }
 
-    const eventData = { name, type, date, start, end, venue, attendees, proof, sdgs, desc };
+    const eventData = {
+      name,
+      type,
+      date,
+      start,
+      end,
+      venue,
+      attendees,
+      proof,
+      sdgs,
+      desc,
+    };
 
-    let hiddenContainer = editingIndex !== null
-      ? document.querySelectorAll(".hidden-event-container")[editingIndex]
-      : document.createElement("div");
+    let hiddenContainer =
+      editingIndex !== null
+        ? document.querySelectorAll(".hidden-event-container")[editingIndex]
+        : document.createElement("div");
 
     hiddenContainer.className = "hidden-event-container";
     hiddenContainer.style.display = "none";
@@ -312,12 +529,12 @@ document.addEventListener("DOMContentLoaded", function () {
     addHidden("event-attendees", attendees);
     addHidden("event-proof", proof);
     addHidden("event-desc", desc);
-    
+
     // Store SDG checkboxes as hidden values
     const sdgContainer = document.createElement("div");
     sdgContainer.className = "event-sdg-hidden";
     sdgContainer.style.display = "none";
-    sdgs.forEach(s => {
+    sdgs.forEach((s) => {
       const cbInput = document.createElement("input");
       cbInput.type = "hidden";
       cbInput.value = s;
@@ -329,7 +546,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Store file references (actual files will be uploaded separately)
     const modalFileInput = document.getElementById("modalFileInput");
     if (modalFileInput && modalFileInput.files.length) {
-      Array.from(modalFileInput.files).forEach(file => {
+      Array.from(modalFileInput.files).forEach((file) => {
         const fileInput = document.createElement("input");
         fileInput.type = "hidden";
         fileInput.className = "event-file-hidden";
@@ -351,28 +568,31 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     const title = `<strong>${name}</strong> (${type || "—"})`;
-    const when  = `${date} • ${start} – ${end}`;
+    const when = `${date} • ${start} – ${end}`;
     const where = venue ? `Venue: ${venue}` : "";
-    const nums  = attendees ? `Attendees: ${attendees}` : "";
-    const sdg   = sdgs.length ? `SDGs: ${sdgs.join(", ")}` : "";
-    const note  = desc ? `<em>${desc}</em>` : "";
+    const nums = attendees ? `Attendees: ${attendees}` : "";
+    const sdg = sdgs.length ? `SDGs: ${sdgs.join(", ")}` : "";
+    const note = desc ? `<em>${desc}</em>` : "";
 
     card.innerHTML = `
-      ${title}<br>${when}<br>${where}${nums ? " • " + nums : ""}<br>${sdg}<br>${note}
+      ${title}<br>${when}<br>${where}${
+      nums ? " • " + nums : ""
+    }<br>${sdg}<br>${note}
       <span class="event-delete" style="position:absolute;top:8px;right:8px;color:#d32f2f;font-weight:bold;cursor:pointer;">×</span>
     `;
 
-    card.addEventListener("click", e => {
+    card.addEventListener("click", (e) => {
       if (e.target.classList.contains("event-delete")) return;
       editEvent(card, hiddenContainer, eventData);
     });
 
-    card.querySelector(".event-delete").addEventListener("click", e => {
+    card.querySelector(".event-delete").addEventListener("click", (e) => {
       e.stopPropagation();
       if (confirm("Delete this event?")) {
         previewList.removeChild(card);
         hiddenContainer.remove();
-        if (!previewList.children.length) previewList.innerHTML = "<p><em>No events added yet.</em></p>";
+        if (!previewList.children.length)
+          previewList.innerHTML = "<p><em>No events added yet.</em></p>";
       }
     });
 
@@ -394,33 +614,39 @@ document.addEventListener("DOMContentLoaded", function () {
   function editEvent(cardElement, hiddenContainer, data) {
     editingIndex = Array.from(previewList.children).indexOf(cardElement);
 
-    document.getElementById("modalEventName").value      = data.name;
-    document.getElementById("modalEventType").value      = data.type;
-    document.getElementById("modalEventDate").value      = data.date;
-    document.getElementById("modalEventVenue").value     = data.venue;
+    document.getElementById("modalEventName").value = data.name;
+    document.getElementById("modalEventType").value = data.type;
+    document.getElementById("modalEventDate").value = data.date;
+    document.getElementById("modalEventVenue").value = data.venue;
     document.getElementById("modalEventAttendees").value = data.attendees;
-    document.getElementById("modalEventProof").value     = data.proof;
-    document.getElementById("modalEventDesc").value      = data.desc;
+    document.getElementById("modalEventProof").value = data.proof;
+    document.getElementById("modalEventDesc").value = data.desc;
 
     const [startTime, startPeriod] = data.start.split(" ");
-    const [endTime,   endPeriod]   = data.end.split(" ");
+    const [endTime, endPeriod] = data.end.split(" ");
     document.getElementById("modalStartTime").value = startTime || "";
     document.getElementById("modalStartPeriod").value = startPeriod || "AM";
     document.getElementById("modalEndTime").value = endTime || "";
     document.getElementById("modalEndPeriod").value = endPeriod || "AM";
 
-    document.querySelectorAll('#eventModal input[type="checkbox"]').forEach(c => c.checked = false);
-    data.sdgs.forEach(s => {
+    document
+      .querySelectorAll('#eventModal input[type="checkbox"]')
+      .forEach((c) => (c.checked = false));
+    data.sdgs.forEach((s) => {
       // Extract the number from the full description (e.g., "4. Quality Education" → "4")
       const match = s.match(/^(\d+)/);
       const sdgNumber = match ? match[1] : s;
-      const cb = document.querySelector(`#eventModal input[value="${sdgNumber}"]`);
+      const cb = document.querySelector(
+        `#eventModal input[value="${sdgNumber}"]`
+      );
       if (cb) cb.checked = true;
     });
 
     const modalInput = document.getElementById("modalFileInput");
     modalInput.value = "";
-    const modalPrev = modalInput.closest(".drop-zone").querySelector(".file-preview-container");
+    const modalPrev = modalInput
+      .closest(".drop-zone")
+      .querySelector(".file-preview-container");
     if (modalPrev) modalPrev.innerHTML = "<p>No files selected.</p>";
 
     modal.style.display = "flex";
@@ -433,12 +659,19 @@ document.addEventListener("DOMContentLoaded", function () {
   if (clearInlineBtn) {
     clearInlineBtn.onclick = () => {
       const container = document.getElementById("inlineEventForm");
-      container.querySelectorAll("input[type=text], input[type=date], input[type=number], input[type=url], textarea")
-              .forEach(el => el.value = "");
-      container.querySelectorAll("input[type=checkbox]").forEach(c => c.checked = false);
+      container
+        .querySelectorAll(
+          "input[type=text], input[type=date], input[type=number], input[type=url], textarea"
+        )
+        .forEach((el) => (el.value = ""));
+      container
+        .querySelectorAll("input[type=checkbox]")
+        .forEach((c) => (c.checked = false));
       const inlineInput = container.querySelector(".drop-zone-input");
       inlineInput.value = "";
-      const inlinePrev = inlineInput.closest(".drop-zone").querySelector(".file-preview-container");
+      const inlinePrev = inlineInput
+        .closest(".drop-zone")
+        .querySelector(".file-preview-container");
       if (inlinePrev) inlinePrev.innerHTML = "<p>No files selected.</p>";
     };
   }
@@ -503,33 +736,48 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (!sessionUser || !sessionUser.organizationId) {
-        alert("Error: Could not determine your organization. Please log in again.");
+        alert(
+          "Error: Could not determine your organization. Please log in again."
+        );
         return;
       }
 
       // Collect form data
-      const startYear = parseInt(document.getElementById("startYear").value) || new Date().getFullYear();
+      const startYear =
+        parseInt(document.getElementById("startYear").value) ||
+        new Date().getFullYear();
       const endYear = startYear + 1;
       const academicYear = `${startYear}-${endYear}`;
-      const orgAcronym = document.querySelector('input[name="org_acronym"]').value || "unknown";
+      const orgAcronym =
+        document.querySelector('input[name="org_acronym"]').value || "unknown";
 
+      // TODO: Kenneth: changed the input[] into select[] sa position
       const submissionData = {
         applicationInfo: {
-          applicantName: document.querySelector('input[name="applicant_name"]').value || "",
-          email: document.querySelector('input[name="applicant_email"]').value || sessionUser.email || "",
-          position: document.querySelector('input[name="applicant_position"]').value || ""
+          applicantName:
+            document.querySelector('input[name="applicant_name"]').value || "",
+          email:
+            document.querySelector('input[name="applicant_email"]').value ||
+            sessionUser.email ||
+            "",
+          position:
+            document.querySelector('select[name="applicant_position"]').value ||
+            "",
         },
         orgInfo: {
           orgId: sessionUser.organizationId,
           name: document.querySelector('input[name="org_name"]').value || "",
-          acronym: document.querySelector('input[name="org_acronym"]').value || "",
-          email: document.querySelector('input[name="org_email"]').value || ""
+          acronym:
+            document.querySelector('input[name="org_acronym"]').value || "",
+          email: document.querySelector('input[name="org_email"]').value || "",
         },
         academicYear: academicYear,
         semester: document.getElementById("semester").value || "",
         events: [],
-        revisionComment: document.querySelector('textarea[name="add_note"]').value || "",
-        confirmAccuracy: document.querySelector('input[name="confirm"]').checked || false
+        revisionComment:
+          document.querySelector('textarea[name="add_note"]').value || "",
+        confirmAccuracy:
+          document.querySelector('input[name="confirm"]').checked || false,
       };
 
       // Collect inline event form data (default event)
@@ -567,17 +815,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const sdgValues = Array.from(container.querySelectorAll('.event-sdg-value')).map(inp => inp.value);
         const eventData = {
           id: `E${Date.now()}`, // Generate unique event ID
-          eventName: container.querySelector('.event-name')?.value || "",
-          eventType: container.querySelector('.event-type')?.value || "",
-          eventDate: container.querySelector('.event-date')?.value || "",
-          startTime: container.querySelector('.start-time')?.value || "",
-          endTime: container.querySelector('.end-time')?.value || "",
-          eventVenue: container.querySelector('.event-venue')?.value || "",
-          eventDescription: container.querySelector('.event-desc')?.value || "",
-          attendance: parseInt(container.querySelector('.event-attendees')?.value || 0),
-          eventProof: container.querySelector('.event-proof')?.value || "",
+          eventName: container.querySelector(".event-name")?.value || "",
+          eventType: container.querySelector(".event-type")?.value || "",
+          eventDate: container.querySelector(".event-date")?.value || "",
+          startTime: container.querySelector(".start-time")?.value || "",
+          endTime: container.querySelector(".end-time")?.value || "",
+          eventVenue: container.querySelector(".event-venue")?.value || "",
+          eventDescription: container.querySelector(".event-desc")?.value || "",
+          attendance: parseInt(
+            container.querySelector(".event-attendees")?.value || 0
+          ),
+          eventProof: container.querySelector(".event-proof")?.value || "",
           eventSDG: sdgValues,
-          supportingDocuments: Array.from(container.querySelectorAll('.event-file-hidden')).map(f => f.value)
+          supportingDocuments: Array.from(
+            container.querySelectorAll(".event-file-hidden")
+          ).map((f) => f.value),
         };
         submissionData.events.push(eventData);
       });
@@ -645,12 +897,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Success!
         alert("Submission successful! Your form has been submitted.");
         submissionForm.reset();
-        
+
         // Redirect to history
         setTimeout(() => {
           window.location.href = "history.php";
         }, 1000);
-
       } catch (err) {
         console.error("Submission error:", err);
         alert("Submission failed: " + err.message);
@@ -666,22 +917,22 @@ document.addEventListener("DOMContentLoaded", function () {
   async function uploadSubmissionFiles(submissionId, orgAcronym) {
     try {
       const inlineContainer = document.getElementById("inlineEventForm");
-      const inlineFileInput = inlineContainer.querySelector('.drop-zone-input');
+      const inlineFileInput = inlineContainer.querySelector(".drop-zone-input");
 
       // Collect all files from inline and modal forms
       const allFiles = new FormData();
-      allFiles.append('submissionId', submissionId);
-      allFiles.append('orgAcronym', orgAcronym);
+      allFiles.append("submissionId", submissionId);
+      allFiles.append("orgAcronym", orgAcronym);
 
       let hasFiles = false;
       const addedFiles = new Set(); // Track file names to prevent duplicates
 
       // Add inline form files (from single event form at top)
       if (inlineFileInput && inlineFileInput.files.length > 0) {
-        Array.from(inlineFileInput.files).forEach(file => {
+        Array.from(inlineFileInput.files).forEach((file) => {
           const fileKey = file.name + file.size; // Unique key
           if (!addedFiles.has(fileKey)) {
-            allFiles.append('files[]', file);
+            allFiles.append("files[]", file);
             addedFiles.add(fileKey);
             hasFiles = true;
           }
@@ -689,12 +940,12 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Add modal form files (from "Add Another Event" modal only)
-      const modalFileInput = document.getElementById('modalFileInput');
+      const modalFileInput = document.getElementById("modalFileInput");
       if (modalFileInput && modalFileInput.files.length > 0) {
-        Array.from(modalFileInput.files).forEach(file => {
+        Array.from(modalFileInput.files).forEach((file) => {
           const fileKey = file.name + file.size; // Unique key
           if (!addedFiles.has(fileKey)) {
-            allFiles.append('files[]', file);
+            allFiles.append("files[]", file);
             addedFiles.add(fileKey);
             hasFiles = true;
           }
@@ -708,27 +959,26 @@ document.addEventListener("DOMContentLoaded", function () {
       // Upload files
       const uploadResponse = await fetch("../../php-server/routes/upload.php", {
         method: "POST",
-        body: allFiles
+        body: allFiles,
       });
 
       const uploadResult = await uploadResponse.json();
 
       if (!uploadResult.success) {
-        return { 
-          success: false, 
+        return {
+          success: false,
           hasFiles: true,
-          error: uploadResult.message || "File upload failed"
+          error: uploadResult.message || "File upload failed",
         };
       }
 
       return { success: true, hasFiles: true, files: uploadResult.paths };
-
     } catch (err) {
       console.error("File upload error:", err);
-      return { 
-        success: false, 
+      return {
+        success: false,
         hasFiles: true,
-        error: err.message
+        error: err.message,
       };
     }
   }
@@ -737,8 +987,7 @@ document.addEventListener("DOMContentLoaded", function () {
    *  10. TIME INPUT BUTTON-LIKE BEHAVIOR
    *      Make time inputs open picker when clicked anywhere
    * ----------------------------------------------------------------- */
-  const startTimeInput = document.getElementById("startTime");
-  const endTimeInput = document.getElementById("endTime");
+
 
   [startTimeInput, endTimeInput].forEach(input => {
     if (input) {

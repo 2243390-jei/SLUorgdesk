@@ -106,6 +106,11 @@ if (empty($_SESSION['logged_in'])) {
               </div>
             </div>
           </div>
+          
+          <!-- SLU OrgDesk Logo -->
+          <div id="header-logo">
+            <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+          </div>
         </div>
       </header>
 
