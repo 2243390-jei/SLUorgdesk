@@ -1,21 +1,24 @@
 <?php
+// Start session before clearing
 session_start();
+// Set JSON response type
 header('Content-Type: application/json');
 
-// Clear session data
+// Clear all session data
 $_SESSION = array();
 
-// Destroy the PHP session
+// Destroy the PHP session completely
 session_destroy();
 
-// Ensure session variables are cleared
+// Ensure all session variables are cleared
 if (function_exists('session_unset')) {
     session_unset();
 }
 
-// Delete session cookie
+// Delete session cookie from client
 if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
+    // Clear the session cookie by setting past expiration
     setcookie(
         session_name(),
         '',
@@ -27,7 +30,7 @@ if (ini_get('session.use_cookies')) {
     );
 }
 
-// Return success response
+// Return logout success response
 echo json_encode([
     'success' => true,
     'message' => 'Session terminated'
