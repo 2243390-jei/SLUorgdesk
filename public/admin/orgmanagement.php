@@ -14,8 +14,8 @@ if (empty($_SESSION['logged_in'])) {
   <title>Admin Organization Management</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="../style/orgmanagement.css">
-  <script src="../script/orgmanagement.js" defer></script>
+  <link rel="stylesheet" href="./styles/orgmanagement.css">
+  <script src="./script/orgmanagement.js" defer></script>
 </head>
 
 <body>

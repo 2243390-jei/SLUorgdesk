@@ -59,19 +59,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchOrganizations() {
     try {
-      const apiBase = "../php-server/routes/organizations.php";
+      const apiBase = "http://localhost:5000/api/Organizations";
       console.log('Fetching organizations from:', apiBase);
       const response = await fetch(apiBase);
       console.log('Response status:', response.status);
       const result = await response.json();
       console.log('Fetched data:', result);
-      organizations = result.success ? result.data : [];
+      console.log('Result.data:', result.data);
+      console.log('Is array?', Array.isArray(result.data));
+      organizations = result.success && result.data ? result.data : [];
+      console.log('Organizations after assignment:', organizations);
+      console.log('Organizations length:', organizations.length);
       filteredData = [...organizations];
+      console.log('FilteredData:', filteredData);
       renderTable();
       renderPagination();
     } catch (err) {
       console.error("Error fetching organizations:", err);
-      orgTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the server is running at ../php-server/routes/organizations.php</td></tr>`;
+      orgTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at http://localhost:5000</td></tr>`;
       return [];
     }
   }
@@ -102,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "card-item";
       card.innerHTML = `
         <div class="card-header">
-          <img src="${org.logoUrl || '../Images/default-logo.png'}" alt="${org.name}" class="card-logo" />
+          <img src="${org.localLogoPath || '../Images/default-logo.png'}" alt="${org.name}" class="card-logo" />
           <div>
             <div class="card-title">${org.name || 'N/A'}</div>
             <div class="card-email">${org.email || 'N/A'}</div>
@@ -150,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pageData.forEach((org) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><img src="${org.logoUrl || "../Images/default-logo.png"}" alt="${org.name}" class="org-logo"></td>
+        <td><img src="${org.localLogoPath || "../Images/default-logo.png"}" alt="${org.name}" class="org-logo"></td>
         <td class="org-name">${org.name || "N/A"}</td>
         <td class="org-email">${org.email || "N/A"}</td>
         <td>${org.isWhitelisted ? "Organization" : "Pending"}</td>
@@ -249,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (acronymField) acronymField.value = org.acronym || "";
       if (emailField) emailField.value = org.email || "";
       if (schoolField) schoolField.value = org.school || "";
-      if (logoField) logoField.value = org.logoUrl || "";
+      if (logoField) logoField.value = org.localLogoPath || "";
 
       addOrgModal.style.display = "flex";
     }
@@ -276,47 +281,106 @@ document.addEventListener("DOMContentLoaded", () => {
     orgToDelete = null;
   }
 
-  // Add new organization (temporary - only updates UI)
-  function addOrganization(orgData) {
-    // Add new organization to local array with temporary ID
-    orgData._id = 'temp_' + Date.now();
-    orgData.isWhitelisted = true; // Default to organization status
-    organizations.unshift(orgData); // Add to beginning of array
-    // Update the filtered data and UI
-    filteredData = [...organizations];
-    renderTable();
-    renderPagination();
-  }
-
-  // Edit organization (temporary - only updates UI)
-  function editOrganization(orgData) {
-    if (!orgToEdit) return;
-    
-    // Edit existing organization in local array
-    const orgIndex = organizations.findIndex(o => o._id === orgToEdit);
-    if (orgIndex !== -1) {
-      organizations[orgIndex] = { ...organizations[orgIndex], ...orgData };
-      // Update the filtered data and UI
-      filteredData = [...organizations];
-      renderTable();
-      renderPagination();
+  // Add new organization - Call Node.js API
+  async function addOrganization(orgData) {
+    try {
+      const response = await fetch('http://localhost:5000/api/Organizations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orgData)
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        // Refresh organizations list
+        organizations = await new Promise((resolve, reject) => {
+          fetch('http://localhost:5000/api/Organizations')
+            .then(res => res.json())
+            .then(data => resolve(data.success ? data.data : []))
+            .catch(reject);
+        });
+        filteredData = [...organizations];
+        renderTable();
+        renderPagination();
+        alert('Organization created successfully!');
+      } else {
+        alert('Error creating organization: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error adding organization:', error);
+      alert('Error: ' + error.message);
     }
   }
 
-  // Delete organization (temporary - only updates UI)
-  function confirmDelete() {
+  // Edit organization - Call Node.js API
+  async function editOrganization(orgData) {
+    if (!orgToEdit) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/Organizations/${orgToEdit}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orgData)
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        // Refresh organizations list
+        organizations = await new Promise((resolve, reject) => {
+          fetch('http://localhost:5000/api/Organizations')
+            .then(res => res.json())
+            .then(data => resolve(data.success ? data.data : []))
+            .catch(reject);
+        });
+        filteredData = [...organizations];
+        renderTable();
+        renderPagination();
+        alert('Organization updated successfully!');
+      } else {
+        alert('Error updating organization: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error editing organization:', error);
+      alert('Error: ' + error.message);
+    }
+  }
+
+  // Delete organization - Call Node.js API
+  async function confirmDelete() {
     if (!orgToDelete) return;
     
-    // Find the organization to "delete" in the local array
-    const orgIndex = organizations.findIndex(o => o._id === orgToDelete);
-    if (orgIndex !== -1) {
-      // Temporarily remove from local array only
-      organizations.splice(orgIndex, 1);
-      // Update the filtered data and UI
-      filteredData = [...organizations];
-      renderTable();
-      renderPagination();
-      closeDeleteModal();
+    try {
+      const response = await fetch(`http://localhost:5000/api/Organizations/${orgToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        // Refresh organizations list
+        organizations = await new Promise((resolve, reject) => {
+          fetch('http://localhost:5000/api/Organizations')
+            .then(res => res.json())
+            .then(data => resolve(data.success ? data.data : []))
+            .catch(reject);
+        });
+        filteredData = [...organizations];
+        renderTable();
+        renderPagination();
+        closeDeleteModal();
+        alert('Organization deleted successfully!');
+      } else {
+        alert('Error deleting organization: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting organization:', error);
+      alert('Error: ' + error.message);
     }
   }
 

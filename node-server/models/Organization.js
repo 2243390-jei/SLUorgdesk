@@ -12,4 +12,4 @@ const organizationSchema = new mongoose.Schema({
   localLogoPath: String
 })
 
-module.exports = mongoose.model('organizations', organizationSchema)
+module.exports = mongoose.model('Organizations', organizationSchema)
