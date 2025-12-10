@@ -9,30 +9,6 @@ class User
     private $collection = 'User';
 
     /**
-     * Get all users with selected fields
-     */
-    public function getAll($limit = 50, $offset = 0)
-    {
-        $options = [
-            'skip' => $offset,
-            'limit' => $limit,
-            'projection' => [
-                '_id' => 1,
-                'name' => 1,
-                'email' => 1,
-                'role' => 1,
-                'studentId' => 1,
-                'school' => 1,
-                'isActive' => 1,
-                'createdAt' => 1
-            ]
-        ];
-
-        $cursor = Database::query($this->collection, [], $options);
-        return $this->cursorToArray($cursor);
-    }
-
-    /**
      * Get user by ID
      */
     public function getById($id, $includePassword = false)
@@ -122,54 +98,6 @@ class User
     public function getByEmailWithPassword($email)
     {
         return $this->getByEmail($email, true);
-    }
-
-    /**
-     * Create user
-     */
-    public function create($data)
-    {
-        $document = [
-            'name' => $data['name'] ?? null,
-            'email' => $data['email'] ?? null,
-            'password' => $data['password'] ?? null,
-            'role' => $data['role'] ?? 'student',
-            'studentId' => $data['studentId'] ?? null,
-            'school' => $data['school'] ?? null,
-            'course' => $data['course'] ?? null,
-            'yearLevel' => $data['yearLevel'] ?? null,
-            'isActive' => $data['isActive'] ?? true,
-            'createdAt' => new MongoDB\BSON\UTCDateTime(time() * 1000)
-        ];
-
-        return Database::insert($this->collection, $document);
-    }
-
-    /**
-     * Update user
-     */
-    public function update($id, $data)
-    {
-        try {
-            $objectId = new MongoDB\BSON\ObjectId($id);
-            $data['updatedAt'] = new MongoDB\BSON\UTCDateTime(time() * 1000);
-            return Database::update($this->collection, ['_id' => $objectId], $data);
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Delete user
-     */
-    public function delete($id)
-    {
-        try {
-            $objectId = new MongoDB\BSON\ObjectId($id);
-            return Database::delete($this->collection, ['_id' => $objectId]);
-        } catch (Exception $e) {
-            return false;
-        }
     }
 
     /**

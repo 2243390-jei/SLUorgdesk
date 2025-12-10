@@ -87,16 +87,16 @@ if (empty($_SESSION['logged_in'])) {
         </div>
 
         <h3 class="form-section-title">Academic Year Information</h3>
-        <div class="form-row">
-          <div class="form-group">
+        <div class="academic-row">
+          <div class="form-group year-group">
             <label for="startYear">Start Year <span class="required">*</span></label>
             <input type="number" id="startYear" name="start_year" placeholder="e.g. 2025" min="2000" required>
           </div>
-          <div class="form-group">
+          <div class="form-group year-group">
             <label for="endYear">End Year <span class="required">*</span></label>
             <input type="number" id="endYear" name="end_year" placeholder="e.g. 2026" min="2000" required>
           </div>
-          <div class="form-group">
+          <div class="form-group semester-group">
             <label for="semester">Semester <span class="required">*</span></label>
             <select id="semester" name="semester" required>
               <option value="" disabled selected>Select Semester</option>
@@ -129,33 +129,17 @@ if (empty($_SESSION['logged_in'])) {
             <label>Event Date <span class="required">*</span></label>
             <input type="date" id="eventDate" required>
           </div>
-          <div class="form-group">
-            <label>Event Time</label>
-            <div class="event-time-container">
-              <div class="form-row">
-                <div class="form-group time-group">
-                  <label>Start Time</label>
-                  <div class="time-input-group">
-                    <input type="text" id="startTime" class="time-input" placeholder="12:00" maxlength="5" required>
-                    <select id="startPeriod" class="time-period">
-                      <option value="AM">AM</option>
-                      <option value="PM">PM</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group time-group">
-                  <label>End Time</label>
-                  <div class="time-input-group">
-                    <input type="text" id="endTime" class="time-input" placeholder="01:30" maxlength="5" required>
-                    <select id="endPeriod" class="time-period">
-                      <option value="AM">AM</option>
-                      <option value="PM">PM</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+          <div class="form-row">
+            <div class="form-group time-group">
+              <label for="startTime">Start Time <span class="required">*</span></label>
+              <input type="time" id="startTime" name="start_time" required>
+            </div>
+            <div class="form-group time-group">
+              <label for="endTime">End Time <span class="required">*</span></label>
+              <input type="time" id="endTime" name="end_time" required>
             </div>
           </div>
+          
           <div class="form-group">
             <label>Venue</label>
             <input type="text" id="eventVenue" placeholder="Your answer">

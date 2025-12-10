@@ -38,18 +38,6 @@ class SubmissionController
     }
 
     /**
-     * Get submission by event ID
-     */
-    public function getByEventId($eventId)
-    {
-        $data = $this->submission->getByEventId($eventId);
-        if (!$data) {
-            return ['success' => false, 'error' => 'Submission not found'];
-        }
-        return ['success' => true, 'data' => $data];
-    }
-
-    /**
      * Get submissions by organization
      */
     public function getByOrganization($orgId)
@@ -58,18 +46,6 @@ class SubmissionController
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
 
         $data = $this->submission->getByOrganization($orgId, $limit, $offset);
-        return ['success' => true, 'data' => $data];
-    }
-
-    /**
-     * Get submissions by year and semester
-     */
-    public function getByYearSemester($year, $semester)
-    {
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
-        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-        $data = $this->submission->getByYearSemester($year, $semester, $limit, $offset);
         return ['success' => true, 'data' => $data];
     }
 

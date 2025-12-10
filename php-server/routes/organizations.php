@@ -29,28 +29,6 @@ try {
         } else {
             $response = $controller->getAll();
         }
-    } elseif ($method === 'POST') {
-        // Only admin can create organizations
-        AuthMiddleware::requireRole('Admin');
-        $data = json_decode(file_get_contents('php://input'), true);
-        $response = $controller->create($data);
-    } elseif ($method === 'PUT') {
-        // Only admin can update organizations
-        AuthMiddleware::requireRole('Admin');
-        if (!isset($_GET['id'])) {
-            $response = ['success' => false, 'error' => 'ID required'];
-        } else {
-            $data = json_decode(file_get_contents('php://input'), true);
-            $response = $controller->update($_GET['id'], $data);
-        }
-    } elseif ($method === 'DELETE') {
-        // Only admin can delete organizations
-        AuthMiddleware::requireRole('Admin');
-        if (!isset($_GET['id'])) {
-            $response = ['success' => false, 'error' => 'ID required'];
-        } else {
-            $response = $controller->delete($_GET['id']);
-        }
     }
 } catch (Exception $e) {
     $response = ['success' => false, 'error' => $e->getMessage()];

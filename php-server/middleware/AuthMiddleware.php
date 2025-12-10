@@ -43,51 +43,5 @@ class AuthMiddleware
         return $user;
     }
 
-    /**
-     * Require user to be admin or OSAS
-     */
-    public static function requireAdminOrOsas()
-    {
-        $user = self::requireLogin();
-        $role = strtolower($user['role'] ?? '');
-
-        if ($role !== 'admin' && $role !== 'osas') {
-            http_response_code(403);
-            echo json_encode([
-                'success' => false,
-                'error' => 'Forbidden: Admin or OSAS access required'
-            ]);
-            exit;
-        }
-
-        return $user;
-    }
-
-    /**
-     * Require user to own the resource (organization)
-     */
-    public static function requireOrgOwnership($orgId)
-    {
-        $user = self::requireLogin();
-
-        // Admin can access anything
-        if (strtolower($user['role'] ?? '') === 'admin') {
-            return $user;
-        }
-
-        // Organization users can only access their own org
-        if (strtolower($user['role'] ?? '') === 'organization') {
-            if ($user['organizationId'] !== $orgId) {
-                http_response_code(403);
-                echo json_encode([
-                    'success' => false,
-                    'error' => 'Forbidden: Cannot access other organizations'
-                ]);
-                exit;
-            }
-        }
-
-        return $user;
-    }
 }
 ?>
