@@ -173,7 +173,45 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.innerWidth > 767 && profilePic && modal && logoutBtn && cancelBtn) {
     profilePic.addEventListener('click', (e) => {
       e.stopPropagation();
-      modal.style.display = 'block';
+        // Before showing modal, populate it with session info (name + email)
+        (async () => {
+          try {
+            const user = await getSessionUser();
+            if (user) {
+              const content = `
+                <div class="profile-modal-body">
+                  <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+                    <img src="${profilePic.src || '../../images/student_img/profile.png'}" alt="Profile" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">
+                    <div>
+                      <h3 style="margin:0;font-size:1.05rem;color:#1e1362;">${user.name || user.fullname || 'Student'}</h3>
+                      <p style="margin:4px 0 0 0;color:#666;">${user.email || ''}</p>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;justify-content:flex-end;">
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
+                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                  </div>
+                </div>
+              `;
+              modal.querySelector('.profile-modal-content').innerHTML = content;
+
+              // re-wire buttons inside the modal
+              const newLogout = modal.querySelector('#logoutBtn');
+              const newCancel = modal.querySelector('#cancelBtn');
+              if (newCancel) newCancel.addEventListener('click', () => modal.style.display = 'none');
+              if (newLogout) {
+                newLogout.addEventListener('click', async () => {
+                  try { await fetch('../../php-server/routes/logout.php', { method: 'POST' }); } catch (err) { console.error('Logout error:', err); }
+                  window.location.href = '../../index.php';
+                });
+              }
+            }
+          } catch (e) {
+            console.error('Failed to fetch session user for modal:', e);
+          }
+        })();
+
+        modal.style.display = 'block';
     });
 
     const closeModal = () => modal.style.display = 'none';
@@ -208,3 +246,19 @@ document.addEventListener("DOMContentLoaded", () => {
    INIT MANUAL LOGIN SETUP
    ============================== */
 document.addEventListener("DOMContentLoaded", setupManualLogin);
+
+/* ==============================
+   DISABLE INSPECT & DEV TOOLS
+   ============================== */
+// Disable right-click context menu
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+      (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+      (e.ctrlKey && e.shiftKey && e.key === 'C')) {
+    e.preventDefault();
+  }
+});

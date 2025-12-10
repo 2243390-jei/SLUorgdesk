@@ -5,39 +5,54 @@ if (empty($_SESSION['logged_in'])) {
     exit;
 }
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/analytics.css">
-    <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
-    <title>OSAS Analytics Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Osas Calendar — Analytics Dashboard</title>
+  <link rel="stylesheet" href="styles/analytics.css">
+  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
 </head>
 <body>
   <div class="app">
-    <aside class="leftbar" aria-label="Main navigation">
-      <div class="brand">
-        <img src="../images/SLU_logo.png" alt="SLU Logo" class="logo">
+    <!-- Left circular sidebar -->
+    <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
+      <div class="sidebar-top">
+        <div class="sidebar-profile">
+          <div class="avatar">A</div>
+          <div class="profile-text">
+            <div class="admin-title">ADMIN</div>
+            <div class="admin-sub muted">Admin Name</div>
+          </div>
+        </div>
       </div>
 
-      <nav class="left-nav" aria-label="Sidebar">
-        <a href="../osas/calendar.php" class="nav-link circle-btn" title="Calendar" aria-label="Calendar">
-          <img src="../images/osas/calendar.png" alt="Calendar" class="nav-icon">
-        </a>
-        <a href="../osas/orgs.php" class="nav-link circle-btn" title="Organizations" aria-label="Organizations">
-          <img src="../images/osas/group.png" alt="Organizations" class="nav-icon">
-        </a>
-        <a href="../osas/analytics.php" class="nav-link circle-btn active" title="Analytics" aria-label="Analytics">
-          <img src="../images/osas/statistics.png" alt="Analytics" class="nav-icon">
-        </a>
-        <!-- Logout button in sidebar -->
-        <button id="logoutBtn" class="circle-btn logout-btn" title="Logout" aria-label="Logout">
-          <img src="../images/osas/logout.png" alt="Logout" class="nav-icon">
-        </button>
+      <nav class="sidebar-menu" aria-label="Sidebar">
+        <ul>
+          <li class="nav-item" onclick="location.href='../osas/calendar.php'">
+            <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
+            <span class="menu-label">CALENDAR</span>
+          </li>
+          <li class="nav-item" onclick="location.href='../osas/orgs.php'">
+            <img src="../Images/osas/group.png" alt="" class="menu-icon">
+            <span class="menu-label">ORG MANAGEMENT</span>
+          </li>
+          <li class="nav-item active" onclick="location.href='../osas/analytics.php'">
+            <img src="../Images/osas/statistics.png" alt="" class="menu-icon">
+            <span class="menu-label">ANALYTICS</span>
+          </li>
+        </ul>
       </nav>
-    </aside>  
 
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
+          <span class="menu-label">Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main area -->
     <main class="main-area">
       <header class="header">
         <div class="greeting">
@@ -50,15 +65,15 @@ if (empty($_SESSION['logged_in'])) {
             <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization">
             <button id="searchClear" title="Clear" aria-label="Clear search">x</button>
           </div>
+          <!-- Profile moved to header -->
           <div class="profile-header">
-            <button class="profile-circle" id="mobileProfileBtn">O</button>
+            <div class="profile-circle" id="mobileProfileBtn">O</div>
           </div>
         </div>
       </header>
 
       <div class="body">
-        <!-- Stats Overview Cards - COMPLETELY REMOVED -->
-
+        <!-- Charts Row 1: Top Active Organizations + Monthly Submissions -->
         <div class="charts-row">
           <div class="orgs-section">
             <div class="section-header">
@@ -82,6 +97,7 @@ if (empty($_SESSION['logged_in'])) {
           </div>
         </div>
 
+        <!-- Charts Row 2: SDG Submissions -->
         <div class="charts-row">
           <div class="chart-full">
             <div class="chart-card">
@@ -100,6 +116,7 @@ if (empty($_SESSION['logged_in'])) {
           </div>
         </div>
 
+        <!-- Charts Row 3: Submissions by School -->
         <div class="charts-row">
           <div class="chart-full">
             <div class="chart-card">
@@ -116,12 +133,12 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <!-- Logout Confirmation Modal -->
-      <div id="logoutModal" class="modal" role="dialog" aria-hidden="true" aria-labelledby="logoutModalTitle">
+      <div id="logoutModal" class="modal" aria-hidden="true" aria-labelledby="logoutModalTitle">
         <div class="modal-content">
           <div class="modal-header">
             <h3 id="logoutModalTitle">Confirm Logout</h3>
             <button id="logoutModalClose" class="modal-close" aria-label="Close">
-              <img src="../images/osas/cross.png" alt="Close" class="nav-icon">
+              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
             </button>
           </div>
           <div class="modal-body">
@@ -135,16 +152,21 @@ if (empty($_SESSION['logged_in'])) {
       </div>
 
       <!-- Mobile Profile Modal -->
-      <div id="profileModal" class="modal profile-modal" role="dialog" aria-hidden="true" aria-labelledby="profileModalTitle">
+      <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
         <div class="modal-content">
           <div class="modal-header">
             <h3 id="profileModalTitle">Profile</h3>
             <button id="profileModalClose" class="modal-close" aria-label="Close">
-              <img src="../images/osas/cross.png" alt="Close" class="nav-icon">
+              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
             </button>
           </div>
           <div class="modal-body">
-            <!-- Content will be populated by JS -->
+            <div class="profile-info">
+              <div class="profile-large">O</div>
+              <div class="profile-details">
+                <h4>OSAS Admin</h4>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -152,7 +174,7 @@ if (empty($_SESSION['logged_in'])) {
       <footer class="footer muted">© <span id="curYear"></span> Osas Dashboard</footer>
     </main>
   </div>
-  
+
   <script src="script/analytics.js"></script>
 </body>
 </html>
