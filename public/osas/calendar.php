@@ -20,10 +20,10 @@ if (empty($_SESSION['logged_in'])) {
     <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">A</div>
+          <div class="avatar">O</div>
           <div class="profile-text">
-            <div class="admin-title">ADMIN</div>
-            <div class="admin-sub muted">Admin Name</div>
+            <div class="admin-title">OSAS</div>
+            <div class="admin-sub muted"></div>
           </div>
         </div>
       </div>
@@ -160,26 +160,6 @@ if (empty($_SESSION['logged_in'])) {
           <div class="modal-footer">
             <button id="logoutCancel" class="btn-secondary">Cancel</button>
             <button id="logoutConfirm" class="btn-primary">Logout</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mobile Profile Modal -->
-      <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 id="profileModalTitle">Profile</h3>
-            <button id="profileModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="profile-info">
-              <div class="profile-large">O</div>
-              <div class="profile-details">
-                <h4>OSAS Admin</h4>
-              </div>
-            </div>
           </div>
         </div>
       </div>

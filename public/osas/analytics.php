@@ -21,10 +21,10 @@ if (empty($_SESSION['logged_in'])) {
     <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">A</div>
+          <div class="avatar">O</div>
           <div class="profile-text">
-            <div class="admin-title">ADMIN</div>
-            <div class="admin-sub muted">Admin Name</div>
+            <div class="admin-title">OSAS</div>
+            <div class="admin-sub muted"></div>
           </div>
         </div>
       </div>
