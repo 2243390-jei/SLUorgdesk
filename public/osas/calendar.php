@@ -30,7 +30,7 @@ if (empty($_SESSION['logged_in'])) {
 
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
-          <li class="nav-item active" onclick="location.href='../osas/dashboard.php'">
+          <li class="nav-item active" onclick="location.href='../osas/calendar.php'">
             <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
