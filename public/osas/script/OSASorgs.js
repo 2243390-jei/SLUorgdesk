@@ -234,7 +234,14 @@ function hideProfileModal() {
 // Logout function
 function performLogout() {
   // Redirect to ../index.php instead of login.html
-  window.location.href = "../../index.php";
+   try {
+        fetch('../../php-server/routes/logout.php', { method: 'POST' });
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+
+      // Redirect to login
+      window.location.href = '../../index.php';
 }
 
 // Event listeners for logout functionality
