@@ -64,24 +64,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchOrganizations() {
     try {
-      const apiBase = "http://localhost:5000/api/Organizations";
-      console.log('Fetching organizations from:', apiBase);
+      const apiBase = API_CONFIG.organizationsEndpoint;
       const response = await fetch(apiBase);
-      console.log('Response status:', response.status);
       const result = await response.json();
-      console.log('Fetched data:', result);
-      console.log('Result.data:', result.data);
-      console.log('Is array?', Array.isArray(result.data));
       organizations = result.success && result.data ? result.data : [];
-      console.log('Organizations after assignment:', organizations);
-      console.log('Organizations length:', organizations.length);
       filteredData = [...organizations];
-      console.log('FilteredData:', filteredData);
       renderTable();
       renderPagination();
     } catch (err) {
       console.error("Error fetching organizations:", err);
-      orgTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at http://localhost:5000</td></tr>`;
+      orgTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at ${API_CONFIG.apiBase}</td></tr>`;
       return [];
     }
   }
@@ -280,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add new organization - Call Node.js API
   async function addOrganization(orgData) {
     try {
-      const response = await fetch('http://localhost:5000/api/Organizations', {
+      const response = await fetch(API_CONFIG.organizationsEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -292,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         // Refresh organizations list
         organizations = await new Promise((resolve, reject) => {
-          fetch('http://localhost:5000/api/Organizations')
+          fetch(API_CONFIG.organizationsEndpoint)
             .then(res => res.json())
             .then(data => resolve(data.success ? data.data : []))
             .catch(reject);
@@ -315,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!orgToEdit) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Organizations/${orgToEdit}`, {
+      const response = await fetch(`${API_CONFIG.organizationsEndpoint}/${orgToEdit}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -327,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         // Refresh organizations list
         organizations = await new Promise((resolve, reject) => {
-          fetch('http://localhost:5000/api/Organizations')
+          fetch(API_CONFIG.organizationsEndpoint)
             .then(res => res.json())
             .then(data => resolve(data.success ? data.data : []))
             .catch(reject);
@@ -350,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!orgToDelete) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Organizations/${orgToDelete}`, {
+      const response = await fetch(`${API_CONFIG.organizationsEndpoint}/${orgToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -361,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         // Refresh organizations list
         organizations = await new Promise((resolve, reject) => {
-          fetch('http://localhost:5000/api/Organizations')
+          fetch(API_CONFIG.organizationsEndpoint)
             .then(res => res.json())
             .then(data => resolve(data.success ? data.data : []))
             .catch(reject);

@@ -123,7 +123,7 @@ async function initialize() {
 // Fetch users from Node.js API
 async function fetchUsers() {
     try {
-        const apiBase = "http://localhost:5000/api/User";
+        const apiBase = API_CONFIG.usersEndpoint;
         console.log('Fetching users from:', apiBase);
         const response = await fetch(apiBase);
         console.log('Response status:', response.status);
@@ -133,7 +133,7 @@ async function fetchUsers() {
         return users;
     } catch (err) {
         console.error("Error fetching users:", err);
-        userTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at http://localhost:5000</td></tr>`;
+        userTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at ${API_CONFIG.apiBase}</td></tr>`;
         return [];
     }
 }
@@ -337,7 +337,7 @@ async function handleSubmit(event) {
     try {
         if (userId) {
             // Edit existing user - PATCH request
-            const response = await fetch(`http://localhost:5000/api/User/${userId}`, {
+            const response = await fetch(`${API_CONFIG.usersEndpoint}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -357,7 +357,7 @@ async function handleSubmit(event) {
             }
         } else {
             // Create new user - POST request
-            const response = await fetch('http://localhost:5000/api/User', {
+            const response = await fetch(API_CONFIG.usersEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -387,7 +387,7 @@ async function confirmDelete() {
     if (!userToDelete) return;
     
     try {
-        const response = await fetch(`http://localhost:5000/api/User/${userToDelete}`, {
+        const response = await fetch(`${API_CONFIG.usersEndpoint}/${userToDelete}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

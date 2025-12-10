@@ -14,6 +14,7 @@ if (empty($_SESSION['logged_in'])) {
   <link rel="stylesheet" href="styles/adminmain.css">
   <link rel="stylesheet" href="styles/usermanagement.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="script/config.js" defer></script>
   <script src="script/adminmain.js" defer></script>
   <script src="./script/usermanagement.js" defer></script>
 </head>

@@ -14,6 +14,7 @@ if (empty($_SESSION['logged_in'])) {
     <link rel="stylesheet" href="styles/adminmain.css">
     <link rel="stylesheet" href="styles/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="script/config.js" defer></script>
     <script src="script/adminmain.js" defer></script>
     <script src="script/dashboard.js" defer></script>
 </head>

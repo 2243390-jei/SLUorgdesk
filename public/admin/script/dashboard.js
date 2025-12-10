@@ -66,7 +66,7 @@ function generatePalette(n) {
 // Fetch stats from Node.js API endpoint and update charts
 async function loadDashboardStats() {
     try {
-        const res = await fetch('http://localhost:5000/api/stats');
+        const res = await fetch(`${API_CONFIG.statsEndpoint}`);
         if (!res.ok) {
             console.error('Stats fetch failed:', res.status, res.statusText);
             return;
@@ -78,7 +78,6 @@ async function loadDashboardStats() {
         }
 
         const { roles, recentActivities, organizations, organizationCount, totalUsers } = payload.data;
-        console.log('Dashboard stats loaded:', { roles, recentActivities, organizations, organizationCount, totalUsers });
 
         // Roles
         if (roles && roles.labels && roles.data) {
