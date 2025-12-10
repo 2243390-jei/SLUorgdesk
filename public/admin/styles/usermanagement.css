@@ -134,6 +134,7 @@ body {
   display: flex;
   gap: 16px;
   align-items: center;
+  justify-content: flex-end; /* right-align controls to match orgmanagement */
 }
 
 .add-org-header-btn {
@@ -154,6 +155,20 @@ body {
   background-color: #0052a3;
 }
 
+/* Add User button*/
+.add-user-header-btn {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.08s ease;
+}
+.add-user-header-btn:hover { background-color: #1f4fc4; transform: translateY(-1px); }
+
 .search-wrap {
   position: relative;
   width: 360px;
@@ -162,43 +177,64 @@ body {
   gap: 8px;
 }
 
-/* Filter Button */
+/* Hide native browser search clear buttons to avoid double 'x' */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+input::-ms-clear, input::-ms-reveal { display: none; width: 0; height: 0; }
+
+/* Clear button overlay inside search input */
+#searchClear {
+  position: absolute;
+  right: 44px; /* sits inside input's right padding */
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.search-wrap.has-value #searchClear { opacity: 1; pointer-events: auto; }
+#searchClear::after { content: '✕'; color: #6b7280; font-size: 13px; }
+
+/* Filter Button (blue) */
 #filterToggle {
-  background: #1f2b34;
+  background: var(--accent);
+  color: #fff;
   border: none;
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  padding: 6px; 
+  transition: background-color 0.12s ease;
+  padding: 6px;
 }
-
 
 #filterToggle img {
   width: 18px;
   height: 18px;
   object-fit: contain;
-  filter: brightness(0) invert(1); 
+  filter: none;
   pointer-events: none;
 }
 
-
-#filterToggle:hover {
-  background: #26343f;
-  transform: scale(1.05);
-}
-
-#filterToggle:active {
-  transform: scale(0.95);
-}
+#filterToggle:hover { background: #1f4fc4; }
 .filter-menu {
   position: absolute;
   top: 50px;
-  left: 0;
+  right: 0;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -343,18 +379,18 @@ tr:hover {
 
 /* Modal Styles */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    /* Add these for centering */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65); /* stronger backdrop for better contrast */
+  /* Add these for centering */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
@@ -364,16 +400,110 @@ tr:hover {
   border-radius: 12px;
   width: 450px;
   max-width: calc(100% - 32px);
-  text-align: left;
+  text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.3s ease;
   max-height: 90vh;
   overflow-y: auto;
 }
 
+/* Create modal (match orgmanagement create modal) */
+.createorg-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2000;
+}
+
+.createorg-modal.open {
+  display: flex;
+}
+
+.createorg-modal-content {
+  background: #fff;
+  width: 92%;
+  max-width: 760px;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.createorg-modal-row {
+  margin-bottom: 12px;
+}
+
+.createorg-modal-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.createorg-modal-row input,
+.createorg-modal-row select,
+.createorg-modal-row textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.createorg-modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.createorg-modal-actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-outlined {
+  background-color: #4caf50;
+  color: white;
+}
+
+.reset-btn {
+  background-color: #777;
+  color: white;
+}
+
+.small-confirm {
+  max-width: 400px;
+  text-align: center;
+}
+
 /* Form Styling */
 .form-group {
   margin-bottom: 0;
+}
+
+/* Danger button for destructive actions */
+.danger-btn {
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+  min-width: 100px;
+  height: 40px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.danger-btn:hover {
+  background-color: #dc2626;
 }
 
 .modal #userForm {
@@ -421,7 +551,7 @@ tr:hover {
 /* Buttons Inside Modal */
 .modal-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center; /* center modal action buttons */
   gap: 12px;
   margin-top: 24px;
 }
@@ -438,13 +568,13 @@ tr:hover {
 }
 
 .confirm-btn {
-  background: #2563eb;
+  background: #2bdc6c;
   color: white;
   border: none;
 }
 
 .confirm-btn:hover {
-  background: #1d4ed8;
+  background: #249f59;
   transform: translateY(-1px);
 }
 

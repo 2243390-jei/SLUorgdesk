@@ -63,8 +63,9 @@ if (empty($_SESSION['logged_in'])) {
         <button id="addUserBtn" class="add-user-header-btn">+ Add User</button>
         <div class="search-wrap">
           <input type="search" id="searchInput" placeholder="Search users">
+          <button id="searchClear" title="Clear search"></button>
           <button id="filterToggle" title="Filter">
-            <i class="fas fa-filter"></i>
+            <img src="../Images/osas/filter.png" alt="filter-icon">
           </button>
           <div class="filter-menu hidden" id="filterMenu">
             <div
@@ -124,19 +125,19 @@ if (empty($_SESSION['logged_in'])) {
 
   </main>
 
-  <!-- User Form Modal -->
-  <div id="userModal" class="modal">
-    <div class="modal-content">
+  <!-- User Form Modal (use same create modal styling as orgmanagement) -->
+  <div id="userModal" class="createorg-modal">
+    <div class="createorg-modal-content">
       <h2 id="modalTitle">Add User</h2>
       <form id="userForm">
         <div class="form-group">
           <label for="name">Name</label>
-          <input type="text" id="name" name="name" required>
+          <input type="text" id="name" name="name" placeholder="Enter full name" required>
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
+          <input type="email" id="email" name="email" placeholder="Enter email" required>
         </div>
 
         <div class="form-group">
@@ -153,7 +154,7 @@ if (empty($_SESSION['logged_in'])) {
           </select>
         </div>
 
-        <div class="modal-buttons">
+        <div class="createorg-modal-actions">
           <button type="submit" class="confirm-btn">Save User</button>
           <button type="button" class="cancel-btn" onclick="closeUserModal()">Cancel</button>
         </div>
@@ -161,13 +162,13 @@ if (empty($_SESSION['logged_in'])) {
     </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
+  <!-- Delete Confirmation Modal (use same modal structure as orgmanagement confirm modal) -->
   <div id="deleteModal" class="modal">
     <div class="modal-content">
       <h2 id="modalTitle">Confirm Delete</h2>
       <p>Are you sure you want to delete this user? This action cannot be undone.</p>
       <div class="modal-buttons">
-        <button type="button" class="delete-btn-modal" onclick="confirmDelete()">Delete</button>
+        <button type="button" class="danger-btn" onclick="confirmDelete()">Delete</button>
         <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
       </div>
     </div>
