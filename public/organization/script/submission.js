@@ -1,6 +1,39 @@
-/* submission.js – COMPLETE & FINAL */
-
+//Submission JS
 document.addEventListener("DOMContentLoaded", function () {
+  //Autofill Form Data
+  async function autofillOrgData() {
+    try {
+      // Get session user to get organization ID
+      const sessionRes = await fetch("../../php-server/routes/users.php?session=me");
+      const sessionData = await sessionRes.json();
+      
+      if (sessionData.success && sessionData.data && sessionData.data.organizationId) {
+        const orgId = sessionData.data.organizationId;
+        
+        // Fetch organization details
+        const res = await fetch("../../php-server/routes/organizations.php?id=" + orgId);
+        const result = await res.json();
+        
+        if (result.success && result.data) {
+          // Handle both array and single object responses
+          const org = Array.isArray(result.data) ? result.data[0] : result.data;
+          
+          if (org) {
+            // Autofill organization fields
+            if (org.name) document.querySelector('input[name="org_name"]').value = org.name;
+            if (org.acronym) document.querySelector('input[name="org_acronym"]').value = org.acronym;
+            if (org.email) document.querySelector('input[name="org_email"]').value = org.email;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Could not autofill organization data:", err);
+    }
+  }
+  
+  // Autofill on page load
+  autofillOrgData();
+
   /* -----------------------------------------------------------------
    *  1. FILE DROP ZONES (inline + modal) – REMOVABLE FILES, NO ACCIDENTAL PICKER
    * ----------------------------------------------------------------- */

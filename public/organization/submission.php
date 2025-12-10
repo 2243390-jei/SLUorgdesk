@@ -102,6 +102,7 @@ if (empty($_SESSION['logged_in'])) {
               <option value="" disabled selected>Select Semester</option>
               <option value="1st Semester">1st Semester</option>
               <option value="2nd Semester">2nd Semester</option>
+              <option value="Short Term">Short Term</option>
             </select>
           </div>
         </div>

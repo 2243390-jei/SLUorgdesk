@@ -1,4 +1,3 @@
-// Fetch session user from server (secure server-side validation)
 async function getSessionUser() {
   try {
     const response = await fetchWithTimeout("../../php-server/routes/users.php" + "?session=me");

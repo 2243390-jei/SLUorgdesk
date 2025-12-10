@@ -77,6 +77,7 @@ async function initialize() {
         <option value="">All Semesters</option>
         <option value="1st Semester">1st Semester</option>
         <option value="2nd Semester">2nd Semester</option>
+        <option value="Short Term">Short Term</option>
       `;
     }
 
