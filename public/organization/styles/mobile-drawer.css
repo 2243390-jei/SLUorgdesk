@@ -213,6 +213,8 @@
   font-weight: 700;
   cursor: pointer;
   width: 100%;
+  margin-bottom: 80px;
+  
 }
 
 .mobile-sheet #mobileLogoutButton:hover,

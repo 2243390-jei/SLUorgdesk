@@ -32,10 +32,10 @@
     headerDiv.className = 'sheet-header';
     headerDiv.innerHTML = `
       <div class="mobile-profile">
-        <img src="../images/student_img/profile.png" alt="Profile">
+        <img id="mobileProfilePic" src="../images/student_img/profile.png" alt="Profile">
         <div class="mobile-profile-info">
-          <h3>Student Name</h3>
-          <p>Student ID</p>
+          <h3 id="mobileProfileName">Loading...</h3>
+          <p id="mobileProfileEmail">&nbsp;</p>
         </div>
       </div>
     `;
@@ -62,7 +62,7 @@
     panel.appendChild(inner);
     sheet.appendChild(panel);
     document.body.appendChild(sheet);
-
+    // wire logout button and try to populate profile fields from session
     setTimeout(() => {
       const mobileLogout = document.getElementById('mobileLogoutButton');
       if (mobileLogout) {
@@ -73,6 +73,37 @@
           window.location.href = '../../index.php';
         });
       }
+
+      // Fetch current session user (uses same-origin credentials so PHP session cookie is sent)
+      (function fetchMobileProfile() {
+        const nameEl = document.getElementById('mobileProfileName');
+        const emailEl = document.getElementById('mobileProfileEmail');
+        const picEl = document.getElementById('mobileProfilePic');
+        if (!nameEl || !emailEl) return;
+
+        fetch('../../php-server/routes/auth.php?me', { credentials: 'same-origin' })
+          .then(r => r.json())
+          .then(json => {
+            if (json && json.success && json.data) {
+              const user = json.data || {};
+              const name = user.name || (user.fullname || 'Student');
+              const email = user.email || '';
+              nameEl.textContent = name;
+              emailEl.textContent = email;
+
+              // If user object includes a profile image path, set it (common key: avatar or photo)
+              if (user.avatar) picEl.src = user.avatar;
+              if (user.photo) picEl.src = user.photo;
+            } else {
+              nameEl.textContent = 'Student';
+              emailEl.textContent = '';
+            }
+          })
+          .catch(() => {
+            // silent fail — keep placeholders
+            if (nameEl) nameEl.textContent = 'Student';
+          });
+      })();
     }, 50);
   }
 
