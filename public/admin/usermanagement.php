@@ -34,6 +34,7 @@ if (empty($_SESSION['logged_in'])) {
         <li><a href="dashboard.php">Dashboard</a></li>
         <li><a href="orgmanagement.php">Org Management</a></li>
         <li class="active"><a href="usermanagement.php">User Management</a></li>
+        <li><a href="activitylogs.php">Activity Logs</a></li>
       </ul>
     </nav>
   </aside>
