@@ -24,10 +24,9 @@ if (empty($_SESSION['logged_in'])) {
   <!--LEFT SIDEBAR -->
   <aside id="sidebar">
     <div id="sidebar-profile">
-      <div id="profile-icon"></div>
+      <img id="profile-icon" src="../images/user.png" alt="Profile Icon" width="32" height="32">
       <div id="profile-details">
         <div>ADMIN</div>
-        <div>Admin Name</div>
       </div>
     </div>
 
