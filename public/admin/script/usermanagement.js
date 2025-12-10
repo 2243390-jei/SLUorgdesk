@@ -14,7 +14,6 @@ let selectedRole = '';
 // DOM Elements
 const userTableBody = document.getElementById('userTableBody');
 const userCardList = document.getElementById('userCardList');
-const roleModal = document.getElementById('roleModal');
 const userModal = document.getElementById('userModal');
 const deleteModal = document.getElementById('deleteModal');
 const userForm = document.getElementById('userForm');
@@ -25,26 +24,17 @@ const rowsPerPageSelect = document.getElementById('rowsPerPage');
 const addUserBtn = document.getElementById('addUserBtn');
 
 // Ensure modals are hidden by default
-roleModal.style.display = 'none';
 userModal.style.display = 'none';
 deleteModal.style.display = 'none';
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initialize);
-addUserBtn.addEventListener('click', openRoleModal);
+addUserBtn.addEventListener('click', openUserFormModal);
 userForm.addEventListener('submit', handleSubmit);
 searchInput.addEventListener('input', handleSearch);
 filterToggle.addEventListener('click', toggleFilterMenu);
 document.getElementById('clearFilterBtn').addEventListener('click', clearFilters);
 rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
-
-// Role selection event listeners
-document.querySelectorAll('.role-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        selectedRole = e.target.closest('.role-btn').dataset.role;
-        openUserFormModal(selectedRole);
-    });
-});
 
 // Event delegation for filter buttons (role and school)
 filterMenu?.addEventListener('click', (e) => {
@@ -159,7 +149,6 @@ function updateTable() {
             <td>${user.name}</td>
             <td>${user.email}</td>
             <td>${user.role}</td>
-            <td>${user.organization?.name || user.organization || '-'}</td>
             <td>
                 <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
                     ${user.isActive ? 'Active' : 'Inactive'}
@@ -230,7 +219,6 @@ function renderUserCards() {
             </div>
             <div class="card-meta">
                 <span><b>Role:</b> ${user.role}</span>
-                <span><b>Organization:</b> ${user.organization?.name || user.organization || '-'}</span>
                 <span><b>Status:</b> ${user.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <div class="card-actions">
@@ -271,45 +259,16 @@ function updatePagination(totalPages) {
 }
 
 // Modal functions
-function openRoleModal() {
-    roleModal.style.display = 'flex';
-    selectedRole = '';
-}
-
-function closeRoleModal() {
-    roleModal.style.display = 'none';
-}
-
-function openUserFormModal(role) {
-    closeRoleModal();
-    selectedRole = role;
-    
+function openUserFormModal() {
     const modalTitle = document.getElementById('modalTitle');
-    modalTitle.textContent = `Add ${role} User`;
+    modalTitle.textContent = 'Add User';
     
-    // Set the role in the form and disable it
+    // Reset the form for adding a new user
     const roleSelect = document.getElementById('role');
-    roleSelect.value = role;
+    roleSelect.value = '';
     
-    // Show/hide role-specific fields
-    hideAllRoleSpecificFields();
-    
-    switch(role) {
-        case 'OSAS':
-            document.getElementById('osasFields').classList.add('show');
-            break;
-        case 'Admin':
-            document.getElementById('adminFields').classList.add('show');
-            break;
-    }
-    
+    userForm.dataset.userId = '';
     userModal.style.display = 'flex';
-}
-
-function hideAllRoleSpecificFields() {
-    document.querySelectorAll('.role-specific-fields').forEach(field => {
-        field.classList.remove('show');
-    });
 }
 
 function openEditModal(userId) {
@@ -325,18 +284,6 @@ function openEditModal(userId) {
     document.getElementById('password').value = ''; // Don't populate password
     document.getElementById('role').value = user.role;
     
-    // Show/hide role-specific fields based on user's role
-    hideAllRoleSpecificFields();
-    
-    switch(user.role) {
-        case 'OSAS':
-            document.getElementById('osasFields').classList.add('show');
-            break;
-        case 'Admin':
-            document.getElementById('adminFields').classList.add('show');
-            break;
-    }
-    
     userForm.dataset.userId = userId;
     userModal.style.display = 'flex';
 }
@@ -344,7 +291,6 @@ function openEditModal(userId) {
 function closeUserModal() {
     userModal.style.display = 'none';
     userForm.reset();
-    hideAllRoleSpecificFields();
     selectedRole = '';
 }
 
@@ -477,9 +423,6 @@ function changePage(page) {
 
 // Close modals when clicking outside
 window.addEventListener('click', function(event) {
-    if (event.target === roleModal) {
-        closeRoleModal();
-    }
     if (event.target === userModal) {
         closeUserModal();
     }

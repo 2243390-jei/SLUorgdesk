@@ -73,10 +73,6 @@ if (empty($_SESSION['logged_in'])) {
             <button class="filter-item" data-type="role" data-filter="Admin">Admin</button>
             <button class="filter-item" data-type="role" data-filter="OSAS">OSAS</button>
             <button class="filter-item" data-type="role" data-filter="Organization">Organization</button>
-            <div
-              style="padding: 10px 8px; font-weight: 600; font-size: 12px; text-transform: uppercase; color: #666; border-bottom: 1px solid #e1e8ed; margin-top: 10px;">
-              Organization</div>
-            <button class="filter-item" data-type="school" data-filter="">All Organizations</button>
             <div class="filter-clear">
               <button id="clearFilterBtn">Clear All Filters</button>
             </div>
@@ -93,7 +89,6 @@ if (empty($_SESSION['logged_in'])) {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Organization</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -128,30 +123,6 @@ if (empty($_SESSION['logged_in'])) {
 
   </main>
 
-  <!-- Role Selection Modal -->
-  <div id="roleModal" class="modal">
-    <div class="modal-content">
-      <h2 id="modalTitle">Select User Role</h2>
-      <div class="role-options">
-        <button class="role-btn" data-role="Admin">
-          <i class="fas fa-user-shield"></i>
-          Admin
-        </button>
-        <button class="role-btn" data-role="OSAS">
-          <i class="fas fa-briefcase"></i>
-          OSAS
-        </button>
-        <button class="role-btn" data-role="Organization">
-          <i class="fas fa-building"></i>
-          Organization
-        </button>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="cancel-btn" onclick="closeRoleModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
   <!-- User Form Modal -->
   <div id="userModal" class="modal">
     <div class="modal-content">
@@ -178,25 +149,7 @@ if (empty($_SESSION['logged_in'])) {
             <option value="">Select Role</option>
             <option value="Admin">Admin</option>
             <option value="OSAS">OSAS</option>
-            <option value="Organization">Organization</option>
           </select>
-        </div>
-
-        <div id="osasFields" class="role-specific-fields">
-          <div class="form-group">
-            <label for="osasEmail">OSAS Email</label>
-            <input type="email" id="osasEmail" name="osasEmail">
-          </div>
-        </div>
-
-        <div id="adminFields" class="role-specific-fields">
-          <div class="form-group">
-            <label for="adminLevel">Admin Level</label>
-            <select id="adminLevel" name="adminLevel">
-              <option value="Super">Super</option>
-              <option value="Regular">Regular</option>
-            </select>
-          </div>
         </div>
 
         <div class="modal-buttons">
