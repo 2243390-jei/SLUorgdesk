@@ -194,10 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error('Logout error:', err);
       }
 
-      // Clear client-side storage
-      localStorage.clear();
-      sessionStorage.clear();
-
       // Redirect to login
       window.location.href = '../../index.php';
     });

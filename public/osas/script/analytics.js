@@ -931,7 +931,14 @@ function hideProfileModal() {
 
 // Logout function
 function performLogout() {
-    window.location.href = "../../index.php";
+      try {
+        fetch('../../php-server/routes/logout.php', { method: 'POST' });
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+
+      // Redirect to login
+      window.location.href = '../../index.php';
 }
 
 // Event Listeners
