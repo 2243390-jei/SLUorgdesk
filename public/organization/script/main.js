@@ -186,7 +186,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     modal.addEventListener('click', (e) => e.stopPropagation());
+  }
 
+  // Always wire logout button if present (desktop and mobile)
+  if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       try {
         await fetch('../../php-server/routes/logout.php', { method: 'POST' });

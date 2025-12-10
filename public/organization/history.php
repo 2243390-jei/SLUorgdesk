@@ -13,6 +13,7 @@ if (empty($_SESSION['logged_in'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLU OrgDesk | History</title>
     <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="styles/mobile-drawer.css" />
     <link rel="stylesheet" href="styles/history.css" />
     <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
     <script src="script/mobile-drawer.js" defer></script>
@@ -24,6 +25,9 @@ if (empty($_SESSION['logged_in'])) {
         <div class="logo">
             <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" />
         </div>
+        <button id="hamburgerBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" type="button">
+
+        </button>
         <nav>
             <ul>
                 <li><a href="submission.php">Submission</a></li>
