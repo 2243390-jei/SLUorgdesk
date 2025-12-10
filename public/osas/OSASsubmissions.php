@@ -13,7 +13,7 @@ if (empty($_SESSION['logged_in'])) {
   <title>Organization Submissions</title>
   <link rel="stylesheet" href="styles/OSASsubmissions.css">
   <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
-  <script src="script/OSASsubmissions.js" defer></script>
+  <script src="script/osassubmissions.js" defer></script>
 </head>
 <body>
   <div class="app">

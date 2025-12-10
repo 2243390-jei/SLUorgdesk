@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         const eventData = JSON.parse(e.target.getAttribute("data-event"));
         localStorage.setItem("selectedEvent", JSON.stringify(eventData));
-        window.location.href = "../osas/submissionFullDetails.php";
+        window.location.href = "../osas/submissionfulldetails.php";
       });
     });
   }

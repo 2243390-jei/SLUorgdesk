@@ -1,105 +1,177 @@
 <?php
 session_start();
 if (empty($_SESSION['logged_in'])) {
-    header('Location: ../../index.php');
-    exit;
+  header('Location: ../../index.php');
+  exit;
 }
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
   <title>Admin User Management</title>
-
+  <link rel="stylesheet" href="styles/adminmain.css">
+  <link rel="stylesheet" href="styles/usermanagement.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="./styles/usermanagement.css">
   <script src="./script/usermanagement.js" defer></script>
 </head>
 
 <body>
-  <div class="app">
-    <aside class="leftbar">
-      <div class="brand">
-        <img src="../Images/Icon.png" alt="SLU Logo" class="logo">
+
+  <!--LEFT SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-profile">
+      <div id="profile-icon"></div>
+      <div id="profile-details">
+        <div>ADMIN</div>
+        <div>Admin Name</div>
+      </div>
+    </div>
+
+    <nav id="sidebar-nav">
+      <ul>
+        <li><a href="dashboard.php">Dashboard</a></li>
+        <li><a href="orgmanagement.php">Org Management</a></li>
+        <li class="active"><a href="usermanagement.php">User Management</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT WRAPPER-->
+  <main id="main-content">
+
+    <!-- ======= HEADER ======= -->
+    <header id="main-header">
+      <div id="header-text">
+        <h1>ADMIN USER MANAGEMENT</h1>
+        <p>Good day, Admin!</p>
+        <p>Let's make sure everything's in order today.</p>
       </div>
 
-      <nav class="left-nav">
-        <a href="../admin/dashboard.php" class="circle-btn">
-          <img src="../Images/statisctics.png" alt="" height="16" width="16">
-        </a>
-        <a href="../admin/orgmanagement.php" class="circle-btn">
-          <img src="../Images/osas/group.png" alt="" height="16" width="16">
-        </a>
-        <a href="../admin/usermanagement.php" class="circle-btn active">
-          <img src="../Images/osas/user.png" alt="" height="16" width="16">
-        </a>
-      </nav>
-    </aside>
+      <div id="header-logo">
+        <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+      </div>
+    </header>
 
-    <main class="main-area">
-      <header class="header">
-        <div class="greeting">
-          <h1>User Management</h1>
-          <div class="muted">
-            Manage system users and roles
+    <!--  USERMANAGEMENT BODY -->
+    <section id="gen-wrapper">
+      <h2>User Management</h2>
+      <!-- Content here -->
+      <div class="top-actions">
+        <button id="addUserBtn" class="add-user-header-btn">+ Add User</button>
+        <div class="search-wrap">
+          <input type="search" id="searchInput" placeholder="Search users">
+          <button id="filterToggle" title="Filter">
+            <i class="fas fa-filter"></i>
+          </button>
+          <div class="filter-menu hidden" id="filterMenu">
+            <div
+              style="padding: 10px 8px; font-weight: 600; font-size: 12px; text-transform: uppercase; color: #666; border-bottom: 1px solid #e1e8ed;">
+              Role</div>
+            <button class="filter-item" data-type="role" data-filter="">All Roles</button>
+            <button class="filter-item" data-type="role" data-filter="Admin">Admin</button>
+            <button class="filter-item" data-type="role" data-filter="OSAS">OSAS</button>
+            <button class="filter-item" data-type="role" data-filter="Organization">Organization</button>
+            <div class="filter-clear">
+              <button id="clearFilterBtn">Clear All Filters</button>
+            </div>
           </div>
         </div>
 
-        <div class="top-actions">
-          <button id="addUserBtn" class="add-user-header-btn">+ Add User</button>
+      </div>
 
-          <div class="search-wrap">
-            <input type="search" id="userSearchInput" placeholder="Search users">
-            <button id="userSearchClear" title="Clear search"></button>
-          </div>
-
+      <div class="bottom-actions">
+        <div class="table-container">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
         </div>
-      </header>
+        <div id="userCardList" class="card-list"></div>
+      </div>
 
-      <table class="user-table">
-        <thead>
-          <tr>
-            <th>Avatar</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Organization</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="userTableBody"></tbody>
-      </table>
+      <!-- Pagination -->
+      <div class="pagination-controls">
+        <div class="rows-per-page">
+          <label>
+            Rows per page:
+            <select id="rowsPerPage">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+        </div>
+        <div id="pagination">
+          <button class="pagination-btn prev" aria-label="Previous page">«</button>
+          <div class="page-numbers" role="list"></div>
+          <button class="pagination-btn next" aria-label="Next page">»</button>
+        </div>
+      </div>
 
-      <footer class="footer muted">
-        © <span id="curYear"></span> User Management
-      </footer>
-    </main>
-  </div>
+    </section>
 
+  </main>
+
+  <!-- User Form Modal -->
   <div id="userModal" class="modal">
     <div class="modal-content">
+      <h2 id="modalTitle">Add User</h2>
       <form id="userForm">
-        <label>Name</label>
-        <input id="userName" required>
-        <label>Email</label>
-        <input id="userEmail" type="email" required>
-        <label>Role</label>
-        <select id="userRole">
-          <option>Admin</option>
-          <option>OSAS</option>
-          <option>Org Officer</option>
-          <option>Student</option>
-        </select>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
 
-        <div class="modal-actions">
-          <button type="submit" class="btn-outlined">Save</button>
-          <button type="button" id="cancelUser" class="reset-btn">Cancel</button>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Leave empty to keep current password">
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="OSAS">OSAS</option>
+          </select>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="submit" class="confirm-btn">Save User</button>
+          <button type="button" class="cancel-btn" onclick="closeUserModal()">Cancel</button>
         </div>
       </form>
     </div>
   </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Confirm Delete</h2>
+      <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button type="button" class="delete-btn-modal" onclick="confirmDelete()">Delete</button>
+        <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

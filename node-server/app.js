@@ -9,7 +9,15 @@ const { notFound, errorHandler } = require('./middleware/errorHandler')
 connectDB().catch((err) => console.error('DB connect failed:', err))
 
 const app = express()
-app.use(cors())
+
+// Configure CORS to allow credentials from localhost
+app.use(cors({
+  origin: ['http://localhost', 'http://localhost:80', 'http://127.0.0.1'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
