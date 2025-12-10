@@ -14,6 +14,7 @@ if (empty($_SESSION['logged_in'])) {
     <link rel="stylesheet" href="styles/adminmain.css">
     <link rel="stylesheet" href="styles/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="script/adminmain.js" defer></script>
     <script src="script/dashboard.js" defer></script>
 </head>
 
@@ -36,6 +37,10 @@ if (empty($_SESSION['logged_in'])) {
                 <li><a href="usermanagement.php">User Management</a></li>
             </ul>
         </nav>
+
+        <div id="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
     </aside>
 
     <!-- MAIN CONTENT WRAPPER-->
@@ -49,9 +54,9 @@ if (empty($_SESSION['logged_in'])) {
                 <p>Let's make sure everything's in order today.</p>
             </div>
 
-            <div id="header-logo">
-                <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
-            </div>
+                <div id="header-logo">
+                    <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+                </div>
         </header>
 
         <!--  DASHBOARD BODY -->
@@ -85,6 +90,18 @@ if (empty($_SESSION['logged_in'])) {
         </section>
 
     </main>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal">
+        <div class="modal-content">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-buttons">
+                <button type="button" class="danger-btn" id="confirmLogoutBtn">Logout</button>
+                <button type="button" class="cancel-btn" id="cancelLogoutBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
