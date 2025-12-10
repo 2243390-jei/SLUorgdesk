@@ -214,7 +214,6 @@
   cursor: pointer;
   width: 100%;
   margin-bottom: 80px;
-  
 }
 
 .mobile-sheet #mobileLogoutButton:hover,
@@ -249,13 +248,14 @@
 @media (max-width: 767px) {
   .hamburger {
     position: fixed;
-    right: 14px;
-    top: 14px;
+    margin-right: 20px;
+    top: 20px;
     transform: none;
     width: 48px;
     height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
   }
 }

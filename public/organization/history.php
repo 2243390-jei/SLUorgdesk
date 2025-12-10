@@ -26,7 +26,6 @@ if (empty($_SESSION['logged_in'])) {
             <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" />
         </div>
         <button id="hamburgerBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" type="button">
-
         </button>
         <nav>
             <ul>
