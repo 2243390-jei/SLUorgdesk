@@ -60,15 +60,8 @@ if (empty($_SESSION['logged_in'])) {
           <div class="muted">Here's what happened this month</div>
         </div>
 
-        <div class="top-actions">
-          <div class="search-wrap">
-            <input id="searchInput" type="search" placeholder="Search past events..." aria-label="Search past events">
-            <button id="searchClear" title="Clear" aria-label="Clear search">x</button>
-          </div>
-          <!-- Profile moved to header -->
-          <div class="profile-header">
-            <div class="profile-circle" id="mobileProfileBtn">O</div>
-          </div>
+        <div id="header-logo" class="header-logo">
+          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" class="logo-img">
         </div>
       </header>
 
@@ -115,7 +108,16 @@ if (empty($_SESSION['logged_in'])) {
         <aside class="right-panel" aria-label="Past events">
           <div class="panel-top">
             <h2>Past Events</h2>
-            <div class="muted">History for selected month (click an event to view more)</div>
+          </div>
+
+          <!-- Search moved to top of panel -->
+          <div class="search-wrap panel-search">
+            <input 
+              id="searchInput" 
+              type="search" 
+              placeholder="Search past events..." 
+              aria-label="Search past events">
+            <button id="searchClear" class="search-clear-btn" title="Clear" aria-label="Clear search">×</button>
           </div>
 
           <!-- Fixed-size, scrollable events list -->

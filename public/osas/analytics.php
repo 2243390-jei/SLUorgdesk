@@ -13,6 +13,7 @@ if (empty($_SESSION['logged_in'])) {
   <title>Osas Calendar — Analytics Dashboard</title>
   <link rel="stylesheet" href="styles/analytics.css">
   <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+  
 </head>
 <body>
   <div class="app">
@@ -59,16 +60,9 @@ if (empty($_SESSION['logged_in'])) {
           <h1>Hello, OSAS</h1>
           <div class="muted">Here are all the student organizations inside of Saint Louis University</div>
         </div>
-
-        <div class="top-actions">
-          <div class="search-wrap">
-            <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization">
-            <button id="searchClear" title="Clear" aria-label="Clear search">x</button>
-          </div>
-          <!-- Profile moved to header -->
-          <div class="profile-header">
-            <div class="profile-circle" id="mobileProfileBtn">O</div>
-          </div>
+        
+        <div id="header-logo" class="header-logo">
+          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" class="logo-img">
         </div>
       </header>
 
@@ -151,25 +145,6 @@ if (empty($_SESSION['logged_in'])) {
         </div>
       </div>
 
-      <!-- Mobile Profile Modal -->
-      <div id="profileModal" class="modal profile-modal" aria-hidden="true" aria-labelledby="profileModalTitle">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 id="profileModalTitle">Profile</h3>
-            <button id="profileModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="profile-info">
-              <div class="profile-large">O</div>
-              <div class="profile-details">
-                <h4>OSAS Admin</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <footer class="footer muted">© <span id="curYear"></span> Osas Dashboard</footer>
     </main>
