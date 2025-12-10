@@ -12,6 +12,7 @@ if (empty($_SESSION['logged_in'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submission Page</title>
   <link rel="stylesheet" href="../organization/styles/style.css">
+  <link rel="stylesheet" href="../organization/styles/mobile-drawer.css">
   <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
   <script src="script/mobile-drawer.js" defer></script>
 </head>
@@ -21,6 +22,9 @@ if (empty($_SESSION['logged_in'])) {
     <div class="logo">
       <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
     </div>
+    <button id="hamburgerBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" type="button">
+     
+    </button>
     <nav>
       <ul>
         <li><a href="submission.php" class="active">Submission</a></li>
@@ -102,6 +106,7 @@ if (empty($_SESSION['logged_in'])) {
               <option value="" disabled selected>Select Semester</option>
               <option value="1st Semester">1st Semester</option>
               <option value="2nd Semester">2nd Semester</option>
+              <option value="Short Term">Short Term</option>
             </select>
           </div>
         </div>

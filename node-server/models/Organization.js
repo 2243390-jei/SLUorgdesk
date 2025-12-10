@@ -6,10 +6,10 @@ const organizationSchema = new mongoose.Schema({
   school: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   isWhitelisted: { type: Boolean, default: true },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   localLogoPath: String
 })
 
-module.exports = mongoose.model('organizations', organizationSchema)
+module.exports = mongoose.model('Organizations', organizationSchema, 'Organizations')

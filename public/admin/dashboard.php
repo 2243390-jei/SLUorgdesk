@@ -11,6 +11,7 @@ if (empty($_SESSION['logged_in'])) {
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles/adminmain.css">
     <link rel="stylesheet" href="styles/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script/dashboard.js"></script>
@@ -54,7 +55,7 @@ if (empty($_SESSION['logged_in'])) {
         </header>
 
         <!--  DASHBOARD BODY -->
-        <section id="dashboard-wrapper">
+        <section id="gen-wrapper">
             <h2>Analytics</h2>
 
             <!-- TOP WIDGETS WRAPPER -->

@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
-const { connectDB } = require('./config/db')
+const { connectDB } = require('./config/database')
 const routes = require('./routes')
 const { notFound, errorHandler } = require('./middleware/errorHandler')
 
@@ -13,16 +13,17 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// static uploads folder
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
-
-// Serve static client files from root directory
-app.use(express.static(path.join(__dirname, '..')))
-
-// API routes
+// API routes FIRST (higher priority)
 app.use('/', routes)
 
-// 404 + error handlers
+// Static file serving AFTER API routes
+// Serve uploads folder
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+
+// Serve static client files from root directory (lowest priority)
+app.use(express.static(path.join(__dirname, '..')))
+
+// 404 + error handlers (must be last)
 app.use(notFound)
 app.use(errorHandler)
 

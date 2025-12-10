@@ -1,169 +1,174 @@
+/* Mobile sheet script: create sheet and wire hamburger */
 (function () {
   const BREAKPOINT = 767;
 
+  function createSheetIfMissing() {
+    if (document.getElementById('mobileSheet')) return;
 
-  function createIfMissing() {
-    const header = document.querySelector('header.navbar');
-    if (!header) return;
+    const sheet = document.createElement('div');
+    sheet.id = 'mobileSheet';
+    sheet.className = 'mobile-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    sheet.setAttribute('aria-hidden', 'true');
 
-    /* ---- Hamburger ---- */
-    if (!header.querySelector('#mobile-hamburger')) {
-      const btn = document.createElement('button');
-      btn.id = 'mobile-hamburger';
-      btn.className = 'mobile-hamburger';
-      btn.setAttribute('aria-label', 'Open menu');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.type = 'button';
-      for (let i = 0; i < 3; i++) {
-        const s = document.createElement('span');
-        btn.appendChild(s);
+    const overlay = document.createElement('div');
+    overlay.id = 'sheetOverlay';
+    overlay.className = 'sheet-overlay';
+    sheet.appendChild(overlay);
+
+    const panel = document.createElement('div');
+    panel.className = 'sheet-panel';
+
+    const handle = document.createElement('div');
+    handle.id = 'sheetHandle';
+    handle.className = 'sheet-handle';
+    panel.appendChild(handle);
+
+    const inner = document.createElement('div');
+    inner.className = 'sheet-inner';
+
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'sheet-header';
+    headerDiv.innerHTML = `
+      <div class="mobile-profile">
+        <img id="mobileProfilePic" src="../images/student_img/profile.png" alt="Profile">
+        <div class="mobile-profile-info">
+          <h3 id="mobileProfileName">Loading...</h3>
+          <p id="mobileProfileEmail">&nbsp;</p>
+        </div>
+      </div>
+    `;
+    inner.appendChild(headerDiv);
+
+    const body = document.createElement('div');
+    body.className = 'sheet-body';
+    const nav = document.createElement('nav');
+    nav.className = 'mobile-nav';
+    nav.innerHTML = `
+      <ul>
+        <li><a href="submission.php">Submission</a></li>
+        <li><a href="history.php">History</a></li>
+      </ul>
+    `;
+    body.appendChild(nav);
+    inner.appendChild(body);
+
+    const logoutWrap = document.createElement('div');
+    logoutWrap.className = 'mobile-logout';
+    logoutWrap.innerHTML = `<button id="mobileLogoutButton">Logout</button>`;
+    inner.appendChild(logoutWrap);
+
+    panel.appendChild(inner);
+    sheet.appendChild(panel);
+    document.body.appendChild(sheet);
+    // wire logout button and try to populate profile fields from session
+    setTimeout(() => {
+      const mobileLogout = document.getElementById('mobileLogoutButton');
+      if (mobileLogout) {
+        mobileLogout.addEventListener('click', e => {
+          e.preventDefault();
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = '../../index.php';
+        });
       }
-      header.appendChild(btn);
-    }
 
-    /* ---- Overlay ---- */
-    if (!document.body.querySelector('#mobile-drawer-overlay')) {
-      const overlay = document.createElement('div');
-      overlay.id = 'mobile-drawer-overlay';
-      overlay.className = 'mobile-drawer-overlay';
-      overlay.setAttribute('tabindex', '-1');
-      document.body.appendChild(overlay);
-    }
+      // Fetch current session user (uses same-origin credentials so PHP session cookie is sent)
+      (function fetchMobileProfile() {
+        const nameEl = document.getElementById('mobileProfileName');
+        const emailEl = document.getElementById('mobileProfileEmail');
+        const picEl = document.getElementById('mobileProfilePic');
+        if (!nameEl || !emailEl) return;
 
-    /* ---- Drawer ---- */
-    if (!document.body.querySelector('#mobile-drawer')) {
-      const drawer = document.createElement('aside');
-      drawer.id = 'mobile-drawer';
-      drawer.className = 'mobile-drawer';
-      drawer.setAttribute('role', 'dialog');
-      drawer.setAttribute('aria-modal', 'true');
-      drawer.setAttribute('aria-hidden', 'true');
+        fetch('../../php-server/routes/auth.php?me', { credentials: 'same-origin' })
+          .then(r => r.json())
+          .then(json => {
+            if (json && json.success && json.data) {
+              const user = json.data || {};
+              const name = user.name || (user.fullname || 'Student');
+              const email = user.email || '';
+              nameEl.textContent = name;
+              emailEl.textContent = email;
 
-      /* ---- Header ---- */
-      const headerDiv = document.createElement('div');
-      headerDiv.className = 'drawer-header';
-      headerDiv.innerHTML = `
-        <div class="drawer-title">SLU OrgDesk Menu</div>
-        <button class="drawer-close" aria-label="Close menu" type="button">
-          <img src="../images/student_img/history/close_modal.png" alt="Close Icon" width="24" height="24" class="icon">
-        </button>
-      `;
-      drawer.appendChild(headerDiv);
-
-      /* ---- Navigation ---- */
-      const navWrap = document.createElement('nav');
-      navWrap.className = 'drawer-nav';
-      navWrap.setAttribute('aria-label', 'Mobile menu');
-
-      const desktopNav = document.querySelector('header.navbar nav');
-      if (desktopNav) {
-        const desktopUl = desktopNav.querySelector('ul');
-        if (desktopUl) {
-          const clone = desktopUl.cloneNode(true);
-          clone.className = 'drawer-nav-list';
-
-          const logoutLi = document.createElement('li');
-          logoutLi.innerHTML = `<a href="#" id="mobileLogoutLink">Logout</a>`;
-          clone.appendChild(logoutLi);
-
-          navWrap.appendChild(clone);
-        }
-      }
-
-      drawer.appendChild(navWrap);
-      document.body.appendChild(drawer);
-
-      setTimeout(() => {
-        const mobileLogout = document.getElementById('mobileLogoutLink');
-        if (mobileLogout) {
-          mobileLogout.addEventListener('click', e => {
-            e.preventDefault();
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = '../../index.php';
+              // If user object includes a profile image path, set it (common key: avatar or photo)
+              if (user.avatar) picEl.src = user.avatar;
+              if (user.photo) picEl.src = user.photo;
+            } else {
+              nameEl.textContent = 'Student';
+              emailEl.textContent = '';
+            }
+          })
+          .catch(() => {
+            // silent fail — keep placeholders
+            if (nameEl) nameEl.textContent = 'Student';
           });
-        }
-      }, 100);
-    }
+      })();
+    }, 50);
   }
 
-  function wireActions() {
-    const hamburger = document.getElementById('mobile-hamburger');
-    const overlay   = document.getElementById('mobile-drawer-overlay');
-    const drawer    = document.getElementById('mobile-drawer');
-    if (!hamburger || !overlay || !drawer) return;
+  function wire() {
+    const hamburger = document.getElementById('hamburgerBtn') || document.getElementById('mobile-hamburger');
+    const sheet = document.getElementById('mobileSheet');
+    const overlay = document.getElementById('sheetOverlay');
+    const handle = document.getElementById('sheetHandle');
+    if (!hamburger || !sheet) return;
 
-    const closeBtn = drawer.querySelector('.drawer-close');
-
-    const openDrawer = () => {
-      drawer.classList.add('open');
-      drawer.setAttribute('aria-hidden', 'false');
+    const open = () => {
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      hamburger.classList.add('is-open');
       hamburger.setAttribute('aria-expanded', 'true');
-      overlay.classList.add('visible');
-      closeBtn?.focus();
       document.documentElement.style.overflow = 'hidden';
     };
-    const closeDrawer = () => {
-      drawer.classList.remove('open');
-      drawer.setAttribute('aria-hidden', 'true');
+    const close = () => {
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+      hamburger.classList.remove('is-open');
       hamburger.setAttribute('aria-expanded', 'false');
-      overlay.classList.remove('visible');
       document.documentElement.style.overflow = '';
-      hamburger.focus();
+      try { hamburger.focus(); } catch (e) {}
     };
 
-    if (!hamburger._wired) {
-      hamburger.addEventListener('click', () => (drawer.classList.contains('open') ? closeDrawer() : openDrawer()));
-      overlay.addEventListener('click', closeDrawer);
-      closeBtn?.addEventListener('click', closeDrawer);
+    hamburger.addEventListener('click', e => {
+      e.preventDefault();
+      sheet.classList.contains('open') ? close() : open();
+    });
 
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-      });
+    if (overlay) overlay.addEventListener('click', close);
+    if (handle) handle.addEventListener('click', close);
 
-      drawer.addEventListener('click', e => {
-        const a = e.target.closest('a');
-        if (a && a.id !== 'mobileLogoutLink') closeDrawer();
-      });
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && sheet.classList.contains('open')) close();
+    });
 
-      hamburger._wired = true;
-    }
+    sheet.addEventListener('click', e => {
+      const a = e.target.closest('a');
+      if (a && a.id !== 'mobileLogoutButton') close();
+    });
   }
 
-
   function toggleVisibilityByWidth() {
-    const isMobile   = window.innerWidth <= BREAKPOINT;
-    const hamburger  = document.getElementById('mobile-hamburger');
-    const drawer     = document.getElementById('mobile-drawer');
-    const overlay    = document.getElementById('mobile-drawer-overlay');
-    const profilePic = document.getElementById('nav-profile-pic');
-
-    // Hamburger / drawer visibility
+    const isMobile = window.innerWidth <= BREAKPOINT;
+    const hamburger = document.getElementById('hamburgerBtn') || document.getElementById('mobile-hamburger');
+    const sheet = document.getElementById('mobileSheet');
+    const overlay = document.getElementById('sheetOverlay');
     if (hamburger) hamburger.style.display = isMobile ? 'inline-flex' : 'none';
-    if (drawer)    drawer.style.display    = isMobile ? 'flex'       : 'none';
-    if (overlay)   overlay.style.display   = isMobile ? 'block'      : 'none';
+    if (sheet) sheet.style.display = isMobile ? 'block' : 'none';
+    if (overlay) overlay.style.display = isMobile ? 'block' : 'none';
 
-    if (profilePic) {
-      profilePic.style.pointerEvents = isMobile ? 'none' : 'auto';
-      // Removed: profilePic.style.opacity = ... (no blur!)
-    }
-
-    // Auto-close drawer when switching to desktop
-    if (!isMobile && drawer && drawer.classList.contains('open')) {
-      drawer.classList.remove('open');
-      drawer.setAttribute('aria-hidden', 'true');
+    if (!isMobile && sheet && sheet.classList.contains('open')) {
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
       hamburger?.setAttribute('aria-expanded', 'false');
-      overlay?.classList.remove('visible');
       document.documentElement.style.overflow = '';
     }
   }
 
-
   function init() {
-    createIfMissing();
-    wireActions();
+    createSheetIfMissing();
+    wire();
     toggleVisibilityByWidth();
-
     let rt;
     window.addEventListener('resize', () => {
       clearTimeout(rt);

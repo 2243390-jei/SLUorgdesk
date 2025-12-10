@@ -1,0 +1,265 @@
+/* LOCAL FONT IMPORT*/
+/* Inter Regular */
+@font-face {
+    font-family: "Inter";
+    src: url("../../fonts/Inter-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Inter SemiBold */
+@font-face {
+    font-family: "Inter";
+    src: url("../../fonts/Inter-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+
+/* Bebas Neue */
+@font-face {
+    font-family: "Bebas Neue";
+    src: url("../../fonts/BebasNeue-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* GENERAL RESET*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    display: flex;
+    background: #f5f6fa;
+    color: #1a1a1a;
+}
+
+/* SIDEBAR*/
+#sidebar {
+    width: 240px;
+    background: #1f2933;
+    color: white;
+    padding: 30px 20px;
+    height: 100vh;
+    position: sticky;        
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Profile area */
+#sidebar-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+#profile-icon {
+    width: 45px;
+    height: 45px;
+    background: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Profile TEXT */
+#profile-details div:first-child {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+#profile-details div:last-child {
+    font-size: 15px;
+    opacity: 0.8;
+}
+
+/* SIDEBAR NAVIGATION*/
+#sidebar-nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 30px;
+    padding-bottom: 70px;
+}
+
+#sidebar-nav ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar-nav li {
+    margin: 12.5px 0;
+    font-size: 22.5px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.25s ease;
+    position: relative;
+    text-align: left;
+    font-weight: 500;
+    opacity: 0.8;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1.5px;
+}
+
+/* Make the anchor fill the li so the whole row is clickable */
+#sidebar-nav li a {
+    display: block;
+    padding: 12px 20px;
+    color: inherit;
+    text-decoration: none;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+#sidebar-nav li:hover a {
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 1;
+}
+
+/* Active state on the anchor (keeps the ::before bar on li) */
+#sidebar-nav li.active a {
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 20px;
+    font-weight: 600;
+    opacity: 1;
+}
+
+/* Keyboard focus for accessibility */
+#sidebar-nav li a:focus {
+    outline: 2px solid rgba(78,168,255,0.35);
+    outline-offset: 2px;
+}
+
+#sidebar-nav li.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: #4ea8ff;
+    border-radius: 2px 0 0 2px;
+}
+
+/* MAIN CONTENT*/
+#main-content {
+    flex: 1;
+    padding: 30px 50px;
+    overflow-y: auto; 
+    max-height: 100vh; 
+}
+
+/* HEADER */
+#main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+#main-header h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+#main-header p {
+    font-size: 15px;
+    opacity: 0.7;
+}
+
+#header-logo img {
+    width: 150px;
+    height: 75px;       
+    display: block;    
+}
+
+
+/* GENERAL WRAPPER*/
+#gen-wrapper {
+    margin-top: 80px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #ededed;
+}
+
+#gen-wrapper h2 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 26px;
+    margin-bottom: 25px;
+    letter-spacing: 1.5px;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e1e8ed;
+}
+
+.rows-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rows-per-page label {
+  font-size: 14px;
+  color: #666;
+}
+
+.rows-per-page select {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+#pagination {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+#pagination button {
+  min-width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--deep-blue);
+  font-size: 14px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#pagination button:hover {
+  background: #f8f9fa;
+}
+
+#pagination button.active-page {
+  background: var(--accent);
+  color: white;
+}

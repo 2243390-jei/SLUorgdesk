@@ -51,7 +51,7 @@ function renderTable(orgs) {
 
     // Redirection to go to OSASsubmissions.php using org ID and orgName when the button is clicked
     row.querySelector(".view-btn").addEventListener("click", () => {
-      window.location.href = `../osas/OSASsubmissions.php?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
+      window.location.href = `../osas/osassubmissions.php?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
     });
 
     tableBody.appendChild(row);
@@ -234,7 +234,14 @@ function hideProfileModal() {
 // Logout function
 function performLogout() {
   // Redirect to ../index.php instead of login.html
-  window.location.href = "../../index.php";
+   try {
+        fetch('../../php-server/routes/logout.php', { method: 'POST' });
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+
+      // Redirect to login
+      window.location.href = '../../index.php';
 }
 
 // Event listeners for logout functionality

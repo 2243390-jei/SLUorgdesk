@@ -116,10 +116,10 @@ async function initialize() {
     currentViewport = isMobile() ? 'mobile' : 'desktop';
 }
 
-// Fetch users from MongoDB
+// Fetch users from Node.js API
 async function fetchUsers() {
     try {
-        const apiBase = "../php-server/routes/users.php";
+        const apiBase = "http://localhost:5000/api/User";
         console.log('Fetching users from:', apiBase);
         const response = await fetch(apiBase);
         console.log('Response status:', response.status);
@@ -129,7 +129,7 @@ async function fetchUsers() {
         return users;
     } catch (err) {
         console.error("Error fetching users:", err);
-        userTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the server is running at ../php-server/routes/users.php</td></tr>`;
+        userTableBody.innerHTML = `<tr><td colspan="6">Error loading data. Please make sure the Node.js server is running at http://localhost:5000</td></tr>`;
         return [];
     }
 }
@@ -140,7 +140,8 @@ function filterUsers() {
         const matchesSearch = user.name.toLowerCase().includes(currentFilters.search.toLowerCase()) ||
                             user.email.toLowerCase().includes(currentFilters.search.toLowerCase());
         const matchesRole = !currentFilters.role || user.role === currentFilters.role;
-        const matchesSchool = !currentFilters.school || user.school === currentFilters.school;
+        const orgName = user.organization?.name || user.organization || '';
+        const matchesSchool = !currentFilters.school || orgName === currentFilters.school;
         return matchesSearch && matchesRole && matchesSchool;
     });
 }
@@ -158,7 +159,7 @@ function updateTable() {
             <td>${user.name}</td>
             <td>${user.email}</td>
             <td>${user.role}</td>
-            <td>${user.school || '-'}</td>
+            <td>${user.organization?.name || user.organization || '-'}</td>
             <td>
                 <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
                     ${user.isActive ? 'Active' : 'Inactive'}
@@ -229,7 +230,7 @@ function renderUserCards() {
             </div>
             <div class="card-meta">
                 <span><b>Role:</b> ${user.role}</span>
-                <span><b>School:</b> ${user.school || '-'}</span>
+                <span><b>Organization:</b> ${user.organization?.name || user.organization || '-'}</span>
                 <span><b>Status:</b> ${user.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <div class="card-actions">
@@ -357,47 +358,88 @@ function closeDeleteModal() {
     userToDelete = null;
 }
 
-// Form submission handler (temporary - only updates UI)
+// Form submission handler - Call Node.js API
 async function handleSubmit(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
     const userData = Object.fromEntries(formData.entries());
     
-    // Add isActive field
-    userData.isActive = true;
-    
     const userId = event.target.dataset.userId;
     
-    if (userId) {
-        // Edit existing user in local array
-        const userIndex = users.findIndex(u => u._id === userId);
-        if (userIndex !== -1) {
-            users[userIndex] = { ...users[userIndex], ...userData };
+    try {
+        if (userId) {
+            // Edit existing user - PATCH request
+            const response = await fetch(`http://localhost:5000/api/User/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                // Refresh users list
+                users = await fetchUsers();
+                updateTable();
+                closeUserModal();
+                alert('User updated successfully!');
+            } else {
+                alert('Error updating user: ' + result.error);
+            }
+        } else {
+            // Create new user - POST request
+            const response = await fetch('http://localhost:5000/api/User', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                // Refresh users list
+                users = await fetchUsers();
+                updateTable();
+                closeUserModal();
+                alert('User created successfully!');
+            } else {
+                alert('Error creating user: ' + result.error);
+            }
         }
-    } else {
-        // Add new user to local array with temporary ID
-        userData._id = 'temp_' + Date.now();
-        users.unshift(userData); // Add to beginning of array
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Error: ' + error.message);
     }
-    
-    // Update UI only
-    updateTable();
-    closeUserModal();
 }
 
-// Delete user (temporary - only updates UI)
+// Delete user - Call Node.js API
 async function confirmDelete() {
     if (!userToDelete) return;
     
-    // Find the user to "delete" in the local array
-    const userIndex = users.findIndex(u => u._id === userToDelete);
-    if (userIndex !== -1) {
-        // Temporarily remove from local array only
-        users.splice(userIndex, 1);
-        // Update the UI
-        updateTable();
-        closeDeleteModal();
+    try {
+        const response = await fetch(`http://localhost:5000/api/User/${userToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            // Refresh users list
+            users = await fetchUsers();
+            updateTable();
+            closeDeleteModal();
+            alert('User deleted successfully!');
+        } else {
+            alert('Error deleting user: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Error: ' + error.message);
     }
 }
 
