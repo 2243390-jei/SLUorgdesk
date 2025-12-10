@@ -1,28 +1,35 @@
 @font-face {
   font-family: "Inter";
-  src: url("../Fonts/Inter_18pt-Regular.ttf") format("truetype");
+  src: url("../../fonts/Inter_18pt-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Inter";
-  src: url("../Fonts/Inter_18pt-Medium.ttf") format("truetype");
+  src: url("../../fonts/Inter_18pt-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Inter";
-  src: url("../Fonts/Inter_18pt-SemiBold.ttf") format("truetype");
+  src: url("../../fonts/Inter_18pt-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Inter";
-  src: url("../Fonts/Inter_24pt-Bold.ttf") format("truetype");
+  src: url("../../fonts/Inter_24pt-Bold.ttf") format("truetype");
   font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebas Neue";
+  src: url("../../fonts/BebasNeue-Regular.ttf") format("truetype");
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -31,7 +38,6 @@
   margin:0; 
   padding:0; 
   font-family: "Inter", system-ui, sans-serif; 
-  font-weight: 400; 
 }
 
 :root{
@@ -1014,363 +1020,75 @@ body {
   text-overflow: ellipsis;
 }
 
-/* New expanded sidebar styles (overrides compact circular nav) */
+/* --- Sidebar: match calendar layout and sizing --- */
 .leftbar.sidebar-expanded {
-  width: 220px;
-  padding: 22px;
+  width: 260px;                /* wider like calendar */
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: stretch;
   position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
   height: 100vh;
   z-index: 1000;
   background: var(--sidebar-bg);
   box-shadow: 2px 0 12px rgba(0,0,0,0.14);
+  overflow: visible;
 }
 
-.leftbar.sidebar-expanded .sidebar-top {
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+/* profile */
+.sidebar-profile { display:flex; align-items:center; gap:12px; }
+.avatar { width:64px; height:64px; border-radius:999px; background: linear-gradient(135deg,#e74c3c,#c0392b); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:0 6px 18px rgba(231,76,60,0.25); }
+
+.profile-text .admin-title { font-weight:700; font-size:14px; color:#fff; }
+.profile-text .admin-sub { font-size:13px; color: rgba(255,255,255,0.75); }
+
+/* menu */
+.sidebar-menu { margin-top: 12px; flex:1; }
+.sidebar-menu ul { list-style:none; padding:0; margin-top:200px; display:flex; flex-direction:column; gap:10px; }
+.nav-item { display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:10px; color: rgba(255,255,255,0.95); cursor:pointer; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; position:relative; transition: all .14s ease; background: transparent; font-family: "Bebas Neue", sans-serif; }
+.nav-item .menu-icon { width:24px; height:24px; object-fit:contain; filter: none; }
+.nav-item:hover { background: rgba(255,255,255,0.03); transform: translateX(3px); }
+.nav-item.active { background: linear-gradient(180deg, rgba(59,130,246,0.12), rgba(37,99,235,0.06)); box-shadow:0 6px 18px rgba(37,99,235,0.06); transform:none; }
+.nav-item.active::before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:6px; background: linear-gradient(180deg,#60a5fa,#2563eb); border-top-right-radius:4px; border-bottom-right-radius:4px; }
+
+/* logout footer */
+.sidebar-footer { margin-top:auto; padding-top:8px; border-top:1px solid rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; }
+.btn-logout { width:100% !important; display:flex; align-items:center; gap:12px; padding:12px; border-radius:10px; background: rgba(231,76,60,0.08); color: rgba(255,255,255,0.95); font-weight:700; text-transform:uppercase; justify-content:flex-start; border:none; }
+.btn-logout .menu-icon { width:24px; height:24px; object-fit:contain; }
+
+/* ensure all sidebar images/icons are consistent */
+.leftbar .menu-icon,
+.leftbar .nav-icon,
+.leftbar img {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
 }
 
-.sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: linear-gradient(135deg,#e74c3c,#c0392b);
-  color: #fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:18px;
-  box-shadow: 0 6px 18px rgba(231,76,60,0.25);
-}
-
-.profile-text .admin-title {
-  font-weight: 700;
-  font-size: 13px;
-  color: #fff;
-  letter-spacing: 0.6px;
-}
-
-.profile-text .admin-sub {
-  font-size: 12px;
-  color: rgba(255,255,255,0.65);
-}
-
-/* Sidebar menu */
-.sidebar-menu {
-  margin-top: 10px;
-  flex: 1;
-}
-
-.sidebar-menu ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 200px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 12px;
-  border-radius: 10px;
-  color: rgba(255,255,255,0.9);
-  cursor: pointer;
-  transition: all .16s ease;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  background: transparent;
-  position: relative;
-}
-
-.nav-item .menu-icon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.9;
-  filter: brightness(0) invert(1);
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.03);
-  transform: translateX(3px);
-}
-
-.nav-item.active {
-  background: rgba(37,99,235,0.12);
-  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
-  transform: none;
-}
-
-/* thin accent bar on left of active item */
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 6px;
-  background: linear-gradient(180deg,#60a5fa,#2563eb);
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-/* Footer logout button styling (matches menu) */
-.sidebar-footer {
-  padding-top: 8px;
-  border-top: 1px solid rgba(255,255,255,0.03);
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-logout {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  background: rgba(231,76,60,0.08);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-/* adjust main area margin to compensate wider sidebar */
+/* adjust main content to account for the new sidebar width */
 .main-area {
-  margin-left: 220px; /* override previous 92px */
+  margin-left: 260px;  /* same as sidebar width */
+  transition: margin-left .18s ease;
 }
 
-/* Responsive: collapse back to original compact nav on small screens */
-@media (max-width: 768px) {
-  .leftbar.sidebar-expanded {
-    width: 100%;
-    height: 70px;
-    bottom: 0;
-    top: auto;
-    left: 0;
-    right: 0;
-    flex-direction: row;
-    align-items: center;
-    padding: 8px 10px;
-  }
-
-  .sidebar-profile, .sidebar-menu, .sidebar-footer {
-    display: none;
-  }
-
-  .main-area {
-    margin-left: 0;
-    margin-bottom: 70px;
-  }
-}
+/* responsive adjustments */
 @media (max-width: 1024px) {
-  .body {
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .right-panel {
-    width: 100%;
-    order: 2;
-  }
-  
-  .calendar-column {
-    order: 1;
-    width: 100%;
-  }
-  
-  .events-list { 
-    height: 300px;
-  }
-  
-  .calendar-grid {
-    min-height: 500px;
-  }
+  .leftbar.sidebar-expanded { width: 220px; }
+  .main-area { margin-left: 220px; }
 }
 
 @media (max-width: 768px) {
-  .leftbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    width: 100%;
-    height: 70px;
-    flex-direction: row;
-    justify-content: space-around;
-    padding: 8px 4px;
-    z-index: 1000;
-    border-radius: 0;
-  }
-
-  .logo {
-    display: none;
-  }
-
-  .left-nav {
-    flex-direction: row;
-    margin-top: 0;
-    width: 100%;
-    justify-content: space-around;
-    gap: 0;
-  }
-
-  .circle-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-  }
-
-  .circle-btn.logout-btn {
-    display: none;
-  }
-
-  .main-area {
-    margin-left: 0;
-    margin-bottom: 70px;
-    padding: 16px;
-    gap: 20px;
-    width: 100%;
-  }
-
-  .header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  
-  .top-actions {
-    width: 100%;
-    justify-content: space-between;
-    order: 2;
-  }
-  
-  .search-wrap {
-    width: 100%;
-    max-width: none;
-    flex: 1;
-  }
-
-  .greeting {
-    order: 1;
-    text-align: center;
-  }
-
-  .greeting h1 {
-    font-size: 24px;
-    margin-bottom: 4px;
-  }
-
-  .calendar-head {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .nav-controls {
-    align-self: center;
-    order: 2;
-  }
-  
-  .month-block {
-    min-width: auto;
-    justify-content: center;
-    order: 1;
-    padding: 12px 16px;
-  }
-
-  .month-name {
-    font-size: 16px;
-  }
-
-  .year-name {
-    font-size: 14px;
-  }
-
-  .calendar-grid { 
-    padding: 12px; 
-    gap: 6px;
-    min-height: 400px;
-    grid-template-columns: repeat(7, 1fr);
-    overflow-x: auto;
-  }
-  
-  .day { 
-    min-height: 70px;
-    padding: 6px 4px;
-    font-size: 12px;
-  }
-
-  .day .date-row {
-    font-size: 12px;
-    margin-bottom: 4px;
-  }
-
-  .event-badge {
-    font-size: 9px;
-    padding: 2px 4px;
-  }
-
-  .week {
-    font-size: 11px;
-    padding: 8px 2px;
-  }
-
-  .right-panel {
-    padding: 12px;
-    width: 100%;
-  }
-  
-  .events-list {
-    height: 250px;
-  }
-
-  .detail-panel {
-    width: 100%;
-    padding: 16px;
-    z-index: 1001;
-  }
-
-  .detail-org-name {
-    font-size: 1.3rem;
-  }
-
-  .detail-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .detail-section {
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-  }
-
-  .profile-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
+  .leftbar.sidebar-expanded { width: 100%; height: 70px; top: auto; bottom: 0; left:0; right:0; flex-direction:row; align-items:center; padding:8px 10px; }
+  .sidebar-profile, .sidebar-menu, .sidebar-footer { display:none; }
+  .main-area { margin-left: 0; margin-bottom: 70px; }
+}
 
   .search-wrap input[type="search"] {
     padding: 10px 36px 10px 12px;
