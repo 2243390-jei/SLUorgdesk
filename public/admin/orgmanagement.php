@@ -14,6 +14,7 @@ if (empty($_SESSION['logged_in'])) {
   <link rel="stylesheet" href="styles/adminmain.css">
   <link rel="stylesheet" href="styles/orgmanagement.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="script/adminmain.js" defer></script>
   <script src="./script/orgmanagement.js" defer></script>
 </head>
 
@@ -36,6 +37,10 @@ if (empty($_SESSION['logged_in'])) {
         <li><a href="usermanagement.php">User Management</a></li>      
       </ul>
     </nav>
+
+    <div id="sidebar-footer">
+      <button id="logoutBtn" class="btn-logout">Logout</button>
+    </div>
   </aside>
 
   <!-- MAIN CONTENT WRAPPER-->
@@ -177,6 +182,18 @@ if (empty($_SESSION['logged_in'])) {
           <button type="button" id="cancelCreateOrg" class="reset-btn">Cancel</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal">
+    <div class="modal-content">
+      <h2>Confirm Logout</h2>
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-buttons">
+        <button type="button" class="danger-btn" id="confirmLogoutBtn">Logout</button>
+        <button type="button" class="cancel-btn" id="cancelLogoutBtn">Cancel</button>
+      </div>
     </div>
   </div>
 </body>
