@@ -709,6 +709,12 @@ textarea {
   background-color: #fff;
 }
 
+/* TODO: Kenneth: Nag add ako error css */
+.error {
+  color: red;
+  font-size: 12px;
+}
+
 /* DROP ZONE */
 .drop-zone {
   border: 2px dashed #bbb;
