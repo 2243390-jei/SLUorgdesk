@@ -1,6 +1,8 @@
 <?php
-// Start session for this route
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../controllers/UserController.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -14,68 +16,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $controller = new UserController();
-$method = $_SERVER['REQUEST_METHOD'];
 $response = [];
 
 try {
-    if ($method === 'GET') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['session']) && $_GET['session'] === 'me') {
-            // Get current session user - allowed without explicit login check as session IS the check
             $response = !empty($_SESSION['user']) 
                 ? ['success' => true, 'data' => $_SESSION['user']]
                 : ['success' => false, 'error' => 'No user logged in'];
         } else {
-            // Other GET operations require authentication
-            $user = AuthMiddleware::requireLogin();
+            AuthMiddleware::requireLogin();
             
             if (isset($_GET['id'])) {
                 $response = $controller->getById($_GET['id']);
             } elseif (isset($_GET['role'])) {
-                // OSAS can filter by role
                 AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByRole($_GET['role']);
             } elseif (isset($_GET['email'])) {
-                // OSAS can search by email
                 AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByEmail($_GET['email']);
             }
         }
-    } elseif ($method === 'POST') {
-        // Check if this is a login request
-        $data = json_decode(file_get_contents('php://input'), true);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
         
         if (isset($data['action']) && $data['action'] === 'login') {
-            // Login does NOT require authentication
             $email = isset($data['email']) ? trim(strtolower($data['email'])) : '';
             $password = isset($data['password']) ? $data['password'] : '';
             $response = $controller->authenticate($email, $password);
-            // on successful login, set session user
-            if (is_array($response) && isset($response['success']) && $response['success'] === true) {
+            
+            if (is_array($response) && ($response['success'] ?? false) === true) {
                 $_SESSION['user'] = $response['data'];
                 $_SESSION['logged_in'] = true;
             }
         } else {
-            // User creation requires OSAS role
             AuthMiddleware::requireRole('OSAS');
             $response = $controller->create($data);
         }
-    } elseif ($method === 'PUT') {
-        // Authentication required for updates
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $user = AuthMiddleware::requireLogin();
         
         if (!isset($_GET['id'])) {
             $response = ['success' => false, 'error' => 'ID required'];
+        } elseif ($user['role'] !== 'OSAS' && $_GET['id'] !== (string)$user['_id']) {
+            $response = ['success' => false, 'error' => 'Unauthorized: Cannot update another user'];
         } else {
-            // Users can only update their own profile, OSAS can update anyone
-            if ($user['role'] !== 'OSAS' && $_GET['id'] !== (string)$user['_id']) {
-                $response = ['success' => false, 'error' => 'Unauthorized: Cannot update another user'];
-            } else {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $response = $controller->update($_GET['id'], $data);
-            }
+            $data = json_decode(file_get_contents('php://input'), true) ?? [];
+            $response = $controller->update($_GET['id'], $data);
         }
     }
 } catch (Exception $e) {
+    http_response_code(500);
     $response = ['success' => false, 'error' => $e->getMessage()];
 }
 

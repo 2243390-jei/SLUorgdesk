@@ -33,6 +33,7 @@ document.getElementById('curYear').textContent = new Date().getFullYear();
 // Use current system date - no hardcoded dates
 let viewDate = new Date();
 const today = new Date();
+today.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
 
 // Organization to school mapping
 let orgToSchoolMap = {};
@@ -69,8 +70,10 @@ async function fetchOrganization(opts = {}) {
     // Create organization to school mapping (normalize _id)
     orgToSchoolMap = {}; // reset
     organizations.forEach(org => {
-      const id = (org._id && typeof org._id === 'string') ? org._id : (org._id && org._id.$oid ? org._id.$oid : org._id);
-      orgToSchoolMap[id] = org.school;
+      if (org._id) {
+        const id = (typeof org._id === 'string') ? org._id : (org._id.$oid ? org._id.$oid : org._id);
+        orgToSchoolMap[id] = org.school;
+      }
     });
 
     return orgToSchoolMap;
@@ -96,51 +99,95 @@ async function fetchSubmissions(opts = {}) {
     if (opts.limit) params.append('limit', opts.limit);
 
     const url = `../../php-server/routes/submissions.php` + (Array.from(params).length ? `?${params.toString()}` : '');
+    console.log("Fetching from URL:", url);
+    
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
+      return [];
+    }
 
     const result = await response.json();
+    console.log("Backend response:", result);
+    
     const submissions = result.success ? result.data : [];
     console.log(`Successfully fetched ${Array.isArray(submissions) ? submissions.length : 0} submissions from backend`);
 
     if (!Array.isArray(submissions) || submissions.length === 0) {
+      console.log("No submissions found or submissions is not an array");
       return [];
     }
 
-    // Transform submissions to events (same as before)
+    // Transform submissions to events
     const transformedEvents = [];
 
     submissions.forEach((submission) => {
-      if (submission.event) {
-        // If event.eventDate stored as UTCDateTime object, format helper in backend converted it to string already.
-        let eventDate = new Date(submission.event.eventDate || submission.submittedAt || Date.now());
-        if (isNaN(eventDate)) eventDate = new Date();
-        const eventDateISO = toISO(eventDate);
+      if (submission.event && submission.event.eventName) {
+        try {
+          // Parse event date
+          let eventDate;
+          if (submission.event.eventDate) {
+            eventDate = new Date(submission.event.eventDate);
+          } else if (submission.submittedAt) {
+            eventDate = new Date(submission.submittedAt);
+          } else {
+            eventDate = new Date();
+          }
+          
+          // Check if date is valid
+          if (isNaN(eventDate.getTime())) {
+            console.warn("Invalid date for submission:", submission._id);
+            eventDate = new Date();
+          }
+          
+          const eventDateISO = toISO(eventDate);
 
-        const orgId = submission.orgInfo?.orgId;
-        const orgKey = (typeof orgId === 'object' && orgId.$oid) ? orgId.$oid : orgId;
-        const school = orgToSchoolMap[orgKey] || orgToSchoolMap[submission.orgInfo?._id] || 'Unknown School';
+          // Get organization info
+          const orgId = submission.orgInfo?.orgId || submission.orgInfo?._id;
+          let orgKey;
+          
+          if (typeof orgId === 'object' && orgId !== null && orgId.$oid) {
+            orgKey = orgId.$oid;
+          } else if (orgId) {
+            orgKey = orgId.toString();
+          } else {
+            orgKey = submission.orgInfo?._id?.$oid || submission.orgInfo?._id;
+          }
+          
+          const school = orgToSchoolMap[orgKey] || submission.orgInfo?.school || 'Unknown School';
+          const orgName = submission.orgInfo?.name || 'Unknown Organization';
+          const acronym = submission.orgInfo?.acronym || 'ORG';
 
-        transformedEvents.push({
-          id: submission._id?.$oid || submission._id,
-          title: `${submission.orgInfo?.acronym || 'ORG'} - ${submission.event.eventName}`,
-          date: eventDateISO,
-          start: submission.event.startTime || "09:00",
-          end: submission.event.endTime || "10:00",
-          category: getCategoryFromOrgType(submission.orgInfo?.acronym),
-          description: `${submission.orgInfo?.name || 'Unknown Organization'} - ${submission.event.eventName}`,
-          submissionData: submission,
-          eventData: submission.event,
-          status: submission.status || "Unknown",
-          school: school,
-          organizationType: submission.orgInfo?.acronym || "Unknown Type",
-          acronym: submission.orgInfo?.acronym || "No Acronym",
-          completeName: submission.orgInfo?.name || "Unknown Name",
-          SDGCategory: submission.event.eventSDG ? (Array.isArray(submission.event.eventSDG) ? submission.event.eventSDG.join(', ') : submission.event.eventSDG) : "Not specified"
-        });
+          transformedEvents.push({
+            id: (submission._id && submission._id.$oid) ? submission._id.$oid : submission._id,
+            title: `${acronym} - ${submission.event.eventName}`,
+            date: eventDateISO,
+            start: submission.event.startTime || "09:00",
+            end: submission.event.endTime || "10:00",
+            category: getCategoryFromOrgType(acronym),
+            description: `${orgName} - ${submission.event.eventName}`,
+            submissionData: submission,
+            eventData: submission.event,
+            status: submission.status || "Unknown",
+            school: school,
+            organizationType: acronym,
+            acronym: acronym,
+            completeName: orgName,
+            SDGCategory: submission.event.eventSDG ? 
+              (Array.isArray(submission.event.eventSDG) ? 
+                submission.event.eventSDG.join(', ') : 
+                submission.event.eventSDG) : 
+              "Not specified"
+          });
+          
+          console.log("Transformed event:", transformedEvents[transformedEvents.length - 1]);
+        } catch (error) {
+          console.error("Error transforming submission:", submission._id, error);
+        }
       }
     });
 
+    console.log(`Total transformed events: ${transformedEvents.length}`);
     return transformedEvents;
   } catch (error) {
     console.error("Error fetching submissions from backend:", error);
@@ -150,6 +197,8 @@ async function fetchSubmissions(opts = {}) {
 
 // Helper function to categorize organizations
 function getCategoryFromOrgType(orgType) {
+  if (!orgType) return 'General';
+  
   const categories = {
     'ICON': 'Academic',
     'SCO': 'Academic',
@@ -162,15 +211,19 @@ function getCategoryFromOrgType(orgType) {
 
 // Utility functions
 function toISO(dateObj){
+  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+    dateObj = new Date();
+  }
   const y = dateObj.getFullYear();
-  const m = String(dateObj.getMonth()+1).padStart(2,'0');
-  const d = String(dateObj.getDate()).padStart(2,'0');
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
 function fromISO(iso){
-  const [y,m,d] = iso.split('-').map(Number);
-  return new Date(y, m-1, d);
+  if (!iso || typeof iso !== 'string') return new Date();
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
 }
 
 function clearDayHighlights(){
@@ -186,20 +239,25 @@ async function renderCalendar(){
 
   calendarGrid.innerHTML = '';
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(w => {
-    const el = document.createElement('div'); el.className = 'week'; el.textContent = w; calendarGrid.appendChild(el);
+    const el = document.createElement('div'); 
+    el.className = 'week'; 
+    el.textContent = w; 
+    calendarGrid.appendChild(el);
   });
 
   const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const prevMonthDays = new Date(year, month, 0).getDate();
 
+  // Previous month days
   for (let i = firstDay - 1; i >= 0; i--){
     const dnum = prevMonthDays - i;
-    const cellDate = new Date(year, month-1, dnum);
+    const cellDate = new Date(year, month - 1, dnum);
     const cell = makeDayCell(cellDate, true);
     calendarGrid.appendChild(cell);
   }
 
+  // Current month days
   for (let d = 1; d <= daysInMonth; d++){
     const cellDate = new Date(year, month, d);
     const cell = makeDayCell(cellDate, false);
@@ -211,7 +269,7 @@ async function renderCalendar(){
   if (filled % 7 !== 0) {
     const toAdd = 7 - (filled % 7);
     for (let k = 1; k <= toAdd; k++){
-      const cellDate = new Date(year, month+1, k);
+      const cellDate = new Date(year, month + 1, k);
       const cell = makeDayCell(cellDate, true);
       calendarGrid.appendChild(cell);
     }
@@ -220,9 +278,10 @@ async function renderCalendar(){
   // Update calendar cells with events after rendering
   const events = await fetchSubmissions({
     month: month + 1,
-    year: year,
-    search: (searchInput.value || '').trim()
+    year: year
   });
+  
+  console.log(`Rendering calendar with ${events.length} events`);
   updateCalendarCellsWithEvents(events);
 }
 
@@ -237,12 +296,15 @@ function makeDayCell(dateObj, inactive=false){
   dateRow.className = 'date-row';
   const dayNum = document.createElement('div'); 
   dayNum.textContent = dateObj.getDate();
+  
   const todayMark = document.createElement('div');
-  if (iso === toISO(today) && !inactive) {
+  const todayISO = toISO(today);
+  if (iso === todayISO && !inactive) {
     todayMark.textContent = 'Today';
     todayMark.style.fontSize = '12px';
     todayMark.style.color = '#2563eb';
   }
+  
   dateRow.appendChild(dayNum); 
   dateRow.appendChild(todayMark);
   el.appendChild(dateRow);
@@ -250,14 +312,14 @@ function makeDayCell(dateObj, inactive=false){
   const evList = document.createElement('div');
   evList.className = 'event-list';
   
-  // Create empty spacer - events will be populated separately
+  // Create empty spacer
   const spacer = document.createElement('div'); 
   spacer.style.minHeight = '6px'; 
   evList.appendChild(spacer);
   
   el.appendChild(evList);
 
-  // Add click event to ALL cells (both active and inactive)
+  // Add click event to ALL cells
   el.addEventListener('click', async () => {
     // Only act when clicking current-month days
     if (inactive) return;
@@ -266,14 +328,23 @@ function makeDayCell(dateObj, inactive=false){
     el.classList.add('highlight');
 
     const isoStr = iso;
+    console.log(`Clicked on date: ${isoStr}`);
+    
     // Request backend for exact-day events
     const events = await fetchSubmissions({
-      date: isoStr,
-      search: (searchInput.value || '').trim()
+      date: isoStr
     });
 
-    // all events returned are for the exact date — determine past status client-side
-    const pastEvents = events.filter(event => fromISO(event.date) < today);
+    console.log(`Found ${events.length} events for ${isoStr}`);
+    
+    // Filter past events (events before today)
+    const pastEvents = events.filter(event => {
+      const eventDate = fromISO(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate < today;
+    });
+
+    console.log(`Past events: ${pastEvents.length}`);
     
     if (pastEvents.length > 0){
       // Find and highlight the first matching event card
@@ -281,23 +352,22 @@ function makeDayCell(dateObj, inactive=false){
       const card = document.querySelector(`.event-card[data-id="${firstEvent.id}"]`);
       if (card) {
         // Scroll to the card if needed
-        const cardRect = card.getBoundingClientRect();
-        const containerRect = eventsListEl.getBoundingClientRect();
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         
-        if (cardRect.top < containerRect.top || cardRect.bottom > containerRect.bottom) {
-          card.scrollIntoView(false);
-        }
-        
-        // Also highlight the card
+        // Highlight the card
         document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         
         // Open detail panel for that event
         openDetailPanel(firstEvent);
+      } else {
+        // If card not found in DOM, open detail panel directly
+        openDetailPanel(firstEvent);
       }
     } else {
-      // If no events for this date, just clear any active event cards
+      // If no events for this date, clear any active event cards
       document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
+      console.log("No past events found for this date");
     }
   });
 
@@ -306,35 +376,62 @@ function makeDayCell(dateObj, inactive=false){
 
 // ---------------- Render Past Events panel ----------------
 async function renderPastEvents(filterText = '') {
+  console.log(`Rendering past events with filter: "${filterText}"`);
+  
   eventsListEl.innerHTML = '';
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
 
-  // Fetch events from backend (month-level)
+  // Fetch events from backend for current month
   const events = await fetchSubmissions({
     month: viewMonth + 1,
-    year: viewYear,
-    search: (filterText || '').trim()
+    year: viewYear
   });
 
-  // Because backend returned month-filtered data, client-side still checks isSameMonth & isPast
+  console.log(`Fetched ${events.length} total events for month ${viewMonth + 1}/${viewYear}`);
+
+  // Filter by month and past status
   const monthEvents = events.filter(event => {
     const d = fromISO(event.date);
+    d.setHours(0, 0, 0, 0);
+    
     const isSameMonth = (d.getFullYear() === viewYear && d.getMonth() === viewMonth);
     const isPast = d < today;
+    
     return isSameMonth && isPast;
   }).sort((a,b) => (b.date + b.start) > (a.date + a.start) ? 1 : -1);
 
+  console.log(`Month events (past only): ${monthEvents.length}`);
+
+  // THEN filter by search text on client side only
   const q = (filterText || '').trim().toLowerCase();
   const filtered = monthEvents.filter(event => {
     if (!q) return true;
-    return (event.title + ' ' + event.category + ' ' + event.description + ' ' + event.acronym + ' ' + event.completeName + ' ' + event.SDGCategory).toLowerCase().includes(q);
+    
+    const searchText = (
+      (event.title || '') + ' ' + 
+      (event.category || '') + ' ' + 
+      (event.description || '') + ' ' + 
+      (event.acronym || '') + ' ' + 
+      (event.completeName || '') + ' ' + 
+      (event.SDGCategory || '') + ' ' +
+      (event.school || '')
+    ).toLowerCase();
+    
+    return searchText.includes(q);
   });
+
+  console.log(`Filtered events after search: ${filtered.length}`);
 
   if (filtered.length === 0){
     const empty = document.createElement('div'); 
     empty.className = 'event-card';
-    empty.innerHTML = `<div class="event-title">No past events</div><div class="event-meta muted">No events matching the month/search</div>`;
+    empty.innerHTML = `
+      <div class="event-title">No past events found</div>
+      <div class="event-meta muted">
+        ${q ? 'No events matching your search' : 'No past events for this month'}
+      </div>
+    `;
     eventsListEl.appendChild(empty);
     return;
   }
@@ -347,12 +444,15 @@ async function renderPastEvents(filterText = '') {
 
     const head = document.createElement('div'); 
     head.className = 'event-head';
+    
     const title = document.createElement('div'); 
     title.className = 'event-title'; 
-    title.textContent = event.title;
+    title.textContent = event.title || 'Untitled Event';
+    
     const meta = document.createElement('div'); 
     meta.className = 'event-meta'; 
-    meta.textContent = `${event.date} • ${event.school}`;
+    meta.textContent = `${event.date} • ${event.school} • ${event.start}`;
+    
     head.appendChild(title); 
     head.appendChild(meta);
 
@@ -366,8 +466,9 @@ async function renderPastEvents(filterText = '') {
     }
     
     details.innerHTML = `
-      <div class="event-desc">${event.completeName}</div>
-      <div class="event-extra">Applicant: ${event.submissionData.applicationInfo?.applicantName || 'N/A'}</div>
+      <div class="event-desc">${event.completeName || event.description}</div>
+      <div class="event-extra">${event.category} • ${event.status}</div>
+      ${sdgDisplay}
     `;
 
     card.appendChild(head);
@@ -375,7 +476,6 @@ async function renderPastEvents(filterText = '') {
 
     // Clicking opens slide-in panel with full details
     card.addEventListener('click', (e) => {
-      // Don't let click bubble accidentally cause other behaviors
       e.stopPropagation();
       
       // Remove active class from all other cards
@@ -387,16 +487,9 @@ async function renderPastEvents(filterText = '') {
       
       // Highlight corresponding day in calendar
       clearDayHighlights();
-      const dayEl = document.querySelector(`.day[data-date="${event.date}"]`);
+      const dayEl = document.querySelector(`.day[data-date="${event.date}"]:not(.inactive)`);
       if (dayEl) {
         dayEl.classList.add('highlight');
-        // Scroll to day if needed
-        const dayRect = dayEl.getBoundingClientRect();
-        const calendarRect = calendarGrid.getBoundingClientRect();
-        
-        if (dayRect.top < calendarRect.top || dayRect.bottom > calendarRect.bottom) {
-          dayEl.scrollIntoView(false);
-        }
       }
     });
 
@@ -412,8 +505,10 @@ async function renderPastEvents(filterText = '') {
   });
 }
 
-// Update calendar cells with events (NO ANIMATION)
+// Update calendar cells with events
 function updateCalendarCellsWithEvents(events) {
+  console.log(`Updating calendar cells with ${events.length} events`);
+  
   // Clear all existing event badges
   document.querySelectorAll('.event-list').forEach(eventList => {
     eventList.innerHTML = '';
@@ -422,11 +517,15 @@ function updateCalendarCellsWithEvents(events) {
   // Group events by date
   const eventsByDate = {};
   events.forEach(event => {
-    if (!eventsByDate[event.date]) {
-      eventsByDate[event.date] = [];
+    if (event && event.date) {
+      if (!eventsByDate[event.date]) {
+        eventsByDate[event.date] = [];
+      }
+      eventsByDate[event.date].push(event);
     }
-    eventsByDate[event.date].push(event);
   });
+
+  console.log(`Events grouped by date:`, Object.keys(eventsByDate));
 
   // Add events to each day cell
   Object.keys(eventsByDate).forEach(date => {
@@ -442,7 +541,8 @@ function updateCalendarCellsWithEvents(events) {
         eventsToShow.forEach(eventItem => {
           const badge = document.createElement('span');
           badge.className = 'event-badge';
-          badge.textContent = eventItem.acronym;
+          badge.textContent = eventItem.acronym || 'EVT';
+          badge.title = eventItem.title;
           eventList.appendChild(badge);
         });
         
@@ -451,8 +551,7 @@ function updateCalendarCellsWithEvents(events) {
           const moreBadge = document.createElement('span');
           moreBadge.className = 'event-badge more-badge';
           moreBadge.textContent = `+${eventsOnDate.length - 2} more`;
-          moreBadge.style.background = '#f0f0f0';
-          moreBadge.style.color = '#666';
+          moreBadge.title = `${eventsOnDate.length - 2} more events`;
           eventList.appendChild(moreBadge);
         }
       }
@@ -460,7 +559,7 @@ function updateCalendarCellsWithEvents(events) {
   });
 
   // Add spacers to days with no events
-  document.querySelectorAll('.day').forEach(dayEl => {
+  document.querySelectorAll('.day:not(.inactive)').forEach(dayEl => {
     const eventList = dayEl.querySelector('.event-list');
     if (eventList && eventList.children.length === 0) {
       const spacer = document.createElement('div');
@@ -472,11 +571,13 @@ function updateCalendarCellsWithEvents(events) {
 
 // ---------------- Slide-in detail panel ----------------
 function openDetailPanel(event) {
-  const submission = event.submissionData;
-  const eventData = event.eventData;
+  console.log("Opening detail panel for event:", event);
   
-  detailTitle.textContent = event.title;
-  detailMeta.textContent = `${event.date} • ${event.school} • ${event.organizationType}`;
+  const submission = event.submissionData || {};
+  const eventData = event.eventData || {};
+  
+  detailTitle.textContent = event.title || 'Event Details';
+  detailMeta.textContent = `${event.date} • ${event.school || 'Unknown School'} • ${event.organizationType || 'General'}`;
   
   // Improved design for detail panel with event and submission details
   detailBody.innerHTML = `
@@ -487,7 +588,7 @@ function openDetailPanel(event) {
       </div>
     </div>
 
-    ${eventData ? `
+    ${eventData.eventName ? `
     <div class="detail-section">
       <h4 class="detail-section-title">Event Details</h4>
       <div class="detail-grid">
@@ -495,26 +596,34 @@ function openDetailPanel(event) {
           <span class="detail-label">Event Name:</span>
           <span class="detail-value">${eventData.eventName}</span>
         </div>
+        ${eventData.eventType ? `
         <div class="detail-item">
           <span class="detail-label">Event Type:</span>
           <span class="detail-value">${eventData.eventType}</span>
         </div>
+        ` : ''}
         <div class="detail-item">
           <span class="detail-label">Date & Time:</span>
-          <span class="detail-value">${event.date} • ${event.start} - ${event.end}</span>
+          <span class="detail-value">${event.date} • ${event.start || 'N/A'} - ${event.end || 'N/A'}</span>
         </div>
+        ${eventData.eventVenue ? `
         <div class="detail-item">
           <span class="detail-label">Venue:</span>
           <span class="detail-value">${eventData.eventVenue}</span>
         </div>
+        ` : ''}
+        ${eventData.attendance ? `
         <div class="detail-item">
           <span class="detail-label">Attendance:</span>
-          <span class="detail-value">${eventData.attendance || 'N/A'}</span>
+          <span class="detail-value">${eventData.attendance}</span>
         </div>
+        ` : ''}
+        ${eventData.eventDescription ? `
         <div class="detail-item full-width">
           <span class="detail-label">Description:</span>
-          <span class="detail-value">${eventData.eventDescription || 'No description available'}</span>
+          <span class="detail-value">${eventData.eventDescription}</span>
         </div>
+        ` : ''}
       </div>
     </div>
     ` : ''}
@@ -524,7 +633,7 @@ function openDetailPanel(event) {
       <div class="detail-grid">
         <div class="detail-item">
           <span class="detail-label">School:</span>
-          <span class="detail-value">${event.school}</span>
+          <span class="detail-value">${event.school || 'Unknown'}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Acronym:</span>
@@ -546,46 +655,35 @@ function openDetailPanel(event) {
     </div>
     ` : ''}
 
+    ${submission.applicationInfo ? `
     <div class="detail-section">
       <h4 class="detail-section-title">Contact Information</h4>
       <div class="detail-grid">
         <div class="detail-item">
           <span class="detail-label">Applicant:</span>
-          <span class="detail-value">${submission.applicationInfo?.applicantName || 'N/A'} (${submission.applicationInfo?.position || 'N/A'})</span>
+          <span class="detail-value">${submission.applicationInfo.applicantName || 'N/A'} (${submission.applicationInfo.position || 'N/A'})</span>
         </div>
+        ${submission.applicationInfo.email ? `
         <div class="detail-item">
           <span class="detail-label">Applicant Email:</span>
-          <span class="detail-value">${submission.applicationInfo?.email || 'N/A'}</span>
+          <span class="detail-value">${submission.applicationInfo.email}</span>
         </div>
+        ` : ''}
       </div>
     </div>
+    ` : ''}
 
-    ${eventData?.supportingDocuments && eventData.supportingDocuments.length > 0 ? `
+    ${eventData.supportingDocuments && eventData.supportingDocuments.length > 0 ? `
     <div class="detail-section">
       <h4 class="detail-section-title">Supporting Documents</h4>
       <div class="document-list">
         ${eventData.supportingDocuments.map((doc, index) => {
-          // Extract document title from filename or use a meaningful title
-          let docTitle = 'Supporting Document';
-          if (typeof doc === 'string') {
-            // If it's a URL or filename, extract the meaningful part
-            const fileName = doc.split('/').pop() || doc;
-            docTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
-            docTitle = docTitle.replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
-            docTitle = docTitle.charAt(0).toUpperCase() + docTitle.slice(1); // Capitalize first letter
-          } else if (doc.title) {
-            // If it's an object with title property
-            docTitle = doc.title;
-          } else if (doc.name) {
-            // If it's an object with name property
-            docTitle = doc.name;
-          }
-          
+          const docTitle = getDocumentTitle(doc);
           const docUrl = typeof doc === 'string' ? doc : (doc.url || doc.link || '#');
           
           return `
             <div class="document-item">
-              <span class="doc-icon"></span>
+              <span class="doc-icon">📄</span>
               <div class="doc-info">
                 <span class="doc-name">${docTitle}</span>
                 <a href="${docUrl}" target="_blank" class="doc-link">View</a>
@@ -597,12 +695,12 @@ function openDetailPanel(event) {
     </div>
     ` : ''}
 
-    ${eventData?.eventProof ? `
+    ${eventData.eventProof ? `
     <div class="detail-section">
       <h4 class="detail-section-title">Event Proof</h4>
       <div class="document-list">
         <div class="document-item">
-          <span class="doc-icon"></span>
+          <span class="doc-icon">✅</span>
           <div class="doc-info">
             <span class="doc-name">Event Proof Document</span>
             <a href="${eventData.eventProof}" target="_blank" class="doc-link">View</a>
@@ -617,15 +715,23 @@ function openDetailPanel(event) {
       <div class="detail-grid">
         <div class="detail-item">
           <span class="detail-label">Submission ID:</span>
-          <span class="detail-value monospace">${event.id}</span>
+          <span class="detail-value monospace">${event.id || 'N/A'}</span>
         </div>
+        ${submission.academicYear ? `
         <div class="detail-item">
           <span class="detail-label">Academic Year:</span>
-          <span class="detail-value">${submission.academicYear || 'N/A'}</span>
+          <span class="detail-value">${submission.academicYear}</span>
         </div>
+        ` : ''}
+        ${submission.semester ? `
         <div class="detail-item">
           <span class="detail-label">Semester:</span>
-          <span class="detail-value">${submission.semester || 'N/A'}</span>
+          <span class="detail-value">${submission.semester}</span>
+        </div>
+        ` : ''}
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">${event.status}</span>
         </div>
       </div>
     </div>
@@ -645,7 +751,6 @@ function getDocumentTitle(doc) {
   if (!doc) return 'Document';
   
   if (typeof doc === 'string') {
-    // If it's a URL or filename, extract the meaningful part
     const fileName = doc.split('/').pop() || doc;
     let title = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
     title = title.replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
@@ -665,7 +770,6 @@ function getDocumentTitle(doc) {
       'evaluation': 'Evaluation Form'
     };
     
-    // Check if the title matches any common document types
     const lowerTitle = title.toLowerCase();
     for (const [key, value] of Object.entries(docTypeMappings)) {
       if (lowerTitle.includes(key)) {
@@ -675,10 +779,8 @@ function getDocumentTitle(doc) {
     
     return title || 'Supporting Document';
   } else if (doc.title) {
-    // If it's an object with title property
     return doc.title;
   } else if (doc.name) {
-    // If it's an object with name property
     return doc.name;
   }
   
@@ -722,57 +824,15 @@ function hideLogoutModal() {
   logoutModal.setAttribute('aria-hidden', 'true');
 }
 
-// Show profile modal (mobile)
-function showProfileModal() {
-  profileModal.classList.add('show');
-  profileModal.setAttribute('aria-hidden', 'false');
-}
-
-// Hide profile modal (mobile)
-function hideProfileModal() {
-  profileModal.classList.remove('show');
-  profileModal.setAttribute('aria-hidden', 'true');
-}
-
 // Logout function
 function performLogout() {
-  // Redirect to ../index.php instead of login.html
-   try {
-        fetch('../../php-server/routes/logout.php', { method: 'POST' });
-      } catch (err) {
-        console.error('Logout error:', err);
-      }
+  try {
+    fetch('../../php-server/routes/logout.php', { method: 'POST' });
+  } catch (err) {
+    console.error('Logout error:', err);
+  }
 
-      // Redirect to login
-      window.location.href = '../../index.php';
-}
-
-// Update mobile profile modal content
-function showProfileModal() {
-  profileModal.classList.add('show');
-  profileModal.setAttribute('aria-hidden', 'false');
-  
-  // Update modal content with direct logout button
-  const modalContent = `
-    <div class="profile-info">
-      <div class="profile-large">O</div>
-      <div class="profile-details">
-        <h4>Hello, OSAS</h4>
-        <div class="profile-logout">
-          <button id="profileLogoutBtn" class="btn-logout">
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  profileModal.querySelector('.modal-body').innerHTML = modalContent;
-  
-  // Add direct logout event listener
-  document.getElementById('profileLogoutBtn').addEventListener('click', () => {
-    window.location.href = "../../index.php";
-  });
+  window.location.href = '../../index.php';
 }
 
 // Event listeners for logout functionality
@@ -781,10 +841,6 @@ logoutModalClose.addEventListener('click', hideLogoutModal);
 logoutCancel.addEventListener('click', hideLogoutModal);
 logoutConfirm.addEventListener('click', performLogout);
 
-// Event listeners for mobile profile modal
-mobileProfileBtn.addEventListener('click', showProfileModal);
-profileModalClose.addEventListener('click', hideProfileModal);
-
 // Close modals when clicking on overlay
 logoutModal.addEventListener('click', (e) => {
   if (e.target === logoutModal) {
@@ -792,21 +848,15 @@ logoutModal.addEventListener('click', (e) => {
   }
 });
 
-profileModal.addEventListener('click', (e) => {
-  if (e.target === profileModal) {
-    hideProfileModal();
-  }
-});
-
 // ---------------- Search handling ----------------
-searchInput.addEventListener('input', (e) => {
+searchInput.addEventListener('input', async (e) => {
   const q = e.target.value;
-  renderPastEvents(q);
+  await renderPastEvents(q);
 });
 
-searchClear.addEventListener('click', () => {
+searchClear.addEventListener('click', async () => {
   searchInput.value = '';
-  renderPastEvents('');
+  await renderPastEvents('');
   searchInput.focus();
 });
 
@@ -826,28 +876,37 @@ nextBtn.addEventListener('click', async () => {
 });
 
 todayBtn.addEventListener('click', async () => {
-  viewDate = new Date(); // Reset to current system date
+  viewDate = new Date();
   await renderCalendar();
   await renderPastEvents(searchInput.value);
   clearDayHighlights();
 });
 
-// Initial render - call renamed fetchOrganization
+// Initial render
 async function initializeCalendar() {
   try {
-    makeEventsListScrollable(); // Make events list scrollable
+    console.log("Initializing calendar...");
+    makeEventsListScrollable();
     
-    // First fetch organizations to build the mapping (backend filtered)
+    // First fetch organizations to build the mapping
     await fetchOrganization();
     
     // Then render calendar and events
     await renderCalendar();
     await renderPastEvents();
-    console.log('Calendar initialized with submission data from backend');
+    
+    console.log("Calendar initialization complete");
   } catch (error) {
     console.error('Error initializing calendar:', error);
+    // Show error message to user
+    eventsListEl.innerHTML = `
+      <div class="event-card" style="text-align: center;">
+        <div class="event-title">Error Loading Calendar</div>
+        <div class="event-meta muted">Please check console for details</div>
+      </div>
+    `;
   }
 }
 
 // Start the application
-initializeCalendar();
+document.addEventListener('DOMContentLoaded', initializeCalendar);

@@ -24,15 +24,15 @@ const filterMenu = document.querySelector('.filter-menu');
 const rowsPerPageSelect = document.getElementById('rowsPerPage');
 const addUserBtn = document.getElementById('addUserBtn');
 
-// Ensure modals are hidden by default
-userModal.style.display = 'none';
-deleteModal.style.display = 'none';
+// Ensure modals are hidden by default (only if they exist)
+if (userModal) userModal.style.display = 'none';
+if (deleteModal) deleteModal.style.display = 'none';
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initialize);
-addUserBtn.addEventListener('click', openUserFormModal);
-userForm.addEventListener('submit', handleSubmit);
-searchInput.addEventListener('input', handleSearch);
+if (addUserBtn) addUserBtn.addEventListener('click', openUserFormModal);
+if (userForm) userForm.addEventListener('submit', handleSubmit);
+if (searchInput) searchInput.addEventListener('input', handleSearch);
 // show/hide clear button
 if (searchInput) {
     searchInput.addEventListener('input', () => updateClearVisibility());

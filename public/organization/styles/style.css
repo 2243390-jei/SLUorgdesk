@@ -699,10 +699,21 @@ textarea {
   font-size: 1rem;
   font-family: "Inter", sans-serif;
   outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: all 0.25s ease;
   box-sizing: border-box;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
 }
 
+.time-group input[type="time"]:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+
+.time-group input[type="time"]:active,
 .time-group input[type="time"]:focus {
   border-color: #1e1362;
   box-shadow: 0 0 4px rgba(30, 19, 98, 0.3);

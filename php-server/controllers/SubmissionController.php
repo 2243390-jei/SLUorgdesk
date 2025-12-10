@@ -1,157 +1,88 @@
 <?php
 require_once __DIR__ . '/../models/Submission.php';
 
-/**
- * Submission Controller
- */
-class SubmissionController
-{
+class SubmissionController {
     private $submission;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->submission = new Submission();
     }
 
-    /**
-     * Get all submissions
-     */
-    public function getAll()
-    {
+    public function getAll() {
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-        $data = $this->submission->getAll($limit, $offset);
-        return ['success' => true, 'data' => $data];
+        return ['success' => true, 'data' => $this->submission->getAll($limit, $offset)];
     }
 
-    /**
-     * Get submission by ID
-     */
-    public function getById($id)
-    {
+    public function getById($id) {
         $data = $this->submission->getById($id);
-        if (!$data) {
-            return ['success' => false, 'error' => 'Submission not found'];
-        }
-        return ['success' => true, 'data' => $data];
+        return $data ? ['success' => true, 'data' => $data] : ['success' => false, 'error' => 'Submission not found'];
     }
 
-    /**
-     * Get submissions by organization
-     */
-    public function getByOrganization($orgId)
-    {
+    public function getByOrganization($orgId) {
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-        $data = $this->submission->getByOrganization($orgId, $limit, $offset);
-        return ['success' => true, 'data' => $data];
+        return ['success' => true, 'data' => $this->submission->getByOrganization($orgId, $limit, $offset)];
     }
 
-    /**
-     * Create submission
-     */
-    public function create($data)
-    {
-        // List of required fields
-        $requiredFields = ['applicationInfo', 'orgInfo', 'academicYear', 'semester', 'events'];
-        $missingFields = [];
-
-        // Check which fields are missing or empty
-        foreach ($requiredFields as $field) {
+    public function create($data) {
+        $required = ['applicationInfo', 'orgInfo', 'academicYear', 'semester', 'events'];
+        $missing = [];
+        
+        foreach ($required as $field) {
             if (empty($data[$field])) {
-                $missingFields[] = $field;
+                $missing[] = $field;
             }
         }
-
-        // If any required fields are missing, return them
-        if (!empty($missingFields)) {
-            return [
-                'success' => false,
-                'error' => 'Missing required fields: ' . implode(', ', $missingFields)
-            ];
+        
+        if (!empty($missing)) {
+            return ['success' => false, 'error' => 'Missing: ' . implode(', ', $missing)];
         }
 
-        // Validate that events is an array with at least one event
-        if (!is_array($data['events']) || count($data['events']) === 0) {
-            return [
-                'success' => false,
-                'error' => 'At least one event is required'
-            ];
+        if (!is_array($data['events']) || empty($data['events'])) {
+            return ['success' => false, 'error' => 'At least one event is required'];
         }
 
-        // All required fields are present, proceed with creation
         $id = $this->submission->create($data);
         return ['success' => true, 'id' => (string)$id];
     }
 
-
-    /**
-     * Update submission
-     */
-    public function update($id, $data)
-    {
+    public function update($id, $data) {
         $result = $this->submission->update($id, $data);
-        if (!$result) {
-            return ['success' => false, 'error' => 'Update failed'];
-        }
-        return ['success' => true];
+        return $result ? ['success' => true] : ['success' => false, 'error' => 'Update failed'];
     }
 
-    /**
-     * Delete submission
-     */
-    public function delete($id)
-    {
+    public function delete($id) {
         $result = $this->submission->delete($id);
-        if (!$result) {
-            return ['success' => false, 'error' => 'Delete failed'];
-        }
-        return ['success' => true];
+        return $result ? ['success' => true] : ['success' => false, 'error' => 'Delete failed'];
     }
 
-    /**
-     * Get submissions by flexible filtering (search, status, month/year, organizationId, myorg, date)
-     * Accepts an array of query params ($_GET)
-     */
-    public function getFiltered($queryParams = [])
-    {
-        $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 500; // larger default for calendar
+    public function getFiltered($queryParams = []) {
+        $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 500;
         $offset = isset($queryParams['offset']) ? (int)$queryParams['offset'] : 0;
 
         $filters = [];
         if (!empty($queryParams['organizationId'])) {
             $filters['organizationId'] = $queryParams['organizationId'];
         }
-
         if (!empty($queryParams['status'])) {
             $filters['status'] = $queryParams['status'];
         }
-
         if (!empty($queryParams['search'])) {
             $filters['search'] = $queryParams['search'];
         }
-
         if (!empty($queryParams['month']) && !empty($queryParams['year'])) {
             $filters['month'] = (int)$queryParams['month'];
             $filters['year'] = (int)$queryParams['year'];
         }
-
-        // exact day filter (YYYY-MM-DD)
         if (!empty($queryParams['date'])) {
             $filters['date'] = $queryParams['date'];
         }
-
-        // myorg: when '1', use session organizationId if available
-        if (!empty($queryParams['myorg']) && $queryParams['myorg'] === '1') {
-            if (!empty($_SESSION['user']['organizationId'])) {
-                $filters['organizationId'] = $_SESSION['user']['organizationId'];
-            }
+        if (!empty($queryParams['myorg']) && $queryParams['myorg'] === '1' && !empty($_SESSION['user']['organizationId'])) {
+            $filters['organizationId'] = $_SESSION['user']['organizationId'];
         }
 
-        $data = $this->submission->getFiltered($filters, $limit, $offset);
-        return ['success' => true, 'data' => $data];
+        return ['success' => true, 'data' => $this->submission->getFiltered($filters, $limit, $offset)];
     }
 }
 ?>

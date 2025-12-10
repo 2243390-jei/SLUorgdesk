@@ -17,31 +17,7 @@ if (empty($_SESSION['logged_in'])) {
 </head>
 <body>
   <div class="app">
-    <aside class="leftbar" aria-label="Main navigation">
-      <div class="brand">
-        <img src="../Images/SLU_logo.png" alt="SLU Logo" class="logo">
-      </div>
-
-      <nav class="left-nav" role="navigation" aria-label="Sidebar">
-        <a href="../osas/calendar.php">
-          <button class="circle-btn" title="Calendar" aria-label="Calendar">
-            <img src="../Images/osas/calendar.png" alt="Calendar" class="nav-icon">
-          </button>
-        </a>
-
-        <a href="../osas/orgs.html">
-          <button class="circle-btn active" title="Organizations" aria-label="Organizations">
-            <img src="../Images/osas/group.png" alt="Organizations" class="nav-icon">
-          </button>
-        </a>
-        
-        <a href="../osas/analytics.php">
-          <button class="circle-btn" title="Analytics" aria-label="Analytics">
-            <img src="../Images/osas/statistics.png" alt="Analytics" class="nav-icon">
-          </button>
-        </a>
-      </nav>
-    </aside>
+    
     <main class="main-area">
       <header class="header">
         <div class="greeting">
@@ -129,6 +105,11 @@ if (empty($_SESSION['logged_in'])) {
                 <button id="clearFilterBtn">Clear Filter</button>
               </div>
             </div>
+          </div>
+          
+          <!-- SLU OrgDesk Logo -->
+          <div id="header-logo">
+            <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
           </div>
         </div>
       </header>
