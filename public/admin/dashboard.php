@@ -66,9 +66,9 @@
                     <canvas id="chartRoles"></canvas> 
                 </div>
 
-                <!-- Widget 2: Recent Activities -->
+                <!-- Widget 2: Monthly Activities -->
                 <div class="widget-box">
-                    <h3>Recent Activities</h3>
+                    <h3>Monthly Activities</h3>
                     <div class="chart-scroll-container">
                         <canvas id="chartActive"></canvas> 
                     </div>
