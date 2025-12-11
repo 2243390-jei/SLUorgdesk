@@ -10,6 +10,7 @@ AuthMiddleware::requireRole('OSAS');
     <link rel="stylesheet" href="styles/osasmain.css">
     <link rel="stylesheet" href="styles/OSASorgs.css">
     <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
+    <script src="script/profile.js" defer></script>
     <script src="script/OSASorgs.js" defer></script>
     <title>Organizations in SLU</title>
 </head>
@@ -34,10 +35,10 @@ AuthMiddleware::requireRole('OSAS');
     <aside class="sidebar" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">O</div>
+          <img id="profile-icon" src="../images/user.png" alt="Profile Icon" width="32" height="32">
           <div class="profile-text">
-            <div class="admin-title">OSAS</div>
-            <div class="admin-sub" id="desktopPageTitle">Organizations Dashboard</div>
+            <div class="admin-name">OSAS</div>
+            <div class="admin-email">Loading...</div>
           </div>
         </div>
       </div>
@@ -160,8 +161,13 @@ AuthMiddleware::requireRole('OSAS');
         <div class="modal-body" id="submissionDetailsBody">
           <!-- Submission details will be populated here -->
         </div>
+        <div class="revision-section">
+          <label for="revisionComment">Comment Revision:</label>
+          <textarea id="revisionComment" placeholder="Enter your comments or revisions here..." rows="4"></textarea>
+        </div>
         <div class="modal-footer">
           <button id="backToSubmissionsBtn" class="btn-secondary">Back to Submissions</button>
+          <button id="submitRevisionBtn" class="btn-primary">Submit Revision</button>
           <button id="closeSubmissionDetailsBtn" class="btn-secondary">Close All</button>
         </div>
       </div>

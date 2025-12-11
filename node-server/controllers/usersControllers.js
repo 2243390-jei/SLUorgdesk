@@ -137,4 +137,15 @@ const deleteUser = async (req, res) => {
     }
 }
 
-module.exports = { getAllUsers, getUserById, getUserByRole, getUserByEmail, createUser, updateUser, deleteUser }
+// Helper function for login - returns full user object with password for authentication
+const findUserByEmail = async (email) => {
+    try {
+        const user = await User.findOne({ email }).lean()
+        return user
+    } catch (err) {
+        console.error('Error finding user by email:', err)
+        return null
+    }
+}
+
+module.exports = { getAllUsers, getUserById, getUserByRole, getUserByEmail, createUser, updateUser, deleteUser, findUserByEmail }

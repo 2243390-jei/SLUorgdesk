@@ -28,8 +28,7 @@
       <ul>
         <li><a href="dashboard.php">Dashboard</a></li>
         <li class="active"><a href="orgmanagement.php">Org Management</a></li>
-        <li><a href="usermanagement.php">User Management</a></li> 
-        <li><a href="activitylogs.php">Activity Logs</a></li>             
+        <li><a href="usermanagement.php">User Management</a></li>      
       </ul>
     </nav>
 
@@ -144,7 +143,7 @@
 
   <div id="addOrgModal" class="createorg-modal">
     <div class="createorg-modal-content">
-      <h2 id="orgFormTitle">Add Organization</h2>
+      <h2 id="orgFormTitle">Add Organization Details</h2>
 
       <form id="createOrgForm">
         <div class="createorg-modal-row">
@@ -187,6 +186,42 @@
         <div class="createorg-modal-actions">
           <button type="submit" class="btn-outlined">Save</button>
           <button type="button" id="cancelCreateOrg" class="reset-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Form Modal for newly created organization -->
+  <div id="userModal" class="createorg-modal">
+    <div class="createorg-modal-content">
+      <h2 id="modalTitle">Add User for Organization</h2>
+      <form id="userForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter full name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="Organization" selected>Organization</option>
+          </select>
+        </div>
+
+        <div class="createorg-modal-actions">
+          <button type="submit" class="confirm-btn">Save User</button>
+          <button type="button" class="cancel-btn" onclick="closeUserModal()">Cancel</button>
         </div>
       </form>
     </div>
