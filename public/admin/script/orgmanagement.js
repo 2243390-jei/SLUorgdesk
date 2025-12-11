@@ -330,6 +330,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Response has 'id' directly, not 'data._id'
       window.newlyCreatedOrgId = json.id;
       window.newlyCreatedOrgName = orgData.name;
+      // store email for autofill
+      window.newlyCreatedOrgEmail = orgData.email || '';
       console.log('Stored org ID:', window.newlyCreatedOrgId, 'Org Name:', window.newlyCreatedOrgName);
       
       // refresh list
@@ -622,6 +624,14 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (userForm) {
       userForm.reset();
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      if (window.newlyCreatedOrgName && nameInput) {
+        nameInput.value = window.newlyCreatedOrgName;
+      }
+      if (window.newlyCreatedOrgEmail && emailInput) {
+        emailInput.value = window.newlyCreatedOrgEmail;
+      }
     }
     if (userModal) {
       userModal.style.display = 'flex';
