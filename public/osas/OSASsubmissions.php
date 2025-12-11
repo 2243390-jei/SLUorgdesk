@@ -12,7 +12,7 @@ if (empty($_SESSION['logged_in'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organization Submissions</title>
   <link rel="stylesheet" href="styles/OSASsubmissions.css">
-  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
   <script src="script/OSASsubmissions.js" defer></script>
 </head>
 <body>
@@ -23,7 +23,7 @@ if (empty($_SESSION['logged_in'])) {
         <div class="greeting">
           <div class="header-title-container">
             <button id="backButton" class="back-button" title="Back to Organizations" aria-label="Back to Organizations">
-              <img src="../Images/back.png" alt="back">
+              <img src="../images/back.png" alt="back">
             </button>
             <h1>Organization Submissions</h1>
           </div>
@@ -41,7 +41,7 @@ if (empty($_SESSION['logged_in'])) {
 
           <div class="filter-container">
             <button id="filterToggle" class="filter-btn" title="Filter" aria-label="Filter">
-              <img src="../Images/filter.png" alt="filter-btn">
+              <img src="../images/filter.png" alt="filter-btn">
             </button>
 
             <div id="filterDropdown" class="filter-dropdown hidden">
