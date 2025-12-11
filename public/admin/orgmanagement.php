@@ -144,7 +144,7 @@
 
   <div id="addOrgModal" class="createorg-modal">
     <div class="createorg-modal-content">
-      <h2 id="orgFormTitle">Add Organization</h2>
+      <h2 id="orgFormTitle">Add Organization Details</h2>
 
       <form id="createOrgForm">
         <div class="createorg-modal-row">
@@ -164,17 +164,65 @@
 
         <div class="createorg-modal-row">
           <label>School</label>
-          <input type="text" id="orgSchool" placeholder="Enter school" required>
+          <!-- changed to select with fixed school options -->
+          <select id="orgSchool" required>
+            <option value="SEA">SEA</option>
+            <option value="SAMCIS">SAMCIS</option>
+            <option value="SONAHBS">SONAHBS</option>
+            <option value="STELA">STELA</option>
+            <option value="SOM">SOM</option>
+            <option value="SOL">SOL</option>
+            <option value="UNIVERSITY-WIDE">UNIVERSITY-WIDE</option>
+          </select>
         </div>
 
         <div class="createorg-modal-row">
-          <label>Logo URL</label>
-          <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo">
+          <label>Logo</label>
+          <!-- file input for selecting image from desktop -->
+          <input type="file" id="orgLogo" accept="image/*">
+          <!-- hidden input to store existing logo path when editing -->
+          <input type="hidden" id="orgLogoPath" value="">
         </div>
 
         <div class="createorg-modal-actions">
           <button type="submit" class="btn-outlined">Save</button>
           <button type="button" id="cancelCreateOrg" class="reset-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Form Modal for newly created organization -->
+  <div id="userModal" class="createorg-modal">
+    <div class="createorg-modal-content">
+      <h2 id="modalTitle">Add User for Organization</h2>
+      <form id="userForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter full name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="Organization" selected>Organization</option>
+          </select>
+        </div>
+
+        <div class="createorg-modal-actions">
+          <button type="submit" class="confirm-btn">Save User</button>
+          <button type="button" class="cancel-btn" onclick="closeUserModal()">Cancel</button>
         </div>
       </form>
     </div>

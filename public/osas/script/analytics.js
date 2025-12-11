@@ -110,9 +110,15 @@ function setupEventListeners() {
         });
     }
     
-    // Close mobile menu when clicking nav items
+    // Navigation between pages
     document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', closeMobileMenu);
+        item.addEventListener('click', (e) => {
+            const page = item.getAttribute('data-page');
+            if (page) {
+                navigateToPage(page);
+            }
+            closeMobileMenu();
+        });
     });
     
     // Window resize - update charts
@@ -587,6 +593,19 @@ window.addEventListener('online', () => {
 window.addEventListener('offline', () => {
     showError('Network connection lost. Please check your internet connection.');
 });
+
+// Navigation function
+function navigateToPage(page) {
+    const pages = {
+        'calendar': 'calendar.php',
+        'orgs': 'orgs.php',
+        'analytics': 'analytics.php'
+    };
+    
+    if (pages[page]) {
+        window.location.href = pages[page];
+    }
+}
 
 // Export for debugging
 window.analyticsDashboard = {

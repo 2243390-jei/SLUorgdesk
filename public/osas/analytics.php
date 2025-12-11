@@ -1,9 +1,6 @@
 <?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../../index.php');
-    exit;
-}
+require_once __DIR__ . '/../../php-server/middleware/AuthMiddleware.php';
+AuthMiddleware::requireRole('OSAS');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,20 +8,22 @@ if (empty($_SESSION['logged_in'])) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Osas Calendar — Analytics Dashboard</title>
+  <link rel="stylesheet" href="styles/osasmain.css">
   <link rel="stylesheet" href="styles/analytics.css">
   <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
+  <script src="script/profile.js" defer></script>
 </head>
-<body>
+<body data-page="analytics">
+
   <div class="app">
+
     <!-- Mobile Header -->
     <div class="mobile-header">
       <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
       <div class="mobile-greeting">
-        <h1>Analytics Dashboard</h1>
+        <h1 id="mobilePageTitle">Analytics Dashboard</h1>
       </div>
       <div class="mobile-logo">
         <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
@@ -32,28 +31,28 @@ if (empty($_SESSION['logged_in'])) {
     </div>
 
     <!-- Sidebar -->
-    <aside class="sidebar" aria-label="Main navigation">
+     <aside class="sidebar" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">O</div>
+          <img id="profile-icon" src="../images/user.png" alt="Profile Icon" width="32" height="32">
           <div class="profile-text">
-            <div class="admin-title">OSAS</div>
-            <div class="admin-sub">Analytics Dashboard</div>
+            <div class="admin-name">OSAS</div>
+            <div class="admin-email">Loading...</div>
           </div>
         </div>
       </div>
 
-      <nav class="sidebar-menu" aria-label="Sidebar">
+      <nav class="sidebar-menu" aria-label="Sidebar navigation">
         <ul>
-          <li class="nav-item" onclick="location.href='../osas/calendar.php'">
+          <li class="nav-item" data-page="calendar">
             <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
-          <li class="nav-item" onclick="location.href='../osas/orgs.php'">
+          <li class="nav-item" data-page="orgs">
             <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
-          <li class="nav-item active" onclick="location.href='../osas/analytics.php'">
+          <li class="nav-item active" data-page="analytics">
             <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
@@ -75,14 +74,13 @@ if (empty($_SESSION['logged_in'])) {
           <h1>Hello, OSAS</h1>
           <div class="muted">Organization analytics and insights</div>
         </div>
-        
         <div class="header-logo">
           <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
         </div>
       </header>
 
       <div class="dashboard-body">
-        <!-- Top Row: Top Organizations + Monthly Submissions -->
+        <!-- Top Row -->
         <div class="dashboard-row">
           <div class="orgs-section">
             <div class="section-header">
@@ -103,7 +101,7 @@ if (empty($_SESSION['logged_in'])) {
           </div>
         </div>
 
-        <!-- Middle Row: SDG Submissions -->
+        <!-- SDG Submissions -->
         <div class="dashboard-row">
           <div class="chart-full">
             <div class="chart-card">
@@ -121,7 +119,7 @@ if (empty($_SESSION['logged_in'])) {
           </div>
         </div>
 
-        <!-- Bottom Row: Submissions by School -->
+        <!-- Submissions by School -->
         <div class="dashboard-row">
           <div class="chart-full">
             <div class="chart-card">

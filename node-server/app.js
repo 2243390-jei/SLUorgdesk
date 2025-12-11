@@ -44,6 +44,10 @@ app.use(sessionConfig)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// mount upload router so frontend can POST /api/upload_logo
+const uploadRouter = require('./middleware/upload');
+app.use('/api', uploadRouter);
+
 // API routes FIRST (higher priority)
 app.use('/', routes)
 

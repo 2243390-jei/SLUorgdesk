@@ -11,23 +11,76 @@ if (empty($_SESSION['logged_in'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organization Submissions</title>
+  <link rel="stylesheet" href="styles/osasmain.css">
   <link rel="stylesheet" href="styles/OSASsubmissions.css">
   <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
   <script src="script/OSASsubmissions.js" defer></script>
 </head>
-<body>
+<body data-page="submissions">
   <div class="app">
     
-    <main class="main-area">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+      <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="mobile-greeting">
+        <h1 id="mobilePageTitle">Organization Submissions</h1>
+      </div>
+      <div class="mobile-logo">
+        <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="sidebar-top">
+        <div class="sidebar-profile">
+          <div class="avatar">O</div>
+          <div class="profile-text">
+            <div class="admin-title">OSAS</div>
+            <div class="admin-sub" id="desktopPageTitle">Submissions</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu" aria-label="Sidebar navigation">
+        <ul>
+          <li class="nav-item" data-page="calendar">
+            <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
+            <span class="menu-label">CALENDAR</span>
+          </li>
+          <li class="nav-item" data-page="orgs">
+            <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
+            <span class="menu-label">ORG MANAGEMENT</span>
+          </li>
+          <li class="nav-item" data-page="analytics">
+            <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
+            <span class="menu-label">ANALYTICS</span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
+          <img src="../images/osas/logout.png" alt="Logout" class="menu-icon">
+          <span class="menu-label">LOGOUT</span>
+        </button>
+      </div>
+    </aside>
+    
+    <main class="main-content">
       <header class="header">
         <div class="greeting">
           <div class="header-title-container">
             <button id="backButton" class="back-button" title="Back to Organizations" aria-label="Back to Organizations">
               <img src="../images/back.png" alt="back">
             </button>
-            <h1>Organization Submissions</h1>
+            <div>
+              <h1>Organization Submissions</h1>
+              <div class="muted">Viewing submissions for selected organization</div>
+            </div>
           </div>
-          <div class="muted">Viewing submissions for selected organization</div>
         </div>
 
         <div class="header-right">
@@ -117,6 +170,34 @@ if (empty($_SESSION['logged_in'])) {
       <div id="submissionsContainer">
       </div>
     </main>
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal" role="dialog" aria-labelledby="logoutModalTitle" aria-hidden="true">
+      <div class="modal-content">
+        <h2 id="logoutModalTitle">Confirm Logout</h2>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <button id="confirmLogoutBtn" class="btn-primary">Yes, Logout</button>
+          <button id="cancelLogoutBtn" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission Details Modal -->
+    <div id="submissionModal" class="modal" role="dialog" aria-labelledby="submissionModalTitle" aria-hidden="true">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2 id="submissionModalTitle">Submission Details</h2>
+          <button id="closeSubmissionModal" class="modal-close" aria-label="Close submission details">&times;</button>
+        </div>
+        <div class="modal-body" id="submissionDetailsBody">
+          <!-- Submission details will be populated here -->
+        </div>
+        <div class="modal-footer">
+          <button id="closeSubmissionModalBtn" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>

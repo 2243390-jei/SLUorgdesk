@@ -10,25 +10,26 @@ let chartRoles = new Chart(ctxRoles, {
     }
 });
 
-// ======== Active Users Chart (Top Widget 2) ========
+// ======== Monthly Activities Chart (Top Widget 2) ========
 const ctxActive = document.getElementById('chartActive').getContext('2d');
 let chartActive = new Chart(ctxActive, {
-    type: 'bar',
-    data: { labels: [], datasets: [{ label: 'Recent Activities', data: [], backgroundColor: '#4ea8ff' }] },
+    type: 'line',
+    data: { labels: [], datasets: [{
+        label: 'Monthly Activities',
+        data: [],
+        fill: true,
+        tension: 0.3,
+        backgroundColor: 'rgba(78,168,255,0.12)',
+        borderColor: '#4ea8ff',
+        pointBackgroundColor: '#4ea8ff',
+        pointRadius: 4
+    }]},
     options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { 
-                ticks: { color: '#fff' }, 
-                grid: { color: 'rgba(255,255,255,0.1)' }
-            },
-            y: { 
-                ticks: { display: false },
-                grid: { color: 'rgba(255,255,255,0.1)' },
-                beginAtZero: true,
-                max: 10
-            }
+            x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { ticks: { color: '#fff', beginAtZero: true }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } }
     }
@@ -47,8 +48,7 @@ let chartSchools = new Chart(ctxSchools, {
             y: { 
                 ticks: { color: '#fff', stepSize: 1 },
                 grid: { color: 'rgba(255,255,255,0.1)' },
-                beginAtZero: true,
-                max: 10
+                beginAtZero: true
             }
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } }
@@ -61,6 +61,39 @@ function generatePalette(n) {
     const out = [];
     for (let i=0;i<n;i++) out.push(base[i % base.length]);
     return out;
+}
+
+// new: cache for organizations map
+const _orgNameMap = {};
+
+// new: fetch organizations list and build a lookup map (id, acronym, lower-name -> display name)
+async function fetchOrganizationsMap() {
+    if (Object.keys(_orgNameMap).length > 0) return _orgNameMap;
+
+    const endpoint = (typeof API_CONFIG !== 'undefined' && API_CONFIG.orgsEndpoint) ? API_CONFIG.orgsEndpoint : '/api/organizations';
+    try {
+        const res = await fetch(endpoint, { credentials: 'include' });
+        if (!res.ok) {
+            console.warn('Failed to load organizations map:', res.status, res.statusText);
+            return _orgNameMap;
+        }
+        const payload = await res.json();
+        const list = Array.isArray(payload) ? payload : (payload?.data || payload?.organizations || []);
+        if (!Array.isArray(list)) return _orgNameMap;
+
+        list.forEach(org => {
+            if (!org) return;
+            const id = org.id ?? org._id ?? org.org_id ?? org.orgId;
+            const name = org.name ?? org.orgName ?? org.title;
+            const acronym = org.acronym ?? org.short ?? org.code;
+            if (id) _orgNameMap[String(id)] = name || String(acronym || id);
+            if (acronym) _orgNameMap[String(acronym)] = name || String(acronym);
+            if (name) _orgNameMap[String(name).toLowerCase()] = name;
+        });
+    } catch (err) {
+        console.warn('Error fetching organizations map', err);
+    }
+    return _orgNameMap;
 }
 
 // Fetch stats from Node.js API endpoint and update charts
@@ -97,33 +130,59 @@ async function loadDashboardStats(period = '7d') {
             console.warn('Roles data missing or invalid', roles);
         }
 
-        // Recent activities
-        if (recentActivities && Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
+        // Recent activities -> aggregate by month (Jan..Dec) for current year
+        if (Array.isArray(recentActivities)) {
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const counts = new Array(12).fill(0);
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            recentActivities.forEach(a => {
+                const raw = a.createdAt || a.date || a.timestamp || a.created_at || a._id || a.id || a.submittedAt || a.time;
+                let d = null;
+                if (raw && typeof raw === 'string' && /^[0-9a-fA-F]{24}$/.test(raw)) {
+                    // ObjectId -> timestamp
+                    try {
+                        const ts = parseInt(raw.substring(0,8), 16) * 1000;
+                        d = new Date(ts);
+                    } catch (e) { d = null; }
+                } else {
+                    d = raw ? new Date(raw) : null;
+                }
+                if (d && !isNaN(d)) {
+                    const y = d.getFullYear();
+                    const m = d.getMonth(); // 0-11
+                    if (y === currentYear) counts[m] += 1;
+                }
+            });
+
+            chartActive.data.labels = months;
+            chartActive.data.datasets[0].data = counts;
+            chartActive.update();
+        } else if (recentActivities && Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
+            // legacy server-provided shape
             chartActive.data.labels = recentActivities.labels;
             chartActive.data.datasets[0].data = recentActivities.data;
-
-            // Dynamically adjust canvas width based on number of labels.
-            const numItems = recentActivities.labels.length || 1;
-            const canvasEl = document.getElementById('chartActive');
-            if (canvasEl) {
-                // set width with 'important' to override CSS "!important" if present
-                const px = Math.max(480, numItems * 72);
-                canvasEl.style.setProperty('width', px + 'px', 'important');
-                // also ensure parent scroll container allows horizontal scroll
-                const parent = canvasEl.closest('.chart-scroll-container');
-                if (parent) parent.style.overflowX = 'auto';
-            }
-
             chartActive.update();
         } else {
             console.warn('Recent Activities data missing or invalid', recentActivities);
         }
 
-        // Organizations
+        // Organizations - map labels using org list so we show names instead of Unknown/IDs
         if (organizations && Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
-            chartSchools.data.labels = organizations.labels.slice(0, 10);
-            chartSchools.data.datasets[0].data = organizations.data.slice(0, 10);
-            chartSchools.data.datasets[0].backgroundColor = generatePalette(Math.min(10, organizations.data.length));
+            await fetchOrganizationsMap();
+            const mapped = organizations.labels.map(lbl => {
+                if (lbl === null || lbl === undefined) return 'Unknown';
+                const s = String(lbl);
+                return _orgNameMap[s] || _orgNameMap[s.toLowerCase()] || (s.trim() ? s : 'Unknown');
+            });
+
+            const topLabels = mapped.slice(0, 10);
+            const topData = organizations.data.slice(0, 10);
+
+            chartSchools.data.labels = topLabels;
+            chartSchools.data.datasets[0].data = topData;
+            chartSchools.data.datasets[0].backgroundColor = generatePalette(topLabels.length);
             chartSchools.update();
         } else {
             console.warn('Organizations data missing or invalid', organizations);

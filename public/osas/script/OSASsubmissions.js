@@ -318,30 +318,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function attachEventListeners() {
     document.querySelectorAll(".view-details-btn").forEach((btn, index) => {
       btn.addEventListener("click", (e) => {
-        // Find which submission this button belongs to
-        const row = e.target.closest("tr") || e.target.closest(".submission-card");
-        let submissionIndex = -1;
-        
-        // For table rows
-        if (e.target.closest("tr")) {
-          const tbody = document.querySelector("tbody");
-          submissionIndex = Array.from(tbody.querySelectorAll("tr")).indexOf(row);
-        }
-        // For mobile cards
-        else if (e.target.closest(".submission-card")) {
-          const container = document.querySelector(".submissions-mobile");
-          submissionIndex = Array.from(container.querySelectorAll(".submission-card")).indexOf(row);
-        }
-        
-        // Store the submission _id so submissionFullDetails.js fetches the correct submission
-        if (submissionIndex >= 0 && submissions[submissionIndex]) {
-          const submissionId = submissions[submissionIndex]._id;
-          localStorage.setItem("selectedSubmissionId", submissionId);
-        }
-        
         const eventData = JSON.parse(e.target.getAttribute("data-event"));
-        localStorage.setItem("selectedEvent", JSON.stringify(eventData));
-        window.location.href = "../osas/submissionFullDetails.php";
+        showSubmissionModal(eventData);
       });
     });
   }
@@ -362,3 +340,205 @@ function normalizeText(text) {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+// --- SHOW SUBMISSION MODAL ---
+function showSubmissionModal(eventData) {
+  const modal = document.getElementById("submissionModal");
+  const modalBody = document.getElementById("submissionDetailsBody");
+  
+  if (!modal || !modalBody) return;
+  
+  // Build the submission details HTML
+  const sdgs = eventData.eventSDG && eventData.eventSDG.length > 0 
+    ? eventData.eventSDG.map(sdg => `<span class="sdg-tag">${sdg}</span>`).join('')
+    : '<span class="value">None</span>';
+    
+  const docs = (eventData.supportingDocuments || []).length > 0
+    ? `<div class="document-links">${eventData.supportingDocuments.map((doc, i) => `<a href="${doc}" target="_blank" rel="noopener noreferrer">📄 Supporting Document ${i + 1}</a>`).join('')}</div>`
+    : '<span class="value">None</span>';
+    
+  const proofHTML = eventData.eventProof 
+    ? `<a href="${eventData.eventProof}" target="_blank" rel="noopener noreferrer">View Event Proof</a>`
+    : '<span class="value">No proof uploaded</span>';
+
+  const detailsHTML = `
+    <div class="submission-details-grid">
+      <div class="detail-section">
+        <label>Event Name</label>
+        <div class="value">${eventData.eventName || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section">
+        <label>Event Type</label>
+        <div class="value">${eventData.eventType || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section">
+        <label>Event Date</label>
+        <div class="value">${eventData.eventDate || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section">
+        <label>Start Time</label>
+        <div class="value">${eventData.startTime || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section">
+        <label>End Time</label>
+        <div class="value">${eventData.endTime || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section">
+        <label>Venue</label>
+        <div class="value">${eventData.eventVenue || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section full-width">
+        <label>Attendance</label>
+        <div class="value">${eventData.attendance || 'N/A'}</div>
+      </div>
+      
+      <div class="detail-section full-width">
+        <label>SDG Goals</label>
+        <div class="sdg-list">${sdgs}</div>
+      </div>
+      
+      <div class="detail-section full-width">
+        <label>Event Proof</label>
+        <div class="value">${proofHTML}</div>
+      </div>
+      
+      <div class="detail-section full-width">
+        <label>Supporting Documents</label>
+        <div class="value">${docs}</div>
+      </div>
+      
+      ${eventData.eventDescription ? `
+        <div class="detail-section full-width">
+          <label>Description</label>
+          <div class="value">${eventData.eventDescription}</div>
+        </div>
+      ` : ''}
+      
+      ${eventData.eventRemarks ? `
+        <div class="detail-section full-width">
+          <label>Remarks</label>
+          <div class="value">${eventData.eventRemarks}</div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  modalBody.innerHTML = detailsHTML;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById("submissionModalTitle").textContent = eventData.eventName || 'Submission Details';
+}
+
+// --- NAVIGATION ---
+function navigateToPage(page) {
+  const pages = {
+    'calendar': 'calendar.php',
+    'orgs': 'orgs.php',
+    'analytics': 'analytics.php'
+  };
+  if (pages[page]) {
+    window.location.href = pages[page];
+  }
+}
+
+// Wire up navigation items
+document.addEventListener("DOMContentLoaded", () => {
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const page = item.getAttribute('data-page');
+      navigateToPage(page);
+    });
+  });
+
+  // --- LOGOUT MODAL ---
+  const logoutBtn = document.getElementById('logoutBtn');
+  const logoutModal = document.getElementById('logoutModal');
+  const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+  const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      logoutModal.classList.add('show');
+      logoutModal.setAttribute('aria-hidden', 'false');
+    });
+  }
+
+  if (confirmLogoutBtn) {
+    confirmLogoutBtn.addEventListener('click', () => {
+      fetch('../../php-server/routes/logout.php')
+        .then(() => {
+          window.location.href = '../../index.php';
+        })
+        .catch(error => console.error('Logout error:', error));
+    });
+  }
+
+  if (cancelLogoutBtn) {
+    cancelLogoutBtn.addEventListener('click', () => {
+      logoutModal.classList.remove('show');
+      logoutModal.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  // Close modal on background click
+  if (logoutModal) {
+    logoutModal.addEventListener('click', (e) => {
+      if (e.target === logoutModal) {
+        logoutModal.classList.remove('show');
+        logoutModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  // Mobile menu toggle
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (mobileMenuToggle && sidebar) {
+    mobileMenuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-expanded');
+    });
+  }
+
+  // --- SUBMISSION DETAILS MODAL ---
+  const submissionModal = document.getElementById('submissionModal');
+  const closeSubmissionModal = document.getElementById('closeSubmissionModal');
+  const closeSubmissionModalBtn = document.getElementById('closeSubmissionModalBtn');
+
+  function hideSubmissionModal() {
+    if (submissionModal) {
+      submissionModal.classList.remove('show');
+      submissionModal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  if (closeSubmissionModal) {
+    closeSubmissionModal.addEventListener('click', hideSubmissionModal);
+  }
+
+  if (closeSubmissionModalBtn) {
+    closeSubmissionModalBtn.addEventListener('click', hideSubmissionModal);
+  }
+
+  // Close submission modal on background click
+  if (submissionModal) {
+    submissionModal.addEventListener('click', (e) => {
+      if (e.target === submissionModal) {
+        hideSubmissionModal();
+      }
+    });
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      hideSubmissionModal();
+    }
+  });
+});

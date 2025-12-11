@@ -14,4 +14,11 @@ router.post('/', validateOrganization, organizationsController.createOrganizatio
 router.patch('/:id', validateOrganization, organizationsController.updateOrganization);
 router.delete('/:id', organizationsController.deleteOrganization);
 
+
+// Accept both PATCH and PUT for updates so frontend PUT requests succeed
+router.patch('/:id', validateOrganization, organizationsController.updateOrganization)
+router.put('/:id', validateOrganization, organizationsController.updateOrganization)
+
+router.delete('/:id', organizationsController.deleteOrganization)
+
 module.exports = router;
