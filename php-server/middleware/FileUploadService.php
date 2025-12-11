@@ -154,9 +154,6 @@ class FileUploadService
         ];
     }
 
-    /**
-     * Option 1 – Clean date-time + original name (with collision protection)
-     */
     private function generateUniqueFilename($originalName, $uploadDir)
     {
         // Extract file extension and name

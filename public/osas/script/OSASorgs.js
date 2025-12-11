@@ -661,7 +661,23 @@ function showSubmissionDetailsModal(eventData) {
     : '<span style="color: var(--muted);">None</span>';
     
   const docs = (eventData.supportingDocuments || []).length > 0
-    ? `<div class="document-links">${eventData.supportingDocuments.map((doc, i) => `<a href="${doc}" target="_blank" rel="noopener noreferrer">📄 Supporting Document ${i + 1}</a>`).join('')}</div>`
+    ? `<div class="document-links">${eventData.supportingDocuments.map((doc, i) => {
+        let docPath = doc;
+        if (doc.startsWith('http')) {
+          // Already a full URL, use as-is
+          docPath = doc;
+        } else if (doc.startsWith('/uploads/')) {
+          // Starts with /uploads/, prepend /Sluorgdesk/
+          docPath = `/SLUorgdesk${doc}`;
+        } else if (doc.startsWith('uploads/')) {
+          // Starts with uploads/, prepend /Sluorgdesk/
+          docPath = `/SLUorgdesk/${doc}`;
+        } else if (!doc.startsWith('/')) {
+          // Relative path, prepend /Sluorgdesk/
+          docPath = `/SLUorgdesk/${doc}`;
+        }
+        return `<a href="${docPath}" target="_blank" rel="noopener noreferrer">📄 Supporting Document ${i + 1}</a>`;
+      }).join('')}</div>`
     : '<span style="color: var(--muted);">None</span>';
     
   const proofHTML = eventData.eventProof 
