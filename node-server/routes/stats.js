@@ -1,110 +1,98 @@
-const express = require('express')
-const router = express.Router()
-const User = require('../models/User')
-const Organization = require('../models/Organization')
-const Submission = require('../models/Submission')
+const express = require('express');
+const router = express.Router();
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const Submission = require('../models/Submission');
+const Organization = require('../models/Organization');
 
-/**
- * GET /api/stats
- * Fetch aggregated stats for dashboard:
- * - Users by role (count)
- * - Recent activities (submissions per day, last 7 days)
- * - Organizations by school (count)
- */
+// Helper to parse period query param like '7d', '30d', 'all'
+function parsePeriod(period) {
+    if (!period || period === 'all') return null;
+    const m = period.match(/^(\d+)\s*d$/);
+    if (m) return parseInt(m[1], 10);
+    return null;
+}
+
 router.get('/', async (req, res) => {
     try {
-        // Fetch all users
-        const users = await User.find({}, 'role isActive createdAt school lastLogin').lean()
+        const periodParam = req.query.period || '7d';
+        const days = parsePeriod(periodParam);
+        const now = new Date();
+        const startDate = days ? new Date(now.getTime() - days * 24*60*60*1000) : null;
 
-        // Initialize aggregates
-        const roleCount = {}
-        const dayActivities = {}
-        const now = new Date()
+        // Roles: count users by role
+        const roleAgg = await User.aggregate([
+            { $group: { _id: '$role', count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
 
-        // Fetch all submissions
-        const submissions = await Submission.find(
-            { submittedAt: { $exists: true } },
-            'submittedAt'
-        ).lean()
+        const roles = {
+            labels: roleAgg.map(r => r._id || 'Unknown'),
+            data: roleAgg.map(r => r.count)
+        };
 
-        // Build day activities from all submissions
-        const dayMap = {}
-        submissions.forEach(sub => {
-            if (sub.submittedAt) {
-                const subDate = new Date(sub.submittedAt)
-                subDate.setHours(0, 0, 0, 0)
-                const key = subDate.getTime()
-                dayMap[key] = (dayMap[key] || 0) + 1
-                dayActivities[key] = (dayActivities[key] || 0) + 1
+        // Recent activities: using Submission.createdAt (fallback to User.createdAt if needed)
+        // produce one data point per day in the requested range (or last 7 days default)
+        let recentLabels = [];
+        let recentData = [];
+
+        if (days) {
+            // Create array of day labels (YYYY-MM-DD) from startDate -> now
+            for (let i = days - 1; i >= 0; i--) {
+                const day = new Date(now.getTime() - i * 24*60*60*1000);
+                recentLabels.push(day.toISOString().slice(0,10));
             }
-        })
 
-        // Get sorted unique days from submissions
-        const days = Object.keys(dayMap)
-            .map(key => new Date(parseInt(key)))
-            .sort((a, b) => a.getTime() - b.getTime())
+            // Aggregate submissions per day
+            const match = { createdAt: { $gte: startDate } };
+            const subs = await Submission.aggregate([
+                { $match: match },
+                { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } }
+            ]);
 
-        // Generate labels for all days
-        const dayLabels = days.map(d => 
-            d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-        )
+            const map = subs.reduce((acc, cur) => { acc[cur._id] = cur.count; return acc; }, {});
+            recentData = recentLabels.map(l => map[l] || 0);
+        } else {
+            // if 'all' requested, return totals per month or top N months - fallback simple
+            const subs = await Submission.aggregate([
+                { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } }, count: { $sum: 1 } } },
+                { $sort: { _id: 1 } }
+            ]);
+            recentLabels = subs.map(s => s._id);
+            recentData = subs.map(s => s.count);
+        }
 
-        // Get activity data for all days
-        const activityData = days.map(d => dayActivities[d.getTime()] || 0)
+        // Organizations: count users per organization, join organization name
+        const orgAgg = await User.aggregate([
+            { $group: { _id: '$organization', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 20 },
+            { $lookup: { from: 'organizations', localField: '_id', foreignField: '_id', as: 'org' } },
+            { $unwind: { path: '$org', preserveNullAndEmptyArrays: true } },
+            { $project: { name: { $ifNull: ['$org.name', 'Unknown'] }, count: 1 } }
+        ]);
 
-        // Count by role from users
-        users.forEach(user => {
-            const role = user.role || 'Unknown'
-            roleCount[role] = (roleCount[role] || 0) + 1
-        })
+        const organizations = {
+            labels: orgAgg.map(o => o.name),
+            data: orgAgg.map(o => o.count)
+        };
 
-        // Convert role counts to arrays
-        const roleLabels = Object.keys(roleCount)
-        const roleData = Object.values(roleCount)
+        const totalUsers = await User.countDocuments();
 
-        // Fetch organizations with user counts
-        const organizations = await Organization.find({}, 'name acronym school').lean()
-        const orgCount = organizations.length
-        
-        // Count organizations per school
-        const schoolOrgCount = {}
-        organizations.forEach(org => {
-            const school = org.school || 'Unspecified'
-            schoolOrgCount[school] = (schoolOrgCount[school] || 0) + 1
-        })
-
-        // Sort by count descending and prepare labels/data
-        const schoolList = Object.entries(schoolOrgCount)
-            .map(([school, count]) => ({ name: school, count }))
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 10)
-
-        const schoolNames = schoolList.map(s => s.name)
-        const schoolData = schoolList.map(s => s.count)
-
-        res.status(200).json({
+        res.json({
             success: true,
             data: {
-                roles: {
-                    labels: roleLabels,
-                    data: roleData
-                },
-                recentActivities: {
-                    labels: dayLabels,
-                    data: activityData
-                },
-                organizations: {
-                    labels: schoolNames,
-                    data: schoolData
-                },
-                organizationCount: orgCount,
-                totalUsers: users.length
+                roles,
+                recentActivities: { labels: recentLabels, data: recentData },
+                organizations,
+                organizationCount: organizations.labels.length,
+                totalUsers
             }
-        })
+        });
     } catch (err) {
-        console.error('Error fetching stats:', err)
-        res.status(500).json({ success: false, error: 'Failed to fetch stats', details: err.message })
+        console.error('Error building stats', err);
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
-})
+});
 
-module.exports = router
+module.exports = router;

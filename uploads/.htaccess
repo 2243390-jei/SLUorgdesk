@@ -1,0 +1,7 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect all requests to redirect.php
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ redirect.php [L]

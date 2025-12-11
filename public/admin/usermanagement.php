@@ -14,8 +14,10 @@ if (empty($_SESSION['logged_in'])) {
   <link rel="stylesheet" href="styles/adminmain.css">
   <link rel="stylesheet" href="styles/usermanagement.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="script/config.js" defer></script>
   <script src="script/adminmain.js" defer></script>
   <script src="./script/usermanagement.js" defer></script>
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">      
 </head>
 
 <body>
@@ -23,11 +25,10 @@ if (empty($_SESSION['logged_in'])) {
   <!--LEFT SIDEBAR -->
   <aside id="sidebar">
     <div id="sidebar-profile">
-      <div id="profile-icon"></div>
+      <img id="profile-icon" src="../images/user.png" alt="Profile Icon" width="32" height="32">
       <div id="profile-details">
         
         <div>ADMIN</div>
-        <div>Admin Name</div>
       </div>
     </div>
 
@@ -36,6 +37,7 @@ if (empty($_SESSION['logged_in'])) {
         <li><a href="dashboard.php">Dashboard</a></li>
         <li><a href="orgmanagement.php">Org Management</a></li>
         <li class="active"><a href="usermanagement.php">User Management</a></li>
+        <li><a href="activitylogs.php">Activity Logs</a></li>        
       </ul>
     </nav>
     

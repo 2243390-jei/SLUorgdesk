@@ -1,25 +1,16 @@
-// Updated SDG Category Mapping for your format
-const SDG_CATEGORIES = {
-    "1. No Poverty": "1. No Poverty",
-    "2. Zero Hunger": "2. Zero Hunger", 
-    "3. Good Health": "3. Good Health",
-    "4. Quality Education": "4. Quality Education",
-    "5. Gender Equality": "5. Gender Equality",
-    "6. Clean Water": "6. Clean Water",
-    "7. Affordable Energy": "7. Affordable Energy",
-    "8. Decent Work": "8. Decent Work",
-    "9. Innovation": "9. Innovation",
-    "10. Reduced Inequality": "10. Reduced Inequality",
-    "11. Sustainable Cities": "11. Sustainable Cities",
-    "12. Consumption": "12. Consumption",
-    "13. Climate Action": "13. Climate Action",
-    "14. Life Below Water": "14. Life Below Water",
-    "15. Life on Land": "15. Life on Land",
-    "16. Peace and Justice": "16. Peace and Justice",
-    "17. Partnerships": "17. Partnerships"
-};
+// Check if Chart.js is loaded
+if (typeof Chart === 'undefined') {
+    console.error('Chart.js is not loaded. Please include Chart.js in your HTML.');
+    // Load Chart.js dynamically if not loaded
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = init;
+    document.head.appendChild(script);
+} else {
+    init();
+}
 
-// SDG Color Mapping for your format
+// Constants
 const SDG_COLORS = {
     "1. No Poverty": "#E5243B",
     "2. Zero Hunger": "#DDA63A",
@@ -40,683 +31,512 @@ const SDG_COLORS = {
     "17. Partnerships": "#19486A"
 };
 
-// School Color Mapping
 const SCHOOL_COLORS = {
-    "SEA": "#800000",      // Maroon
-    "SAMCIS": "#FFD700",   // Yellow
-    "SONAHBS": "#800080",  // Purple
-    "STELA": "#0000FF",    // Blue
-    "SOM": "#FFC0CB",      // Pink
-    "SOL": "#FF0000"       // Red
+    "SEA": "#800000",
+    "SAMCIS": "#FFD700",
+    "SONAHBS": "#800080",
+    "STELA": "#0000FF",
+    "SOM": "#FFC0CB",
+    "SOL": "#FF0000"
 };
 
-// Enhanced Chart implementation with animations and hover effects
-class LargeChart {
-    constructor(ctx, type, data, options = {}) {
-        this.ctx = ctx;
-        this.type = type;
-        this.data = data;
-        this.options = options;
-        this.hoverInfo = document.getElementById(options.hoverId);
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.hoveredIndex = -1;
-        this.animationProgress = 0;
-        this.isAnimating = true;
-        
-        this.init();
-        this.animateChart();
-        this.setupInteractions();
+// DOM Elements
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const sidebar = document.querySelector('.sidebar');
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutModal = document.getElementById('logoutModal');
+const logoutModalClose = document.getElementById('logoutModalClose');
+const logoutCancel = document.getElementById('logoutCancel');
+const logoutConfirm = document.getElementById('logoutConfirm');
+
+// Chart instances
+let charts = {
+    submissions: null,
+    sdg: null,
+    schools: null
+};
+
+// Initialize application
+function init() {
+    console.log('Initializing Analytics Dashboard...');
+    
+    // Set current year
+    document.getElementById('curYear').textContent = new Date().getFullYear();
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Load data
+    loadAnalyticsData();
+}
+
+// Setup Event Listeners
+function setupEventListeners() {
+    // Mobile menu toggle
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
     }
-
-    init() {
-        const canvas = this.ctx.canvas;
-        const container = canvas.parentElement;
-        
-        // Set canvas to fill its container
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
-        
-        console.log(`Canvas size: ${canvas.width}x${canvas.height}`);
-    }
-
-    animateChart() {
-        const animate = (timestamp) => {
-            if (!this.startTime) this.startTime = timestamp;
-            const progress = Math.min((timestamp - this.startTime) / 1000, 1);
-            this.animationProgress = progress;
-            
-            this.draw();
-            
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                this.isAnimating = false;
-            }
-        };
-        
-        requestAnimationFrame(animate);
-    }
-
-    draw() {
-        const { labels, datasets } = this.data;
-        const ctx = this.ctx;
-        const canvas = ctx.canvas;
-        
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (this.type === 'bar') {
-            this.drawBarChart(labels, datasets[0]);
-        } else if (this.type === 'line') {
-            this.drawLineChart(labels, datasets[0]);
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && 
+            mobileMenuToggle && 
+            !mobileMenuToggle.contains(e.target) && 
+            sidebar.classList.contains('open')) {
+            closeMobileMenu();
         }
-
-        // Always draw bottom labels
-        this.drawBottomLabels(labels);
+    });
+    
+    // Logout functionality
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', showLogoutModal);
     }
-
-    drawBarChart(labels, dataset) {
-        const { data, backgroundColor } = dataset;
-        const ctx = this.ctx;
-        const canvas = ctx.canvas;
-        const padding = { top: 60, right: 60, bottom: 80, left: 80 };
-        const chartWidth = canvas.width - padding.left - padding.right;
-        const chartHeight = canvas.height - padding.top - padding.bottom;
-        
-        const maxValue = Math.max(...data, 1);
-        const barWidth = (chartWidth / labels.length) * 0.6;
-        
-        // Store bar positions for hover detection
-        this.barPositions = [];
-        
-        // Draw bars with animation
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.font = '14px Arial';
-        
-        labels.forEach((label, i) => {
-            const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
-            const animatedHeight = (data[i] / maxValue) * chartHeight * this.animationProgress;
-            const y = padding.top + chartHeight - animatedHeight;
-            
-            // Store bar position
-            this.barPositions.push({
-                x: x,
-                y: y,
-                width: barWidth,
-                height: animatedHeight,
-                index: i,
-                value: data[i],
-                label: label
-            });
-            
-            // Draw bar with animation - use color from dataset or fallback
-            let barColor;
-            if (Array.isArray(backgroundColor)) {
-                barColor = backgroundColor[i];
-            } else if (typeof backgroundColor === 'function') {
-                barColor = backgroundColor(label, i);
-            } else {
-                barColor = backgroundColor;
-            }
-            
-            ctx.fillStyle = barColor;
-            ctx.fillRect(x, y, barWidth, animatedHeight);
-        });
-
-        this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Events');
+    
+    if (logoutModalClose) {
+        logoutModalClose.addEventListener('click', hideLogoutModal);
     }
-
-    drawLineChart(labels, dataset) {
-        const { data, borderColor = '#2563eb' } = dataset;
-        const ctx = this.ctx;
-        const canvas = ctx.canvas;
-        const padding = { top: 60, right: 60, bottom: 80, left: 80 };
-        const chartWidth = canvas.width - padding.left - padding.right;
-        const chartHeight = canvas.height - padding.top - padding.bottom;
-        
-        const maxValue = Math.max(...data, 1);
-        
-        // Store point positions for hover detection
-        this.pointPositions = [];
-        
-        // Draw line with animation
-        ctx.beginPath();
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = borderColor;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        
-        const animatedData = data.map(val => val * this.animationProgress);
-        
-        labels.forEach((label, i) => {
-            const x = padding.left + (i * chartWidth / (labels.length - 1));
-            const y = padding.top + chartHeight - (animatedData[i] / maxValue) * chartHeight;
-            
-            // Store point position
-            this.pointPositions.push({
-                x: x,
-                y: y,
-                index: i,
-                value: data[i],
-                label: label
-            });
-            
-            if (i === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
-            }
-        });
-        ctx.stroke();
-        
-        // Draw points - LARGER with animation
-        ctx.fillStyle = borderColor;
-        this.pointPositions.forEach(point => {
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 8 * this.animationProgress, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw white border around points
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-        });
-
-        this.drawAxes(padding, chartWidth, chartHeight, maxValue, 'Number of Submissions');
+    
+    if (logoutCancel) {
+        logoutCancel.addEventListener('click', hideLogoutModal);
     }
-
-    drawBottomLabels(labels) {
-        const ctx = this.ctx;
-        const canvas = this.ctx.canvas;
-        const padding = { top: 60, right: 60, bottom: 80, left: 80 };
-        const chartWidth = canvas.width - padding.left - padding.right;
-        const chartHeight = canvas.height - padding.top - padding.bottom;
-
-        // Draw bottom labels
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#8f9aa3';
-        ctx.font = '12px Arial';
-        
-        if (this.type === 'bar') {
-            const barWidth = (chartWidth / labels.length) * 0.6;
-            
-            labels.forEach((label, i) => {
-                const x = padding.left + (i * chartWidth / labels.length) + (chartWidth / labels.length - barWidth) / 2;
-                
-                if (this.options.isSDG) {
-                    // For SDG chart, show just the numbers "1", "2", etc.
-                    ctx.fillText(`${i + 1}`, x + barWidth / 2, padding.top + chartHeight + 15);
-                } else {
-                    // For schools chart, show school names
-                    ctx.fillText(label, x + barWidth / 2, padding.top + chartHeight + 15);
-                }
-            });
-        } else if (this.type === 'line') {
-            // For line chart, show month names
-            labels.forEach((label, i) => {
-                const x = padding.left + (i * chartWidth / (labels.length - 1));
-                ctx.fillText(label, x, padding.top + chartHeight + 20);
-            });
-        }
+    
+    if (logoutConfirm) {
+        logoutConfirm.addEventListener('click', performLogout);
     }
-
-    drawAxes(padding, chartWidth, chartHeight, maxValue, yLabel) {
-        const ctx = this.ctx;
-        const canvas = this.ctx.canvas;
-
-        // Draw Y-axis
-        ctx.beginPath();
-        ctx.moveTo(padding.left, padding.top);
-        ctx.lineTo(padding.left, padding.top + chartHeight);
-        ctx.lineTo(padding.left + chartWidth, padding.top + chartHeight);
-        ctx.strokeStyle = '#e1e8ed';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Draw Y-axis labels - LARGER
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#8f9aa3';
-        ctx.font = '14px Arial';
-        for (let i = 0; i <= 5; i++) {
-            const value = Math.round((maxValue / 5) * i);
-            const y = padding.top + chartHeight - (i * chartHeight / 5);
-            ctx.fillText(value, padding.left - 12, y);
-        }
-
-        // Draw Y-axis title - LARGER
-        ctx.save();
-        ctx.translate(padding.left - 40, padding.top + chartHeight / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#8f9aa3';
-        ctx.font = '16px Arial';
-        ctx.fillText(yLabel, 0, 0);
-        ctx.restore();
-    }
-
-    setupInteractions() {
-        const canvas = this.ctx.canvas;
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            this.mouseX = e.clientX - rect.left;
-            this.mouseY = e.clientY - rect.top;
-            
-            this.handleHover();
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            this.hoveredIndex = -1;
-            this.updateHoverInfo();
-        });
-
-        canvas.addEventListener('click', () => {
-            if (this.hoveredIndex >= 0) {
-                this.handleClick(this.hoveredIndex);
-            }
+    
+    if (logoutModal) {
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) hideLogoutModal();
         });
     }
+    
+    // Close mobile menu when clicking nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', closeMobileMenu);
+    });
+    
+    // Window resize - update charts
+    window.addEventListener('resize', () => {
+        Object.values(charts).forEach(chart => {
+            if (chart) chart.resize();
+        });
+    });
+}
 
-    handleHover() {
-        let hoveredIndex = -1;
+// Mobile Menu Functions
+function toggleMobileMenu() {
+    sidebar.classList.toggle('open');
+    document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+}
 
-        if (this.type === 'bar' && this.barPositions) {
-            this.barPositions.forEach((bar, index) => {
-                if (this.mouseX >= bar.x && this.mouseX <= bar.x + bar.width &&
-                    this.mouseY >= bar.y && this.mouseY <= bar.y + bar.height) {
-                    hoveredIndex = index;
-                }
-            });
-        } else if (this.type === 'line' && this.pointPositions) {
-            this.pointPositions.forEach((point, index) => {
-                const distance = Math.sqrt(
-                    Math.pow(this.mouseX - point.x, 2) + 
-                    Math.pow(this.mouseY - point.y, 2)
-                );
-                if (distance <= 20) {
-                    hoveredIndex = index;
-                }
-            });
-        }
+function closeMobileMenu() {
+    sidebar.classList.remove('open');
+    document.body.style.overflow = '';
+}
 
-        if (this.hoveredIndex !== hoveredIndex) {
-            this.hoveredIndex = hoveredIndex;
-            this.updateHoverInfo();
-        }
+// Logout Functions
+function showLogoutModal() {
+    if (logoutModal) {
+        logoutModal.classList.add('show');
     }
+    closeMobileMenu();
+}
 
-    updateHoverInfo() {
-        if (!this.hoverInfo) return;
-
-        if (this.hoveredIndex >= 0 && !this.isAnimating) {
-            let hoverData;
-            if (this.type === 'bar') {
-                hoverData = this.barPositions[this.hoveredIndex];
-            } else {
-                hoverData = this.pointPositions[this.hoveredIndex];
-            }
-
-            // For SDG chart, show full SDG name on hover
-            let displayLabel = hoverData.label;
-            if (this.options.isSDG && this.data.fullLabels) {
-                displayLabel = this.data.fullLabels[this.hoveredIndex];
-            }
-
-            this.hoverInfo.textContent = `${displayLabel}: ${hoverData.value} events`;
-            this.hoverInfo.style.left = (this.mouseX + 15) + 'px';
-            this.hoverInfo.style.top = (this.mouseY - 40) + 'px';
-            this.hoverInfo.classList.add('active');
-        } else {
-            this.hoverInfo.classList.remove('active');
-        }
-    }
-
-    handleClick(index) {
-        console.log(`Clicked on ${this.data.labels[index]}: ${this.data.datasets[0].data[index]} events`);
+function hideLogoutModal() {
+    if (logoutModal) {
+        logoutModal.classList.remove('show');
     }
 }
 
-// Data Processing Functions - FIXED FOR CORRECT DATA STRUCTURE
-class AnalyticsDataProcessor {
-    static processSubmissionsData(submissions, organizations) {
-        // Create a mapping from organization ID to school
-        const orgToSchoolMap = this.createOrgToSchoolMap(organizations);
+function performLogout() {
+    try {
+        fetch('../../php-server/routes/logout.php', { method: 'POST' });
+    } catch (err) {
+        console.error('Logout error:', err);
+    }
+    window.location.href = '../../index.php';
+}
+
+// Data Fetching
+async function fetchOrganizations() {
+    try {
+        const response = await fetch('../../php-server/routes/organizations.php');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+        }
+        const result = await response.json();
+        console.log('Organizations data:', result);
+        return result.success ? result.data : [];
+    } catch (error) {
+        console.error('Error fetching organizations:', error);
+        return [];
+    }
+}
+
+async function fetchSubmissions() {
+    try {
+        const response = await fetch('../../php-server/routes/submissions.php');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+        }
+        const result = await response.json();
+        console.log('Submissions data:', result);
+        return result.success ? result.data : [];
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+        return [];
+    }
+}
+
+// Load Analytics Data
+async function loadAnalyticsData() {
+    console.log('Loading analytics data...');
+    
+    try {
+        // Show loading states
+        showLoadingStates();
         
-        // Extract all events from submissions and map organizations to schools
-        const allEvents = this.extractAllEvents(submissions, orgToSchoolMap);
+        // Fetch data
+        const [submissions, organizations] = await Promise.all([
+            fetchSubmissions(),
+            fetchOrganizations()
+        ]);
         
-        const stats = {
-            totalSubmissions: submissions.length,
-            totalEvents: allEvents.length
+        console.log('Submissions count:', submissions.length);
+        console.log('Organizations count:', organizations.length);
+        
+        // Process and render data
+        const processedData = processAnalyticsData(submissions, organizations);
+        renderAnalytics(processedData);
+        
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+        showError('Failed to load analytics data. Please check your internet connection and try again.');
+    }
+}
+
+function showLoadingStates() {
+    // Show loading messages
+    const orgsList = document.getElementById('orgsList');
+    if (orgsList) {
+        orgsList.innerHTML = '<div class="loading-state">Loading organizations...</div>';
+    }
+    
+    // Hide chart loading messages when charts render
+}
+
+function processAnalyticsData(submissions, organizations) {
+    console.log('Processing analytics data...');
+    
+    // Create organization mapping
+    const orgMap = {};
+    organizations.forEach(org => {
+        let orgId = org._id;
+        
+        // Handle MongoDB ObjectId format
+        if (orgId && typeof orgId === 'object' && orgId.$oid) {
+            orgId = orgId.$oid;
+        } else if (typeof orgId === 'string') {
+            orgId = orgId;
+        }
+        
+        orgMap[orgId] = {
+            name: org.name || 'Unknown',
+            acronym: org.acronym || 'N/A',
+            school: org.school || 'Unknown School'
         };
-
-        // Group by month using submission date
-        const monthlyData = this.groupByMonth(submissions);
+    });
+    
+    console.log('Organization map:', orgMap);
+    
+    // Process monthly data
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyCounts = new Array(12).fill(0);
+    
+    submissions.forEach(submission => {
+        let date;
         
-        // Group by SDG - USING EVENTS DATA
-        const sdgData = this.groupBySDG(allEvents);
+        // Try to get date from event, then submission date
+        if (submission.event && submission.event.eventDate) {
+            date = new Date(submission.event.eventDate);
+        } else if (submission.submittedAt) {
+            date = new Date(submission.submittedAt);
+        } else {
+            date = new Date(); // fallback
+        }
         
-        // Group by school - NOW USING THE MAPPED SCHOOL DATA
-        const schoolData = this.groupBySchool(submissions, orgToSchoolMap);
+        const month = date.getMonth();
+        monthlyCounts[month]++;
+    });
+    
+    console.log('Monthly counts:', monthlyCounts);
+    
+    // Process SDG data
+    const sdgCounts = {};
+    const sdgColors = [];
+    const sdgLabels = [];
+    
+    // Initialize all SDGs (1-17)
+    for (let i = 1; i <= 17; i++) {
+        sdgCounts[i] = 0;
+        sdgLabels.push(i.toString());
         
-        // Group by organization - TOP 5 ONLY
-        const orgData = this.groupByOrganization(submissions, orgToSchoolMap);
-
-        return {
-            stats,
-            monthlyData,
-            sdgData,
-            schoolData,
-            orgData
-        };
+        // Find corresponding color
+        const sdgKey = Object.keys(SDG_COLORS).find(key => key.startsWith(`${i}.`));
+        sdgColors.push(sdgKey ? SDG_COLORS[sdgKey] : '#666666');
     }
-
-    // Create mapping from organization ID to school
-    static createOrgToSchoolMap(organizations) {
-        const orgMap = {};
-        organizations.forEach(org => {
-            // Handle both ObjectId and string formats
-            let orgId = org._id;
-            if (orgId && typeof orgId === 'object' && orgId.$oid) {
-                orgId = orgId.$oid;
-            }
-            // Also store by string representation in case it's already a string
-            orgMap[orgId] = org.school;
-        });
-        return orgMap;
-    }
-
-    // Extract all events from all submissions and add school information
-    static extractAllEvents(submissions, orgToSchoolMap) {
-        const allEvents = [];
-        submissions.forEach(submission => {
-            // Each submission has a single event object, not an array
-            if (submission.event) {
-                // Get the school from the organization mapping
-                let orgId = submission.orgInfo?.orgId;
-                // Handle both ObjectId and string formats
-                if (orgId && typeof orgId === 'object' && orgId.$oid) {
-                    orgId = orgId.$oid;
-                }
-                const school = orgToSchoolMap[orgId] || 'Unknown School';
-                
-                allEvents.push({
-                    ...submission.event,
-                    submissionId: submission._id,
-                    orgInfo: submission.orgInfo,
-                    school: school,
-                    submittedAt: submission.submittedAt
-                });
-            }
-        });
-        return allEvents;
-    }
-
-    static groupByMonth(submissions) {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const monthlyCounts = new Array(12).fill(0);
-        
-        submissions.forEach(submission => {
-            // Use event date if available, otherwise fallback to submission date or current date
-            let date;
-            if (submission.event?.eventDate) {
-                date = new Date(submission.event.eventDate);
-            } else if (submission.submittedAt) {
-                date = new Date(submission.submittedAt);
-            } else {
-                date = new Date(); // fallback to current date
-            }
+    
+    // Count SDG occurrences
+    submissions.forEach(submission => {
+        if (submission.event && submission.event.eventSDG) {
+            const sdgs = Array.isArray(submission.event.eventSDG) ? 
+                submission.event.eventSDG : [submission.event.eventSDG];
             
-            const month = date.getMonth();
-            monthlyCounts[month]++;
-        });
-        
-        return {
-            labels: months,
-            data: monthlyCounts
-        };
-    }
-
-    static groupBySDG(events) {
-        // Initialize all SDG categories with 0 - INCLUDING ALL SDGs
-        const sdgMap = {};
-        Object.keys(SDG_CATEGORIES).forEach(sdg => {
-            sdgMap[sdg] = 0;
-        });
-
-        // Count events per SDG
-        events.forEach(event => {
-            if (event.eventSDG && Array.isArray(event.eventSDG)) {
-                event.eventSDG.forEach(sdg => {
-                    const sdgName = sdg.trim();
-                    
-                    // Direct match with your format
-                    if (SDG_CATEGORIES[sdgName]) {
-                        sdgMap[sdgName]++;
-                    } else {
-                        // Try to find closest match
-                        for (const validSDG in SDG_CATEGORIES) {
-                            if (sdgName.toLowerCase().includes(validSDG.toLowerCase()) || 
-                                validSDG.toLowerCase().includes(sdgName.toLowerCase())) {
-                                sdgMap[validSDG]++;
-                                break;
-                            }
+            sdgs.forEach(sdg => {
+                if (sdg) {
+                    // Extract number from SDG string
+                    const match = sdg.toString().match(/\d+/);
+                    if (match) {
+                        const num = parseInt(match[0]);
+                        if (num >= 1 && num <= 17) {
+                            sdgCounts[num] = (sdgCounts[num] || 0) + 1;
                         }
                     }
-                });
-            }
-        });
-
-        // Include ALL SDGs in ascending order (SDG 1 to SDG 17)
-        const allSDGs = Object.entries(sdgMap)
-            .sort(([a], [b]) => {
-                const numA = parseInt(a.match(/^(\d+)\./)?.[1] || 0);
-                const numB = parseInt(b.match(/^(\d+)\./)?.[1] || 0);
-                return numA - numB;
+                }
             });
-
-        // Use simple labels for display (just numbers 1-17)
-        const labels = Array.from({length: 17}, (_, i) => (i + 1).toString());
-        const data = allSDGs.map(([_, count]) => count);
-        const colors = allSDGs.map(([sdg]) => SDG_COLORS[sdg] || '#666666');
+        }
+    });
+    
+    const sdgData = Object.values(sdgCounts);
+    const activeGoals = sdgData.filter(count => count > 0).length;
+    const totalSDGEvents = sdgData.reduce((sum, count) => sum + count, 0);
+    
+    console.log('SDG data:', sdgData);
+    console.log('Active goals:', activeGoals);
+    console.log('Total SDG events:', totalSDGEvents);
+    
+    // Process school data
+    const schoolCounts = {};
+    const schoolColors = [];
+    const schoolLabels = [];
+    
+    submissions.forEach(submission => {
+        let orgId = submission.orgInfo?.orgId;
         
-        return {
-            labels,
-            data,
-            colors,
-            fullLabels: allSDGs.map(([sdg]) => sdg),
-            totalEvents: data.reduce((sum, count) => sum + count, 0),
-            activeGoals: data.filter(count => count > 0).length
-        };
-    }
-
-    static groupBySchool(submissions, orgToSchoolMap) {
-        const schoolMap = {};
+        // Handle MongoDB ObjectId format
+        if (orgId && typeof orgId === 'object' && orgId.$oid) {
+            orgId = orgId.$oid;
+        } else if (typeof orgId === 'string') {
+            orgId = orgId;
+        }
         
-        submissions.forEach(submission => {
-            let orgId = submission.orgInfo?.orgId;
-            // Handle both ObjectId and string formats
-            if (orgId && typeof orgId === 'object' && orgId.$oid) {
-                orgId = orgId.$oid;
-            }
-            const school = orgToSchoolMap[orgId] || 'Unknown School';
-            schoolMap[school] = (schoolMap[school] || 0) + 1;
-        });
-
-        const labels = Object.keys(schoolMap);
-        const data = Object.values(schoolMap);
-        // Generate colors based on school names
-        const colors = labels.map(school => SCHOOL_COLORS[school] || '#666666');
+        const org = orgMap[orgId];
+        const school = org ? org.school : 'Unknown School';
         
-        return { 
-            labels, 
-            data, 
-            colors 
-        };
-    }
-
-    static groupByOrganization(submissions, orgToSchoolMap) {
-        const orgMap = {};
+        schoolCounts[school] = (schoolCounts[school] || 0) + 1;
+    });
+    
+    // Sort schools by count
+    const sortedSchools = Object.entries(schoolCounts).sort((a, b) => b[1] - a[1]);
+    
+    sortedSchools.forEach(([school, count]) => {
+        schoolLabels.push(school);
+        schoolColors.push(SCHOOL_COLORS[school] || '#666666');
+    });
+    
+    console.log('School data:', sortedSchools);
+    
+    // Process top organizations
+    const orgCounts = {};
+    
+    submissions.forEach(submission => {
+        let orgId = submission.orgInfo?.orgId;
         
-        submissions.forEach(submission => {
-            const orgName = submission.orgInfo?.acronym || submission.orgInfo?.name || 'Unknown Organization';
-            let orgId = submission.orgInfo?.orgId;
-            // Handle both ObjectId and string formats
-            if (orgId && typeof orgId === 'object' && orgId.$oid) {
-                orgId = orgId.$oid;
-            }
-            const school = orgToSchoolMap[orgId] || 'Unknown School';
-            
-            if (!orgMap[orgName]) {
-                orgMap[orgName] = {
-                    name: orgName,
+        // Handle MongoDB ObjectId format
+        if (orgId && typeof orgId === 'object' && orgId.$oid) {
+            orgId = orgId.$oid;
+        } else if (typeof orgId === 'string') {
+            orgId = orgId;
+        }
+        
+        const org = orgMap[orgId];
+        if (org) {
+            const key = `${org.acronym} - ${org.name}`;
+            if (!orgCounts[key]) {
+                orgCounts[key] = {
+                    name: org.acronym || org.name,
                     submissions: 0,
-                    school: school
+                    school: org.school
                 };
             }
-            orgMap[orgName].submissions++;
-        });
+            orgCounts[key].submissions++;
+        }
+    });
+    
+    const topOrgs = Object.values(orgCounts)
+        .sort((a, b) => b.submissions - a.submissions)
+        .slice(0, 5);
+    
+    console.log('Top organizations:', topOrgs);
+    
+    return {
+        monthly: {
+            labels: months,
+            data: monthlyCounts
+        },
+        sdg: {
+            labels: sdgLabels,
+            data: sdgData,
+            colors: sdgColors,
+            totalEvents: totalSDGEvents,
+            activeGoals: activeGoals
+        },
+        schools: {
+            labels: schoolLabels,
+            data: sortedSchools.map(([_, count]) => count),
+            colors: schoolColors
+        },
+        organizations: topOrgs
+    };
+}
 
-        // Convert to array and sort by submissions - TOP 5 ONLY
-        return Object.values(orgMap)
-            .sort((a, b) => b.submissions - a.submissions)
-            .slice(0, 5);
+// Render Analytics
+function renderAnalytics(data) {
+    console.log('Rendering analytics...');
+    
+    try {
+        // Update stats
+        const sdgSubmissions = document.getElementById('sdgSubmissions');
+        const sdgGoals = document.getElementById('sdgGoals');
+        
+        if (sdgSubmissions) {
+            sdgSubmissions.textContent = `${data.sdg.totalEvents} Events`;
+        }
+        
+        if (sdgGoals) {
+            sdgGoals.textContent = `${data.sdg.activeGoals} Goals`;
+        }
+        
+        // Create or update charts
+        createOrUpdateChart('submissionsChart', 'line', {
+            labels: data.monthly.labels,
+            datasets: [{
+                label: 'Submissions',
+                data: data.monthly.data,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 2
+            }]
+        });
+        
+        createOrUpdateChart('sdgChart', 'bar', {
+            labels: data.sdg.labels,
+            datasets: [{
+                label: 'SDG Submissions',
+                data: data.sdg.data,
+                backgroundColor: data.sdg.colors,
+                borderWidth: 1
+            }]
+        });
+        
+        createOrUpdateChart('schoolsChart', 'bar', {
+            labels: data.schools.labels,
+            datasets: [{
+                label: 'School Submissions',
+                data: data.schools.data,
+                backgroundColor: data.schools.colors,
+                borderWidth: 1
+            }]
+        });
+        
+        // Render organizations
+        renderOrganizations(data.organizations);
+        
+    } catch (error) {
+        console.error('Error rendering analytics:', error);
+        showError('Failed to render charts. Please refresh the page.');
     }
 }
 
-// Main Analytics Dashboard - FIXED DATA PROCESSING
-class AnalyticsDashboard {
-    constructor() {
-        this.submissions = [];
-        this.organizations = [];
-        this.processedData = null;
-        this.debounceTimer = null;
-        this.init();
+function createOrUpdateChart(canvasId, type, data) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error(`Canvas element #${canvasId} not found`);
+        return;
     }
-
-    async init() {
-        try {
-            // initial load with no filters
-            await this.loadData({});
-            this.renderStats();
-            this.renderCharts();
-            this.renderOrganizations();
-            this.setupEventListeners();
-        } catch (error) {
-            console.error('Error initializing dashboard:', error);
-            this.showError('Failed to load analytics data');
+    
+    // Remove loading message
+    const loadingElement = canvas.nextElementSibling;
+    if (loadingElement && loadingElement.classList.contains('chart-loading')) {
+        loadingElement.style.display = 'none';
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts[canvasId]) {
+        charts[canvasId].destroy();
+    }
+    
+    // Create new chart
+    charts[canvasId] = new Chart(ctx, {
+        type: type,
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    cornerRadius: 4,
+                    padding: 12
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        color: '#666'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666'
+                    }
+                }
+            }
         }
+    });
+}
+
+function renderOrganizations(orgs) {
+    const orgsList = document.getElementById('orgsList');
+    if (!orgsList) return;
+    
+    if (orgs.length === 0) {
+        orgsList.innerHTML = '<div class="no-data">No organization data available</div>';
+        return;
     }
-
-    // Accept an optional filters object that is forwarded to the backend
-    async loadData(filters = {}) {
-        try {
-            // Use backend endpoints with optional filters (no frontend filtering)
-            const [submissions, organizations] = await Promise.all([
-                fetchSubmissions({ limit: 1000, ...filters }), // pass filters to backend
-                fetchOrganization({ limit: 1000 })
-            ]);
-
-            this.submissions = submissions || [];
-            this.organizations = organizations || [];
-
-            // Process data
-            this.processedData = AnalyticsDataProcessor.processSubmissionsData(this.submissions, this.organizations);
-        } catch (error) {
-            console.error('Error loading data:', error);
-            throw error;
-        }
-    }
-
-    // Reload data with filters and re-render UI
-    async reloadWithFilters(filters = {}) {
-        try {
-            await this.loadData(filters);
-            this.renderStats();
-            this.renderCharts();
-            this.renderOrganizations();
-        } catch (err) {
-            console.error('Failed to reload with filters:', err);
-        }
-    }
-
-    renderStats() {
-        if (!this.processedData) return;
-
-        const { stats, sdgData } = this.processedData;
-
-        document.getElementById('sdgSubmissions').textContent = `${sdgData.totalEvents} Events`;
-        document.getElementById('sdgGoals').textContent = `${sdgData.activeGoals} Goals`;
-    }
-
-    renderCharts() {
-        if (!this.processedData) return;
-
-        console.log('Rendering charts with data:', this.processedData);
-
-        // Monthly Submissions Chart
-        const submissionsCtx = document.getElementById('submissionsChart').getContext('2d');
-        const submissionsData = {
-            labels: this.processedData.monthlyData.labels,
-            datasets: [{
-                data: this.processedData.monthlyData.data,
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)'
-            }]
-        };
-        new LargeChart(submissionsCtx, 'line', submissionsData, { 
-            hoverId: 'submissionsHover'
-        });
-
-        // SDG Chart - With SDG numbers (1-17) at bottom
-        const sdgCtx = document.getElementById('sdgChart').getContext('2d');
-        const sdgData = {
-            labels: this.processedData.sdgData.labels,
-            datasets: [{
-                data: this.processedData.sdgData.data,
-                backgroundColor: this.processedData.sdgData.colors
-            }],
-            fullLabels: this.processedData.sdgData.fullLabels
-        };
-        new LargeChart(sdgCtx, 'bar', sdgData, { 
-            isSDG: true, 
-            hoverId: 'sdgHover'
-        });
-
-        // Schools Chart - WITH COLOR CODING FROM ORGANIZATIONS DATA
-        const schoolsCtx = document.getElementById('schoolsChart').getContext('2d');
-        const schoolsData = {
-            labels: this.processedData.schoolData.labels,
-            datasets: [{
-                data: this.processedData.schoolData.data,
-                backgroundColor: this.processedData.schoolData.colors
-            }]
-        };
-        new LargeChart(schoolsCtx, 'bar', schoolsData, { 
-            hoverId: 'schoolsHover'
-        });
-    }
-
-    renderOrganizations() {
-        const orgsList = document.getElementById('orgsList');
-        orgsList.innerHTML = '';
-
-        if (!this.processedData || this.processedData.orgData.length === 0) {
-            orgsList.innerHTML = '<div class="no-data">No organization data available</div>';
-            return;
-        }
-
-        this.processedData.orgData.forEach((org, index) => {
-            const orgItem = document.createElement('div');
-            orgItem.className = 'org-item';
-            
-            // Get school color for the organization
-            const schoolColor = SCHOOL_COLORS[org.school] || '#666666';
-            
-            orgItem.innerHTML = `
+    
+    let html = '';
+    orgs.forEach((org, index) => {
+        const schoolColor = SCHOOL_COLORS[org.school] || '#666666';
+        
+        html += `
+            <div class="org-item">
                 <div class="org-header">
                     <div class="rank-badge" style="background-color: ${schoolColor}">${index + 1}</div>
                     <div class="org-name">${org.name}</div>
@@ -731,240 +551,45 @@ class AnalyticsDashboard {
                         <div class="org-stat-label">School</div>
                     </div>
                 </div>
-            `;
-            orgsList.appendChild(orgItem);
-        });
-    }
-
-    // Wire UI controls to call backend with filters and re-render
-    setupEventListeners() {
-        // Existing search input and clear button (if present)
-        const searchInput = document.getElementById('searchInput');
-        const searchClearBtn = document.getElementById('searchClear');
-
-        // Optional controls (add these inputs in the HTML if not present):
-        // - <input id="dateFilter" type="date">  (YYYY-MM-DD)
-        // - <select id="orgFilter">...</select>
-        // - <select id="statusFilter">...</select>
-        const dateInput = document.getElementById('dateFilter');
-        const orgSelect = document.getElementById('orgFilter');
-        const statusSelect = document.getElementById('statusFilter');
-
-        // Helper to build filter object from UI controls
-        const buildFilters = () => {
-            const f = {};
-            if (searchInput && searchInput.value.trim()) f.search = searchInput.value.trim();
-            if (dateInput && dateInput.value) f.date = dateInput.value; // YYYY-MM-DD
-            if (orgSelect && orgSelect.value && orgSelect.value !== 'all') f.organizationId = orgSelect.value;
-            if (statusSelect && statusSelect.value && statusSelect.value !== 'all') f.status = statusSelect.value;
-            return f;
-        };
-
-        // Debounced search handler
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                clearTimeout(this.debounceTimer);
-                this.debounceTimer = setTimeout(() => {
-                    const filters = buildFilters();
-                    this.reloadWithFilters(filters);
-                }, 350);
-            });
-        }
-
-        if (searchClearBtn) {
-            searchClearBtn.addEventListener('click', () => {
-                if (searchInput) searchInput.value = '';
-                const filters = buildFilters();
-                this.reloadWithFilters(filters);
-            });
-        }
-
-        if (dateInput) {
-            dateInput.addEventListener('change', () => {
-                const filters = buildFilters();
-                this.reloadWithFilters(filters);
-            });
-        }
-
-        if (orgSelect) {
-            orgSelect.addEventListener('change', () => {
-                const filters = buildFilters();
-                this.reloadWithFilters(filters);
-            });
-        }
-
-        if (statusSelect) {
-            statusSelect.addEventListener('change', () => {
-                const filters = buildFilters();
-                this.reloadWithFilters(filters);
-            });
-        }
-
-        // Window resize message (existing)
-        window.addEventListener('resize', () => {
-            setTimeout(() => {
-                console.log('Please refresh the page for optimal chart sizing');
-            }, 100);
-        });
-
-        // Populate org select dropdown if present
-        if (orgSelect) {
-            // Normalize organization _id to string when populating
-            orgSelect.innerHTML = '<option value="all">All organizations</option>';
-            this.organizations.forEach(org => {
-                let id = org._id;
-                if (id && typeof id === 'object' && id.$oid) id = id.$oid;
-                const name = org.acronym || org.name || id;
-                const opt = document.createElement('option');
-                opt.value = id;
-                opt.textContent = name;
-                orgSelect.appendChild(opt);
-            });
-        }
-    }
-
-    showError(message) {
-        console.error('Dashboard Error:', message);
-        alert(`Analytics Dashboard Error: ${message}`);
-    }
-}
-
-// ---------------- Backend fetch helpers (moved filtering to PHP) ----------------
-async function fetchOrganization(opts = {}) {
-    try {
-        const params = new URLSearchParams();
-        if (opts.id) params.append('id', opts.id);
-        if (opts.search) params.append('search', opts.search);
-        if (opts.school) params.append('school', opts.school);
-        if (opts.acronym) params.append('acronym', opts.acronym);
-        if (opts.limit) params.append('limit', opts.limit);
-        if (opts.offset) params.append('offset', opts.offset);
-
-        const url = `../../php-server/routes/organizations.php` + (Array.from(params).length ? `?${params.toString()}` : '');
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const json = await res.json();
-        return json.success ? json.data : [];
-    } catch (err) {
-        console.error('Error fetching organizations from backend:', err);
-        return [];
-    }
-}
-
-async function fetchSubmissions(opts = {}) {
-    try {
-        const params = new URLSearchParams();
-        if (opts.organizationId) params.append('organizationId', opts.organizationId);
-        if (opts.status) params.append('status', opts.status);
-        if (opts.search) params.append('search', opts.search);
-        if (opts.month) params.append('month', opts.month); // 1-12
-        if (opts.year) params.append('year', opts.year);
-        if (opts.date) params.append('date', opts.date); // exact day YYYY-MM-DD
-        if (opts.limit) params.append('limit', opts.limit);
-        if (opts.offset) params.append('offset', opts.offset);
-        if (opts.myorg) params.append('myorg', opts.myorg ? '1' : '0');
-
-        const url = `../../php-server/routes/submissions.php` + (Array.from(params).length ? `?${params.toString()}` : '');
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const json = await res.json();
-        // Controller returns data already formatted; keep consistent with existing code
-        return json.success ? json.data : [];
-    } catch (err) {
-        console.error('Error fetching submissions from backend:', err);
-        return [];
-    }
-}
-
-// DOM Elements
-const mobileProfileBtn = document.getElementById('mobileProfileBtn');
-const profileModal = document.getElementById('profileModal');
-const profileModalClose = document.getElementById('profileModalClose');
-const logoutBtn = document.getElementById('logoutBtn');
-const logoutModal = document.getElementById('logoutModal');
-const logoutModalClose = document.getElementById('logoutModalClose');
-const logoutCancel = document.getElementById('logoutCancel');
-const logoutConfirm = document.getElementById('logoutConfirm');
-
-// Show/Hide Modal Functions
-function showLogoutModal() {
-    logoutModal.classList.add('show');
-    logoutModal.setAttribute('aria-hidden', 'false');
-}
-
-function hideLogoutModal() {
-    logoutModal.classList.remove('show');
-    logoutModal.setAttribute('aria-hidden', 'true');
-}
-
-// Profile Modal Functions
-function showProfileModal() {
-    profileModal.classList.add('show');
-    profileModal.setAttribute('aria-hidden', 'false');
-    
-    const modalContent = `
-        <div class="profile-info">
-            <div class="profile-large">O</div>
-            <div class="profile-details">
-                <h4>Hello, OSAS</h4>
-                <div class="profile-logout">
-                    <button id="profileLogoutBtn" class="btn-logout">
-                        Logout
-                    </button>
-                </div>
             </div>
-        </div>
+        `;
+    });
+    
+    orgsList.innerHTML = html;
+}
+
+function showError(message) {
+    console.error('Analytics Error:', message);
+    
+    // Create error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `
+        <p>${message}</p>
+        <button onclick="location.reload()" style="margin-top: 8px; padding: 6px 12px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Try Again
+        </button>
     `;
     
-    profileModal.querySelector('.modal-body').innerHTML = modalContent;
-    
-    // Add logout event listener
-    document.getElementById('profileLogoutBtn').addEventListener('click', () => {
-        window.location.href = "../../index.php";
-    });
+    // Add to top of dashboard
+    const dashboardBody = document.querySelector('.dashboard-body');
+    if (dashboardBody) {
+        dashboardBody.prepend(errorDiv);
+    }
 }
 
-function hideProfileModal() {
-    profileModal.classList.remove('show');
-    profileModal.setAttribute('aria-hidden', 'true');
-}
-
-// Logout function
-function performLogout() {
-      try {
-        fetch('../../php-server/routes/logout.php', { method: 'POST' });
-      } catch (err) {
-        console.error('Logout error:', err);
-      }
-
-      // Redirect to login
-      window.location.href = '../../index.php';
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Profile modal events
-    mobileProfileBtn.addEventListener('click', showProfileModal);
-    profileModalClose.addEventListener('click', hideProfileModal);
-    
-    // Logout modal events
-    logoutBtn.addEventListener('click', showLogoutModal);
-    logoutModalClose.addEventListener('click', hideLogoutModal);
-    logoutCancel.addEventListener('click', hideLogoutModal);
-    logoutConfirm.addEventListener('click', performLogout);
-    
-    // Close modals when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === logoutModal) {
-            hideLogoutModal();
-        }
-        if (e.target === profileModal) {
-            hideProfileModal();
-        }
-    });
+// Handle offline/online status
+window.addEventListener('online', () => {
+    console.log('Network connection restored. Reloading data...');
+    loadAnalyticsData();
 });
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    new AnalyticsDashboard();
+window.addEventListener('offline', () => {
+    showError('Network connection lost. Please check your internet connection.');
 });
+
+// Export for debugging
+window.analyticsDashboard = {
+    reload: loadAnalyticsData,
+    charts: charts
+};

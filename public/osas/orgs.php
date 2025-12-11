@@ -11,20 +11,34 @@ if (empty($_SESSION['logged_in'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/OSASorgs.css">
-    <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
-    <script src="script/osasorgs.js" defer></script>
+    <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
+    <script src="script/OSASorgs.js" defer></script>
     <title>Organizations in SLU</title>
 </head>
 <body>
   <div class="app">
-    <!-- Left circular sidebar - copied from analytics.php -->
+    <!-- Add Mobile Header with Hamburger -->
+  <div class="mobile-header">
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="mobile-greeting">
+      <h1>OSAS Organizations</h1>
+    </div>
+    <div class="mobile-logo">
+      <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+    </div>
+  </div>
+
     <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
           <div class="avatar">O</div>
           <div class="profile-text">
             <div class="admin-title">OSAS</div>
-            <!-- <div class="admin-sub muted">Admin Name</div> -->
+            <div class="admin-sub">Organizations Dashboard</div>
           </div>
         </div>
       </div>
@@ -32,15 +46,15 @@ if (empty($_SESSION['logged_in'])) {
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
           <li class="nav-item" onclick="location.href='../osas/calendar.php'">
-            <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
+            <img src="../images/osas/calendar.png" alt="" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
           <li class="nav-item active" onclick="location.href='../osas/orgs.php'">
-            <img src="../Images/osas/group.png" alt="" class="menu-icon">
+            <img src="../images/osas/group.png" alt="" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/analytics.php'">
-            <img src="../Images/osas/statistics.png" alt="" class="menu-icon">
+            <img src="../images/osas/statistics.png" alt="" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
         </ul>
@@ -63,7 +77,7 @@ if (empty($_SESSION['logged_in'])) {
         <div class="top-actions">
           <div class="search-wrap">
             <button id="filterToggle" title="Filter" aria-label="Filter">
-              <img src="../Images/osas/filter.png" alt="Filter" class="filter-icon">
+              <img src="../images/osas/filter.png" alt="Filter" class="filter-icon">
             </button>
 
             <input id="searchInput" type="search" placeholder="Search an Organization" aria-label="Search an Organization">
@@ -109,7 +123,7 @@ if (empty($_SESSION['logged_in'])) {
         <div class="modal-header">
           <h3 id="logoutModalTitle">Confirm Logout</h3>
           <button id="logoutModalClose" class="modal-close" aria-label="Close">
-            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+            <img src="../images/cross.png" alt="Close" class="nav-icon">
           </button>
         </div>
         <div class="modal-body">
@@ -127,7 +141,7 @@ if (empty($_SESSION['logged_in'])) {
         <div class="modal-header">
           <h3 id="profileModalTitle">Profile</h3>
           <button id="profileModalClose" class="modal-close" aria-label="Close">
-            <img src="../Images/cross.png" alt="Close" class="nav-icon">
+            <img src="../images/cross.png" alt="Close" class="nav-icon">
           </button>
         </div>
         <div class="modal-body">

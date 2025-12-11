@@ -89,16 +89,18 @@ body {
 #profile-icon {
     width: 45px;
     height: 45px;
-    background: #fff;
+    background: #fff url('../images/user.png') center/contain no-repeat;
     border-radius: 50%;
     margin-right: 10px;
 }
 
 /* Profile TEXT */
 #profile-details div:first-child {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 18px;
-    letter-spacing: 1px;
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  background: transparent;
+  color: #fff;
 }
 
 #profile-details div:last-child {

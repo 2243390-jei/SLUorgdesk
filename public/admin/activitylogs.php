@@ -10,14 +10,14 @@ if (empty($_SESSION['logged_in'])) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>Admin Activity Logs</title>
     <link rel="stylesheet" href="styles/adminmain.css">
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link rel="stylesheet" href="styles/activitylogs.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="script/config.js" defer></script>
     <script src="script/adminmain.js" defer></script>
-    <script src="script/dashboard.js" defer></script>
-    <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">    
+    <script src="script/activitylogs.js" defer></script>
+    <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">        
 </head>
 
 <body>
@@ -33,10 +33,10 @@ if (empty($_SESSION['logged_in'])) {
 
         <nav id="sidebar-nav">
             <ul>
-                <li class="active"><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="orgmanagement.php">Org Management</a></li>
                 <li><a href="usermanagement.php">User Management</a></li>
-                <li><a href="activitylogs.php">Activity Logs</a></li>
+                <li class="active"><a href="activitylogs.php">Activity Logs</a></li>
             </ul>
         </nav>
 
@@ -61,33 +61,12 @@ if (empty($_SESSION['logged_in'])) {
                 </div>
         </header>
 
-        <!--  DASHBOARD BODY -->
+        <!--  ACTIVITYLOGS BODY -->
         <section id="gen-wrapper">
-            <h2>Analytics</h2>
-
-            <!-- TOP WIDGETS WRAPPER -->
-            <div id="top-widgets">
-                <!-- Widget 1: Users by Role -->
-                <div class="widget-box">
-                    <h3>Users by Role</h3>
-                    <canvas id="chartRoles"></canvas> 
-                </div>
-
-                <!-- Widget 2: Recent Activities -->
-                <div class="widget-box">
-                    <h3>Recent Activities</h3>
-                    <div class="chart-scroll-container">
-                        <canvas id="chartActive"></canvas> 
-                    </div>
-                </div>
-            </div>
-
-            <!-- LARGE BOTTOM WIDGET -->
-            <div id="bottom-widget">
-                <div class="large-box">
-                    <h3>Users by School</h3>
-                    <canvas id="chartSchools"></canvas> 
-                </div>
+            <h2>Activity Logs</h2>
+            <div class="data-section" style="margin-top: 18px;">
+              <h3>Recent Activity</h3>
+              <div id="recentActivityList" class="recent-activity"></div>
             </div>
         </section>
 

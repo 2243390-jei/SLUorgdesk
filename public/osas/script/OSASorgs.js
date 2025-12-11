@@ -12,6 +12,83 @@ const logoutModalClose = document.getElementById('logoutModalClose');
 const logoutCancel = document.getElementById('logoutCancel');
 const logoutConfirm = document.getElementById('logoutConfirm');
 
+// Hamburger menu elements
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const sidebar = document.querySelector('.leftbar.sidebar-expanded');
+let overlay = null;
+
+// Create mobile overlay if it doesn't exist
+function createMobileOverlay() {
+  if (!document.querySelector('.mobile-overlay')) {
+    overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    document.body.appendChild(overlay);
+  } else {
+    overlay = document.querySelector('.mobile-overlay');
+  }
+}
+
+// Toggle mobile menu
+function toggleMobileMenu() {
+  if (!sidebar || !overlay) return;
+  
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+  
+  // Prevent body scroll when menu is open
+  if (sidebar.classList.contains('open')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+// Initialize hamburger menu
+function initHamburgerMenu() {
+  // Create overlay
+  createMobileOverlay();
+  
+  if (mobileMenuToggle && sidebar && overlay) {
+    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+    overlay.addEventListener('click', toggleMobileMenu);
+    
+    // Close menu when clicking logout button on mobile
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768 && sidebar && overlay) {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+    
+    // Close menu when clicking nav items on mobile
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 768 && sidebar && overlay) {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+    
+    // Close menu on window resize if needed
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768 && sidebar && overlay) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+}
+
+// Initialize hamburger menu on DOM load
+document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+
 async function loadOrganizations() {
   try {
     const response = await fetch("../../php-server/routes/organizations.php");
@@ -47,7 +124,7 @@ function renderTable(orgs) {
 
     // Redirection to go to OSASsubmissions.php using org ID and orgName when the button is clicked
     row.querySelector(".view-btn").addEventListener("click", () => {
-      window.location.href = `../osas/osassubmissions.php?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
+      window.location.href = `../osas/OSASsubmissions.php?orgId=${org._id}&orgName=${encodeURIComponent(org.acronym)}`;
     });
 
     tableBody.appendChild(row);
@@ -140,57 +217,70 @@ function filterOrganizations() {
 }
 
 // Clear search
-searchClear.addEventListener("click", () => {
-  searchInput.value = "";
-  renderTable(organizationsData);
-});
+if (searchClear) {
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    renderTable(organizationsData);
+  });
+}
 
 // Searching
-searchInput.addEventListener("input", filterOrganizations);
+if (searchInput) {
+  searchInput.addEventListener("input", filterOrganizations);
+}
 
 // === Filter Dropdown ===
 const filterToggle = document.getElementById("filterToggle");
 const filterMenu = document.getElementById("filterMenu");
 
-filterToggle.addEventListener("click", () => {
-  filterMenu.classList.toggle("hidden");
-});
-
-// Filter by School
-document.querySelectorAll(".filter-item").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const school = btn.dataset.filter;
-    const filtered = organizationsData.filter(org => org.school === school);
-    renderTable(filtered);
-    filterMenu.classList.add("hidden");
+if (filterToggle && filterMenu) {
+  filterToggle.addEventListener("click", () => {
+    filterMenu.classList.toggle("hidden");
   });
-});
 
-// Clear Filters
-document.querySelector(".filter-clear").addEventListener("click", () => {
-  renderTable(organizationsData);
-  filterMenu.classList.add("hidden");
-});
+  // Filter by School
+  document.querySelectorAll(".filter-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const school = btn.dataset.filter;
+      const filtered = organizationsData.filter(org => org.school === school);
+      renderTable(filtered);
+      filterMenu.classList.add("hidden");
+    });
+  });
 
-// Hide dropdown when clicking outside
-document.addEventListener("click", (e) => {
-  if (!filterMenu.contains(e.target) && !filterToggle.contains(e.target)) {
-    filterMenu.classList.add("hidden");
+  // Clear Filters
+  const filterClear = document.querySelector(".filter-clear");
+  if (filterClear) {
+    filterClear.addEventListener("click", () => {
+      renderTable(organizationsData);
+      filterMenu.classList.add("hidden");
+    });
   }
-});
+
+  // Hide dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (filterMenu && !filterMenu.contains(e.target) && filterToggle && !filterToggle.contains(e.target)) {
+      filterMenu.classList.add("hidden");
+    }
+  });
+}
 
 // ========== LOGOUT MODAL FUNCTIONALITY ==========
 
 // Show logout confirmation modal
 function showLogoutModal() {
-  logoutModal.classList.add('show');
-  logoutModal.setAttribute('aria-hidden', 'false');
+  if (logoutModal) {
+    logoutModal.classList.add('show');
+    logoutModal.setAttribute('aria-hidden', 'false');
+  }
 }
 
 // Hide logout confirmation modal
 function hideLogoutModal() {
-  logoutModal.classList.remove('show');
-  logoutModal.setAttribute('aria-hidden', 'true');
+  if (logoutModal) {
+    logoutModal.classList.remove('show');
+    logoutModal.setAttribute('aria-hidden', 'true');
+  }
 }
 
 // Logout function
@@ -207,17 +297,27 @@ function performLogout() {
 }
 
 // Event listeners for logout functionality
-logoutBtn.addEventListener('click', showLogoutModal);
-logoutModalClose.addEventListener('click', hideLogoutModal);
-logoutCancel.addEventListener('click', hideLogoutModal);
-logoutConfirm.addEventListener('click', performLogout);
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', showLogoutModal);
+}
+if (logoutModalClose) {
+  logoutModalClose.addEventListener('click', hideLogoutModal);
+}
+if (logoutCancel) {
+  logoutCancel.addEventListener('click', hideLogoutModal);
+}
+if (logoutConfirm) {
+  logoutConfirm.addEventListener('click', performLogout);
+}
 
 // Close logout modal when clicking on overlay
-logoutModal.addEventListener('click', (e) => {
-  if (e.target === logoutModal) {
-    hideLogoutModal();
-  }
-});
+if (logoutModal) {
+  logoutModal.addEventListener('click', (e) => {
+    if (e.target === logoutModal) {
+      hideLogoutModal();
+    }
+  });
+}
 
 // Initial load of organizations
 loadOrganizations();

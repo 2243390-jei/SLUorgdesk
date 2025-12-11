@@ -5,25 +5,40 @@ if (empty($_SESSION['logged_in'])) {
     exit;
 }
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Osas Calendar — Past Events</title>
   <link rel="stylesheet" href="styles/calendar.css">
-  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
 </head>
 <body>
   <div class="app">
-    <!-- Left circular sidebar -->
-    <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
+    <!-- Mobile Header with Hamburger -->
+    <div class="mobile-header">
+      <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="mobile-greeting">
+        <h1>OSAS Calendar</h1>
+      </div>
+      <div class="mobile-logo">
+        <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+      </div>
+    </div>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
           <div class="avatar">O</div>
           <div class="profile-text">
             <div class="admin-title">OSAS</div>
-            <div class="admin-sub muted"></div>
+            <div class="admin-sub">Calendar Dashboard</div>
           </div>
         </div>
       </div>
@@ -31,15 +46,15 @@ if (empty($_SESSION['logged_in'])) {
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
           <li class="nav-item active" onclick="location.href='../osas/calendar.php'">
-            <img src="../Images/osas/calendar.png" alt="" class="menu-icon">
+            <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/orgs.php'">
-            <img src="../Images/osas/group.png" alt="" class="menu-icon">
+            <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/analytics.php'">
-            <img src="../Images/osas/statistics.png" alt="" class="menu-icon">
+            <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
         </ul>
@@ -47,52 +62,50 @@ if (empty($_SESSION['logged_in'])) {
 
       <div class="sidebar-footer">
         <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
-          <span class="menu-label">Logout</span>
+          <img src="../images/osas/logout.png" alt="" class="menu-icon">
+          <span class="menu-label">LOGOUT</span>
         </button>
       </div>
     </aside>
 
-    <!-- Main area -->
-    <main class="main-area">
+    <!-- Main Content -->
+    <main class="main-content">
       <header class="header">
         <div class="greeting">
           <h1>Hello, OSAS</h1>
           <div class="muted">Here's what happened this month</div>
         </div>
 
-        <div id="header-logo" class="header-logo">
-          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo" class="logo-img">
+        <div class="header-logo">
+          <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
         </div>
       </header>
 
-      <div class="body">
-        <!-- Calendar column -->
-        <section class="calendar-column" aria-label="Calendar">
-          <div class="calendar-head">
-            <div class="month-block">
-              <div class="month-year-linear">
+      <div class="content-body">
+        <!-- Calendar -->
+        <section class="calendar-section" aria-label="Calendar">
+          <div class="calendar-header">
+            <div class="month-display">
+              <div class="month-year-center">
                 <span id="monthName" class="month-name">October</span>
                 <span id="yearName" class="year-name">2025</span>
               </div>
             </div>
 
-            <!-- Navigation controls -->
-            <div class="nav-controls">
+            <div class="calendar-controls">
               <button id="prevBtn" class="icon-btn" aria-label="Previous month">
-                <img src="../Images/osas/back.png" alt="Previous" class="nav-icon">
+                <img src="../images/osas/back.png" alt="Previous">
               </button>
               <button id="todayBtn" class="btn-small">
-                <img src="../Images/osas/calendar.png" alt="Today" class="nav-icon">
-                Today
+                <img src="../images/osas/calendar.png" alt="Today"> Today
               </button>
               <button id="nextBtn" class="icon-btn" aria-label="Next month">
-                <img src="../Images/osas/next.png" alt="Next" class="nav-icon">
+                <img src="../images/osas/next.png" alt="Next">
               </button>
             </div>
           </div>
 
-          <div id="calendarGrid" class="calendar-grid" aria-hidden="false">
-            <!-- Week headers -->
+          <div id="calendarGrid" class="calendar-grid">
             <div class="week">Sun</div>
             <div class="week">Mon</div>
             <div class="week">Tue</div>
@@ -100,58 +113,52 @@ if (empty($_SESSION['logged_in'])) {
             <div class="week">Thu</div>
             <div class="week">Fri</div>
             <div class="week">Sat</div>
-            <!-- days injected by script.js -->
           </div>
         </section>
 
-        <!-- Right panel: Past Events -->
-        <aside class="right-panel" aria-label="Past events">
-          <div class="panel-top">
+        <!-- Past Events Panel -->
+        <aside class="events-panel" aria-label="Past events">
+          <div class="panel-header">
             <h2>Past Events</h2>
           </div>
 
-          <!-- Search moved to top of panel -->
-          <div class="search-wrap panel-search">
-            <input 
-              id="searchInput" 
-              type="search" 
-              placeholder="Search past events..." 
-              aria-label="Search past events">
-            <button id="searchClear" class="search-clear-btn" title="Clear" aria-label="Clear search">×</button>
+          <div class="panel-search">
+            <input id="searchInput" type="search" placeholder="Search past events..." aria-label="Search past events">
+            <button id="searchClear" class="search-clear" aria-label="Clear search">×</button>
           </div>
 
-          <!-- Fixed-size, scrollable events list -->
-          <div id="eventsList" class="events-list" aria-live="polite" tabindex="0">
-            <!-- Event cards injected by script.js -->
-          </div>
+          <div id="eventsList" class="events-list"></div>
 
-          <div class="panel-footer muted small">Click an event to view details; click a day to focus its events.</div>
+          <div class="panel-footer muted">Click an event to view details</div>
         </aside>
       </div>
 
-      <!-- Slide-in detail panel + overlay -->
-      <div id="overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
-      <aside id="detailPanel" class="detail-panel" aria-hidden="true" aria-labelledby="detailTitle">
+      <!-- Overlay and Detail Panel -->
+      <div id="overlay" class="overlay"></div>
+      <aside id="detailPanel" class="detail-panel">
         <div class="detail-header">
-          <div>
+          <button id="detailBack" class="detail-back" aria-label="Go back">
+            <img src="../images/osas/back.png" alt="Back">
+            <span class="back-text">Back</span>
+          </button>
+          <div class="detail-header-content">
             <h3 id="detailTitle">Event Details</h3>
-            <div id="detailMeta" class="muted small"></div>
+            <div id="detailMeta" class="muted"></div>
           </div>
-          <button id="detailClose" class="detail-close" aria-label="Close details">
-            <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
+          <button id="detailClose" class="detail-close" aria-label="Close">
+            <img src="../images/osas/cross.png" alt="Close">
           </button>
         </div>
-
-        <div id="detailBody" class="detail-body" tabindex="0"></div>
+        <div id="detailBody" class="detail-body"></div>
       </aside>
 
-      <!-- Logout Confirmation Modal -->
-      <div id="logoutModal" class="modal" aria-hidden="true" aria-labelledby="logoutModalTitle">
+      <!-- Logout Modal -->
+      <div id="logoutModal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 id="logoutModalTitle">Confirm Logout</h3>
+            <h3>Confirm Logout</h3>
             <button id="logoutModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close" class="nav-icon">
+              <img src="../images/osas/cross.png" alt="Close">
             </button>
           </div>
           <div class="modal-body">
@@ -164,7 +171,7 @@ if (empty($_SESSION['logged_in'])) {
         </div>
       </div>
 
-      <footer class="footer muted">© <span id="curYear"></span> Osas Dashboard</footer>
+      <footer class="footer">© <span id="curYear"></span> Osas Dashboard</footer>
     </main>
   </div>
 

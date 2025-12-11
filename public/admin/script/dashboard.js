@@ -64,59 +64,67 @@ function generatePalette(n) {
 }
 
 // Fetch stats from Node.js API endpoint and update charts
-async function loadDashboardStats() {
+async function loadDashboardStats(period = '7d') {
     try {
-        const res = await fetch('http://localhost:5000/api/stats');
+        if (typeof API_CONFIG === 'undefined' || !API_CONFIG.statsEndpoint) {
+            console.error('API_CONFIG.statsEndpoint is not defined. Set it in script/config.js (e.g. API_CONFIG.statsEndpoint = "/api/stats")');
+            return;
+        }
+
+        const url = new URL(API_CONFIG.statsEndpoint, window.location.origin);
+        url.searchParams.set('period', period);
+
+        const res = await fetch(url.toString(), { credentials: 'include' });
         if (!res.ok) {
             console.error('Stats fetch failed:', res.status, res.statusText);
             return;
         }
         const payload = await res.json();
-        if (!payload.success) {
+        if (!payload || !payload.success) {
             console.error('Stats load failed', payload);
             return;
         }
 
-        const { roles, recentActivities, organizations, organizationCount, totalUsers } = payload.data;
-        console.log('Dashboard stats loaded:', { roles, recentActivities, organizations, organizationCount, totalUsers });
+        const { roles, recentActivities, organizations } = payload.data || {};
 
         // Roles
-        if (roles && roles.labels && roles.data) {
+        if (roles && Array.isArray(roles.labels) && Array.isArray(roles.data)) {
             chartRoles.data.labels = roles.labels;
             chartRoles.data.datasets[0].data = roles.data;
             chartRoles.data.datasets[0].backgroundColor = generatePalette(roles.data.length);
             chartRoles.update();
-            console.log('Roles chart updated');
         } else {
             console.warn('Roles data missing or invalid', roles);
         }
 
         // Recent activities
-        if (recentActivities && recentActivities.labels && recentActivities.data) {
+        if (recentActivities && Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
             chartActive.data.labels = recentActivities.labels;
             chartActive.data.datasets[0].data = recentActivities.data;
-            
-            // Dynamically adjust canvas width based on number of days
-            const numDays = recentActivities.labels.length;
-            const chartCanvas = document.getElementById('chartActive');
-            
-            // Calculate appropriate width for the chart (wider bars and spacing)
-            const canvasWidth = Math.max(400, numDays * 80);
-            chartCanvas.style.width = canvasWidth + 'px';
-            
+
+            // Dynamically adjust canvas width based on number of labels.
+            const numItems = recentActivities.labels.length || 1;
+            const canvasEl = document.getElementById('chartActive');
+            if (canvasEl) {
+                // set width with 'important' to override CSS "!important" if present
+                const px = Math.max(480, numItems * 72);
+                canvasEl.style.setProperty('width', px + 'px', 'important');
+                // also ensure parent scroll container allows horizontal scroll
+                const parent = canvasEl.closest('.chart-scroll-container');
+                if (parent) parent.style.overflowX = 'auto';
+            }
+
             chartActive.update();
-            console.log('Recent Activities chart updated with', numDays, 'days');
         } else {
             console.warn('Recent Activities data missing or invalid', recentActivities);
         }
 
         // Organizations
-        if (organizations && organizations.labels && organizations.data) {
-            chartSchools.data.labels = organizations.labels.slice(0,10);
-            chartSchools.data.datasets[0].data = organizations.data.slice(0,10);
+        if (organizations && Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
+            chartSchools.data.labels = organizations.labels.slice(0, 10);
+            chartSchools.data.datasets[0].data = organizations.data.slice(0, 10);
             chartSchools.data.datasets[0].backgroundColor = generatePalette(Math.min(10, organizations.data.length));
             chartSchools.update();
-            console.log('Organizations chart updated');
         } else {
             console.warn('Organizations data missing or invalid', organizations);
         }
@@ -126,9 +134,9 @@ async function loadDashboardStats() {
     }
 }
 
-// Initial load
-loadDashboardStats();
+// Initial load (backend handles filtering). Call with '7d', '30d', or 'all'.
+loadDashboardStats('7d');
 
-// Optional: refresh every 5 minutes
-setInterval(loadDashboardStats, 5 * 60 * 1000);
+// Optional: refresh periodically
+setInterval(() => loadDashboardStats('7d'), 5 * 60 * 1000);
 

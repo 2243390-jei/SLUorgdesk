@@ -1,5 +1,18 @@
-const app = require('./app')
 const http = require('http')
+
+// Parse command-line arguments for host configuration FIRST (before loading app)
+let HOST = '0.0.0.0'
+const args = process.argv.slice(2)
+for (let i = 0; i < args.length; i++) {
+  if ((args[i] === '--host' || args[i] === '-h') && args[i + 1]) {
+    HOST = args[i + 1]
+    process.env.SERVER_HOST = HOST
+    break
+  }
+}
+
+// Now load app AFTER environment is set
+const app = require('./app')
 
 // Get port from environment or default to 5000
 const PORT = process.env.PORT || 5000
@@ -7,10 +20,10 @@ const PORT = process.env.PORT || 5000
 // Create HTTP server
 const server = http.createServer(app)
 
-// Start server
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-  console.log(`Visit http://localhost:${PORT}`)
+// Start server on specified host and port
+server.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`)
+  console.log(`Listening on ${HOST}:${PORT}`)
 })
 
 // Handle server errors
