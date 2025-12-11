@@ -17,6 +17,7 @@ if (empty($_SESSION['logged_in'])) {
   <script src="script/config.js" defer></script>
   <script src="script/adminmain.js" defer></script>
   <script src="./script/orgmanagement.js" defer></script>
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">      
 </head>
 
 <body>
@@ -34,7 +35,8 @@ if (empty($_SESSION['logged_in'])) {
       <ul>
         <li><a href="dashboard.php">Dashboard</a></li>
         <li class="active"><a href="orgmanagement.php">Org Management</a></li>
-        <li><a href="usermanagement.php">User Management</a></li>      
+        <li><a href="usermanagement.php">User Management</a></li> 
+        <li><a href="activitylogs.php">Activity Logs</a></li>             
       </ul>
     </nav>
 

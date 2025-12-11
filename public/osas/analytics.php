@@ -12,7 +12,7 @@ if (empty($_SESSION['logged_in'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Osas Calendar — Analytics Dashboard</title>
   <link rel="stylesheet" href="styles/analytics.css">
-  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
 </head>
 <body>
   <div class="app">
@@ -27,7 +27,7 @@ if (empty($_SESSION['logged_in'])) {
         <h1>Analytics Dashboard</h1>
       </div>
       <div class="mobile-logo">
-        <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+        <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
       </div>
     </div>
 
@@ -46,15 +46,15 @@ if (empty($_SESSION['logged_in'])) {
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
           <li class="nav-item" onclick="location.href='../osas/calendar.php'">
-            <img src="../Images/osas/calendar.png" alt="Calendar" class="menu-icon">
+            <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/orgs.php'">
-            <img src="../Images/osas/group.png" alt="Organizations" class="menu-icon">
+            <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
           <li class="nav-item active" onclick="location.href='../osas/analytics.php'">
-            <img src="../Images/osas/statistics.png" alt="Analytics" class="menu-icon">
+            <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
         </ul>
@@ -62,7 +62,7 @@ if (empty($_SESSION['logged_in'])) {
 
       <div class="sidebar-footer">
         <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
-          <img src="../Images/osas/logout.png" alt="Logout" class="menu-icon">
+          <img src="../images/osas/logout.png" alt="Logout" class="menu-icon">
           <span class="menu-label">LOGOUT</span>
         </button>
       </div>
@@ -77,7 +77,7 @@ if (empty($_SESSION['logged_in'])) {
         </div>
         
         <div class="header-logo">
-          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+          <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
         </div>
       </header>
 
@@ -142,7 +142,7 @@ if (empty($_SESSION['logged_in'])) {
           <div class="modal-header">
             <h3>Confirm Logout</h3>
             <button id="logoutModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close">
+              <img src="../images/osas/cross.png" alt="Close">
             </button>
           </div>
           <div class="modal-body">
