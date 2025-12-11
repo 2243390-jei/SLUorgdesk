@@ -287,7 +287,11 @@ function openUserFormModal() {
     // Reset the form for adding a new user
     const roleSelect = document.getElementById('role');
     roleSelect.value = '';
-    
+    // ensure role and email are editable for new users
+    roleSelect.disabled = false;
+    const emailInput = document.getElementById('email');
+    if (emailInput) emailInput.readOnly = false;
+
     userForm.dataset.userId = '';
     userModal.style.display = 'flex';
 }
@@ -301,10 +305,19 @@ function openEditModal(userId) {
     
     // Populate the form
     document.getElementById('name').value = user.name;
-    document.getElementById('email').value = user.email;
+    const emailInput = document.getElementById('email');
+    const roleInput = document.getElementById('role');
+    if (emailInput) {
+        emailInput.value = user.email;
+        // Make email readonly for Organization role, editable otherwise
+        emailInput.readOnly = (user.role === 'Organization');
+        roleInput.disabled = (user.role === 'Organization');
+    }
     document.getElementById('password').value = ''; // Don't populate password
-    document.getElementById('role').value = user.role;
-    
+
+    const roleSelect = document.getElementById('role');
+    roleSelect.value = user.role;
+
     userForm.dataset.userId = userId;
     userModal.style.display = 'flex';
 }
@@ -313,6 +326,11 @@ function closeUserModal() {
     userModal.style.display = 'none';
     userForm.reset();
     selectedRole = '';
+    // reset email/readOnly and role disabled state
+    const emailInput = document.getElementById('email');
+    if (emailInput) emailInput.readOnly = false;
+    const roleSelect = document.getElementById('role');
+    if (roleSelect) roleSelect.disabled = false;
 }
 
 function openDeleteModal(userId) {
