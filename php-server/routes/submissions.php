@@ -1,9 +1,6 @@
 <?php
-
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Load controllers and middleware
 require_once __DIR__ . '/../controllers/SubmissionController.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -70,7 +67,6 @@ try {
         $data = json_decode(file_get_contents('php://input'), true);
         
         // Check authorization for creating submission
-        // User must be submitting for their own organization
         if ($user['role'] !== 'admin' && $user['role'] !== 'osas' && isset($data['orgId'])) {
             if ($data['orgId'] !== $user['organizationId']) {
                 $response = ['success' => false, 'error' => 'Unauthorized: Cannot submit for another organization'];

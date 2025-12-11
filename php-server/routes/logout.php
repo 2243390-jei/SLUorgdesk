@@ -1,7 +1,5 @@
 <?php
-// Start session before clearing
 session_start();
-// Set JSON response type
 header('Content-Type: application/json');
 
 // Clear all session data

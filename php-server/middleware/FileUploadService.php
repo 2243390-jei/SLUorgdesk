@@ -55,27 +55,21 @@ class FileUploadService
             $uploadResult = $this->uploadSingleFile($file, $uploadDir, $orgAcronym, $submissionId);
 
             if ($uploadResult['success']) {
-                // Store successful upload filename and path
                 $results['success'][] = $uploadResult['filename'];
                 $results['paths'][]   = $uploadResult['path'];
             } else {
-                // Store upload error message
                 $results['errors'][]  = $uploadResult['error'];
             }
         }
 
-        // Return upload results
         return $results;
     }
 
     private function createOrgFolder($orgAcronym)
     {
-        // Sanitize organization acronym
         $orgAcronym = preg_replace('/[^a-zA-Z0-9_-]/', '', $orgAcronym) ?: 'unknown';
-        // Build organization folder path
         $orgFolder  = $this->baseUploadDir . '/' . strtolower($orgAcronym);
 
-        // Create folder if it doesn't exist
         if (!is_dir($orgFolder)) {
             mkdir($orgFolder, 0755, true);
         }
@@ -91,11 +85,8 @@ class FileUploadService
 
         // Process each file input
         foreach ($files as $fileData) {
-            // Handle multiple files from single input
             if (is_array($fileData['name'])) {
-                // Process each file in array
                 foreach ($fileData['name'] as $i => $name) {
-                    // Skip if no file uploaded
                     if ($fileData['error'][$i] === UPLOAD_ERR_NO_FILE) continue;
 
                     // Build normalized file data
@@ -154,22 +145,15 @@ class FileUploadService
         ];
     }
 
-    /**
-     * Option 1 – Clean date-time + original name (with collision protection)
-     */
+
     private function generateUniqueFilename($originalName, $uploadDir)
     {
         // Extract file extension and name
         $ext  = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $name = pathinfo($originalName, PATHINFO_FILENAME);
-
-        // Sanitize filename characters
         $name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $name);
-        // Collapse multiple underscores
         $name = preg_replace('/_+/', '_', $name);
-        // Remove leading/trailing underscores
         $name = trim($name, '_');
-        // Use default name if empty
         $name = $name ?: 'file';
 
         // Limit filename length
@@ -184,7 +168,6 @@ class FileUploadService
         $counter  = 0;
         $filename = "{$datePrefix}_{$name}.{$ext}";
 
-        // Check for existing files and add counter if needed
         while (file_exists($uploadDir . '/' . $filename)) {
             $counter++;
             $filename = "{$datePrefix}_{$name}_{$counter}.{$ext}";
@@ -201,13 +184,11 @@ class FileUploadService
             return ['valid' => false, 'error' => 'File too large (max 50MB)'];
         }
 
-        // Check if file extension is allowed
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $this->allowedExtensions)) {
             return ['valid' => false, 'error' => "File type not allowed: {$ext}"];
         }
 
-        // Return success if validation passes
         return ['valid' => true];
     }
 
