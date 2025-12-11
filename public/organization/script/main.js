@@ -41,7 +41,8 @@ async function setupManualLogin() {
     }
 
     try {
-      const resp = await fetchWithTimeout("php-server/routes/users.php", {
+      // First, authenticate with PHP to get user data (including role)
+      const phpResp = await fetchWithTimeout("php-server/routes/users.php", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,23 +52,59 @@ async function setupManualLogin() {
         })
       });
 
-      if (!resp.ok) throw new Error(`Server error (${resp.status})`);
+      if (!phpResp.ok) throw new Error(`Server error (${phpResp.status})`);
 
-      const result = await resp.json();
+      const result = await phpResp.json();
 
       if (!result.success) {
         return alert(result.error || "Authentication failed.");
       }
 
       const role = (result.data.role || "").toLowerCase();
+      console.log('PHP login successful. User role:', role);
+      
+      // If admin, also authenticate with Node.js to create session
+      if (role === "admin") {
+        console.log('Admin user detected, attempting Node.js login...');
+        try {
+          console.log('Attempting Node.js login for admin user:', email);
+          const nodeResp = await fetchWithTimeout(`${API_CONFIG.apiBase}/api/users/login`, {
+            method: 'POST',
+            credentials: 'include',  // IMPORTANT: Include cookies for session
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              password: password
+            })
+          });
+
+          console.log('Node.js login response status:', nodeResp.status);
+          const nodeData = await nodeResp.json().catch(() => ({}));
+          console.log('Node.js login response:', nodeData);
+
+          if (!nodeResp.ok) {
+            console.warn('Node.js session creation failed:', nodeData.error || 'Unknown error');
+          } else {
+            console.log('Node.js session created successfully');
+          }
+        } catch (err) {
+          console.warn('Node.js login error:', err.message);
+        }
+      } else {
+        console.log('Non-admin user, skipping Node.js login');
+      }
+
       alert(`Login successful, welcome ${result.data.name || result.data.email}!`);
 
-      switch (role) {
-        case "osas": window.location.href = "public/osas/calendar.php"; break;
-        case "admin": window.location.href = "public/admin/dashboard.php"; break;
-        case "organization": window.location.href = "public/organization/submission.php"; break;
-        default: window.location.href = "public/organization/submission.php"; break;
-      }
+      // Small delay to allow console logs to appear before redirect
+      setTimeout(() => {
+        switch (role) {
+          case "osas": window.location.href = "public/osas/calendar.php"; break;
+          case "admin": window.location.href = "public/admin/dashboard.php"; break;
+          case "organization": window.location.href = "public/organization/submission.php"; break;
+          default: window.location.href = "public/organization/submission.php"; break;
+        }
+      }, 1000);
     } catch (err) {
       return alert("Unable to connect to server. Try again later.");
     }

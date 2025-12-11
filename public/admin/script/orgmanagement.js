@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function fetchOrganizations() {
     try {
       const apiBase = API_CONFIG.organizationsEndpoint;
-      const response = await fetch(apiBase);
+      const response = await fetch(apiBase, { credentials: 'include' });
       const result = await response.json();
       organizations = result.success && result.data ? result.data : [];
       filteredData = [...organizations];
@@ -313,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const resp = await fetch(API_CONFIG.organizationsEndpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orgData)
       });
@@ -367,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const resp = await fetch(url, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -469,6 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`${API_CONFIG.organizationsEndpoint}/${orgToDelete}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         }
@@ -478,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         // Refresh organizations list
         organizations = await new Promise((resolve, reject) => {
-          fetch(API_CONFIG.organizationsEndpoint)
+          fetch(API_CONFIG.organizationsEndpoint, { credentials: 'include' })
             .then(res => res.json())
             .then(data => resolve(data.success ? data.data : []))
             .catch(reject);
@@ -665,11 +668,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const usersEndpoint = API_CONFIG.usersEndpoint || `${API_CONFIG.apiBase}/api/User`;
+      const usersEndpoint = API_CONFIG.usersEndpoint || `${API_CONFIG.apiBase}/api/users`;
       console.log('Creating user with data:', userData);
       
       const resp = await fetch(usersEndpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
       });

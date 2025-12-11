@@ -1,10 +1,4 @@
-/**
- * Validation middleware for common requests
- */
-
-/**
- * Validate user creation/update
- */
+//Validation
 const validateUser = (req, res, next) => {
   const { name, email, password, role } = req.body
 

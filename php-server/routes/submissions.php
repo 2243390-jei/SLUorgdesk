@@ -1,9 +1,6 @@
 <?php
-
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Load controllers and middleware
 require_once __DIR__ . '/../controllers/SubmissionController.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -12,6 +9,11 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// No cache headers
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Handle CORS preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -69,16 +71,38 @@ try {
         // Get request body
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // Check authorization for creating submission
-        // User must be submitting for their own organization
-        if ($user['role'] !== 'admin' && $user['role'] !== 'osas' && isset($data['orgId'])) {
-            if ($data['orgId'] !== $user['organizationId']) {
-                $response = ['success' => false, 'error' => 'Unauthorized: Cannot submit for another organization'];
+        // Check if this is a special action (like adding a revision)
+        if (isset($data['action']) && $data['action'] === 'addRevision') {
+            // Only OSAS can add revisions (case-insensitive check)
+            if (strtolower($user['role']) !== 'osas') {
+                $response = ['success' => false, 'error' => 'Unauthorized: Only OSAS can add revisions'];
+            } else {
+                // Update the submission with the revision comment
+                $updateData = [
+                    'revisionComment' => $data['revisionComment'] ?? '',
+                    'revisionDate' => date('Y-m-d H:i:s'),
+                    'revisionBy' => $user['name'] ?? $user['email'] ?? 'OSAS'
+                ];
+                $result = $controller->update($data['submissionId'], $updateData);
+                
+                if ($result['success']) {
+                    $response = ['success' => true, 'message' => 'Revision added successfully'];
+                } else {
+                    $response = ['success' => false, 'error' => $result['error'] ?? 'Failed to add revision'];
+                }
+            }
+        } else {
+            // Check authorization for creating submission
+            // User must be submitting for their own organization
+            if ($user['role'] !== 'admin' && $user['role'] !== 'osas' && isset($data['orgId'])) {
+                if ($data['orgId'] !== $user['organizationId']) {
+                    $response = ['success' => false, 'error' => 'Unauthorized: Cannot submit for another organization'];
+                } else {
+                    $response = $controller->create($data);
+                }
             } else {
                 $response = $controller->create($data);
             }
-        } else {
-            $response = $controller->create($data);
         }
     } elseif ($method === 'PUT') {
         // Check if ID is provided

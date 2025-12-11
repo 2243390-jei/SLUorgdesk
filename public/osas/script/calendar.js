@@ -165,7 +165,6 @@ function fromISO(iso) {
 }
 
 // Fetch Data
-// keep a simple helper for on-demand refresh of past events
 async function fetchData() {
     await renderPastEvents();
 }
