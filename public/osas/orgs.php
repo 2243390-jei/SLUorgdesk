@@ -17,13 +17,28 @@ if (empty($_SESSION['logged_in'])) {
 </head>
 <body>
   <div class="app">
-   
+    <!-- Add Mobile Header with Hamburger -->
+  <div class="mobile-header">
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="mobile-greeting">
+      <h1>OSAS Organizations</h1>
+    </div>
+    <div class="mobile-logo">
+      <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+    </div>
+  </div>
+
     <aside class="leftbar sidebar-expanded" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
           <div class="avatar">O</div>
           <div class="profile-text">
             <div class="admin-title">OSAS</div>
+            <div class="admin-sub">Organizations Dashboard</div>
           </div>
         </div>
       </div>
