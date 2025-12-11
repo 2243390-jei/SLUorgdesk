@@ -20,10 +20,9 @@ FEATURES:
 HOW TO RUN:
 
 1. PHP Server Setup:
-   - Place the project in your web server directory (e.g., htdocs for Apache/WAMP)
-   - Access the application via: http://localhost/Webtech(Finals)/SLUorgdesk/
-   - Ensure PHP and a MySQL database are configured
+   - Place the project in your web server directory (in the www directory for wamp server)
    - Check php-server/config/database.js for database connection settings
+   -
 
 2. Node.js Server Setup:
    - Navigate to the node-server directory
@@ -31,13 +30,8 @@ HOW TO RUN:
    - Run: npm start --host ip address
    - The Node.js server will run on the configured port (check config files)
 
-3. Database Setup:
-   - Import the database schema (if provided)
-   - Update database connection credentials in config files
+3. Access Steps
+   - Either use localhost or ip address using ip config to access the server
 
-4. Frontend Access:
-   - Admin Dashboard: http://localhost/Webtech(Finals)/SLUorgdesk/public/admin/
-   - Organization Pages: http://localhost/Webtech(Finals)/SLUorgdesk/public/organization/
-   - OSAS Dashboard: http://localhost/Webtech(Finals)/SLUorgdesk/public/osas/
 
 For more information, refer to the application documentation.

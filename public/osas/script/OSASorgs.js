@@ -734,45 +734,61 @@ function showSubmissionDetailsModal(eventData) {
   
   if (!modal || !modalBody) return;
   
-  // Store event data for revision submission
   currentEventData = eventData;
   
-  // Clear previous revision comment
   const revisionTextarea = document.getElementById('revisionComment');
-  if (revisionTextarea) {
-    revisionTextarea.value = '';
-  }
+  if (revisionTextarea) revisionTextarea.value = '';
   
-  // Update modal title
   document.getElementById('submissionDetailsModalTitle').textContent = eventData.eventName || 'Submission Details';
   
-  // Build the submission details HTML
   const sdgs = eventData.eventSDG && eventData.eventSDG.length > 0 
     ? eventData.eventSDG.map(sdg => `<span class="sdg-tag">${sdg}</span>`).join('')
     : '<span style="color: var(--muted);">None</span>';
-    
-  const docs = (eventData.supportingDocuments || []).length > 0
-    ? `<div class="document-links">${eventData.supportingDocuments.map((doc, i) => {
-        let docPath = doc;
-        if (doc.startsWith('http')) {
-          // Already a full URL, use as-is
-          docPath = doc;
-        } else if (doc.startsWith('/uploads/')) {
-          // Starts with /uploads/, prepend /Sluorgdesk/
-          docPath = `/SLUorgdesk${doc}`;
-        } else if (doc.startsWith('uploads/')) {
-          // Starts with uploads/, prepend /Sluorgdesk/
-          docPath = `/SLUorgdesk/${doc}`;
-        } else if (!doc.startsWith('/')) {
-          // Relative path, prepend /Sluorgdesk/
-          docPath = `/SLUorgdesk/${doc}`;
-        }
-        return `<a href="${docPath}" target="_blank" rel="noopener noreferrer">📄 Supporting Document ${i + 1}</a>`;
-      }).join('')}</div>`
-    : '<span style="color: var(--muted);">None</span>';
-    
-  const proofHTML = eventData.eventProof 
-    ? `<a href="${eventData.eventProof}" target="_blank" rel="noopener noreferrer">View Event Proof</a>`
+  
+  // Portable URL resolver
+  const toFullUrl = (raw) => {
+    if (!raw) return raw;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    const origin = window.location.origin;
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const appRoot = pathSegments.length ? `/${pathSegments[0]}` : '';
+    if (raw.startsWith('/')) {
+      if (appRoot && !raw.startsWith(appRoot + '/')) return origin + appRoot + raw;
+      return origin + raw;
+    }
+    if (raw.startsWith('uploads/')) {
+      return origin + (appRoot ? appRoot + '/' : '/') + raw;
+    }
+    try {
+      return new URL(raw, window.location.href).href;
+    } catch (e) {
+      return origin + (appRoot ? appRoot + '/' : '/') + raw;
+    }
+  };
+  
+  // Build supporting documents DOM (portable links)
+  let docsHTML = '<span style="color: var(--muted);">None</span>';
+  if (Array.isArray(eventData.supportingDocuments) && eventData.supportingDocuments.length > 0) {
+    const container = document.createElement('div');
+    container.className = 'document-links';
+    eventData.supportingDocuments.forEach((doc, i) => {
+      const href = toFullUrl(doc);
+      const filename = decodeURIComponent((doc.split('/').pop()) || `Document-${i+1}`);
+      const a = document.createElement('a');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = `📄 ${filename}`;
+      if (i) a.style.marginLeft = '8px';
+      container.appendChild(a);
+    });
+    docsHTML = container.outerHTML;
+  }
+  
+  // Make proof URL portable as well (optional but helpful)
+  const proofHref = eventData.eventProof ? toFullUrl(eventData.eventProof) : null;
+  const proofHTML = proofHref
+    ? `<a href="${proofHref}" target="_blank" rel="noopener noreferrer">View Event Proof</a>`
     : '<span style="color: var(--muted);">No proof uploaded</span>';
 
   const detailsHTML = `
@@ -824,7 +840,7 @@ function showSubmissionDetailsModal(eventData) {
       
       <div class="detail-section full-width">
         <label>Supporting Documents</label>
-        <div class="value">${docs}</div>
+        <div class="value">${docsHTML}</div>
       </div>
       
       ${eventData.eventDescription ? `
@@ -847,6 +863,7 @@ function showSubmissionDetailsModal(eventData) {
   modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
 }
+
 
 function hideSubmissionsModal() {
   const modal = document.getElementById('submissionsModal');
