@@ -1,10 +1,3 @@
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-  header('Location: ../../index.php');
-  exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -171,12 +164,24 @@ if (empty($_SESSION['logged_in'])) {
 
         <div class="createorg-modal-row">
           <label>School</label>
-          <input type="text" id="orgSchool" placeholder="Enter school" required>
+          <!-- changed to select with fixed school options -->
+          <select id="orgSchool" required>
+            <option value="SEA">SEA</option>
+            <option value="SAMCIS">SAMCIS</option>
+            <option value="SONAHBS">SONAHBS</option>
+            <option value="STELA">STELA</option>
+            <option value="SOM">SOM</option>
+            <option value="SOL">SOL</option>
+            <option value="UNIVERSITY-WIDE">UNIVERSITY-WIDE</option>
+          </select>
         </div>
 
         <div class="createorg-modal-row">
-          <label>Logo URL</label>
-          <input type="text" id="orgLogo" placeholder="Enter the URL Image Logo">
+          <label>Logo</label>
+          <!-- file input for selecting image from desktop -->
+          <input type="file" id="orgLogo" accept="image/*">
+          <!-- hidden input to store existing logo path when editing -->
+          <input type="hidden" id="orgLogoPath" value="">
         </div>
 
         <div class="createorg-modal-actions">
