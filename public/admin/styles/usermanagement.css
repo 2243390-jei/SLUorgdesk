@@ -517,6 +517,7 @@ tr:hover {
   flex-direction: column;
   gap: 10px;
   position: relative;
+  border: 1px solid #e2e8f0;
 }
 
 .card-header {
@@ -574,8 +575,244 @@ tr:hover {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
 }
 
 .card-actions .action-icon:hover {
   background: #2563eb;
+  color: #fff;
+}
+
+/* ========== MOBILE ========== */
+@media (max-width: 768px) {
+  .top-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .add-org-header-btn {
+    display: none;
+  }
+
+  .add-user-header-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    order: 1;
+  }
+
+  .search-wrap {
+    width: 100%;
+    order: 3;
+  }
+
+  #filterToggle {
+    order: 2;
+    width: 32px;
+    height: 32px;
+  }
+
+  .filter-menu {
+    width: 140px;
+    top: 40px;
+  }
+
+  /* Hide table container on mobile */
+  .table-container {
+    display: none !important;
+  }
+
+  /* Show card list on mobile */
+  .card-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-item {
+    padding: 14px 12px;
+  }
+
+  .card-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-meta {
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 430px) {
+  /* iPhone 14 Pro Max specific */
+  .top-actions {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .add-user-header-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 60px;
+  }
+
+  .search-wrap {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .search-wrap input[type="search"] {
+    padding: 10px 36px 10px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  #filterToggle {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  #filterToggle img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .filter-menu {
+    width: 130px;
+    right: -10px;
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .filter-item {
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  .card-item {
+    padding: 12px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .card-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .card-email {
+    font-size: 0.9rem;
+  }
+
+  .card-meta {
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .card-actions {
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .card-actions .action-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .modal-content {
+    width: calc(100% - 24px);
+    padding: 20px;
+  }
+
+  #modalTitle {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .form-group input,
+  .form-group select {
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .modal-buttons {
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .modal-buttons button {
+    min-width: auto;
+    flex: 1;
+    height: 36px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .createorg-modal-content {
+    width: 95%;
+    padding: 16px 18px;
+  }
+
+  .createorg-modal-row {
+    margin-bottom: 10px;
+  }
+
+  .createorg-modal-row label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .createorg-modal-row input,
+  .createorg-modal-row select,
+  .createorg-modal-row textarea {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .createorg-modal-actions {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .createorg-modal-actions button {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 100px;
+  }
 }
