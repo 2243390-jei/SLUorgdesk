@@ -37,15 +37,15 @@ if (empty($_SESSION['logged_in'])) {
         <div class="sidebar-profile">
           <div class="avatar">O</div>
           <div class="profile-text">
-            <div class="admin-title">OSAS ADMIN</div>
-            <div class="admin-sub">samcisrpg@slu.edu.ph</div>
+            <div class="admin-title">OSAS</div>
+            <div class="admin-sub">Calendar Dashboard</div>
           </div>
         </div>
       </div>
 
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
-          <li class="nav-item active" onclick="location.href='../osas/dashboard.php'">
+          <li class="nav-item active" onclick="location.href='../osas/calendar.php'">
             <img src="../Images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
