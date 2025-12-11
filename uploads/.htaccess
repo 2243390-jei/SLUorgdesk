@@ -1,4 +1,7 @@
-# Prevent direct access to PHP files unless allowed
+# Enable rewrite engine
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} -f
+
+# Redirect all requests to redirect.php
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ redirect.php [L]
