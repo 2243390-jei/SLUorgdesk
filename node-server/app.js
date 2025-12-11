@@ -1,4 +1,5 @@
 const express = require('express')
+const sessionConfig = require('./config/session')
 const cors = require('cors')
 const path = require('path')
 const { connectDB } = require('./config/database')
@@ -36,6 +37,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
+
+// Session middleware
+app.use(sessionConfig)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
