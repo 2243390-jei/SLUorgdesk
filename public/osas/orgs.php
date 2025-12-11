@@ -161,8 +161,13 @@ AuthMiddleware::requireRole('OSAS');
         <div class="modal-body" id="submissionDetailsBody">
           <!-- Submission details will be populated here -->
         </div>
+        <div class="revision-section">
+          <label for="revisionComment">Comment Revision:</label>
+          <textarea id="revisionComment" placeholder="Enter your comments or revisions here..." rows="4"></textarea>
+        </div>
         <div class="modal-footer">
           <button id="backToSubmissionsBtn" class="btn-secondary">Back to Submissions</button>
+          <button id="submitRevisionBtn" class="btn-primary">Submit Revision</button>
           <button id="closeSubmissionDetailsBtn" class="btn-secondary">Close All</button>
         </div>
       </div>

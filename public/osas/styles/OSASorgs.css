@@ -1352,6 +1352,39 @@ body {
   gap: 12px;
 }
 
+#submissionDetailsModal .revision-section {
+  background: #f9fafb;
+  padding: 20px 32px;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#submissionDetailsModal .revision-section label {
+  display: block;
+  font-weight: 600;
+  color: #26343f;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+#submissionDetailsModal .revision-section textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  resize: vertical;
+  color: #26343f;
+  transition: all 0.2s ease;
+}
+
+#submissionDetailsModal .revision-section textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 #submissionDetailsModal .submission-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

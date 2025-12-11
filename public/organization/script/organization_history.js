@@ -8,6 +8,7 @@ const academicYearFilter = document.getElementById("academicYearFilter");
 const semesterFilter = document.getElementById("semesterFilter");
 const modalEditBtn = document.getElementById("modalEditBtn");
 let isEditMode = false;
+let revisionRefreshInterval = null; // For polling revision comments
 
 // ======================================================
 // Fetch helper
@@ -344,12 +345,19 @@ function fillModal(sub) {
   modal.style.display = "flex";
   document.getElementById("modalClose").addEventListener("click", () => {
     modal.style.display = "none";
+    stopRevisionPolling();
   });
   setupEditToggle();
+  
+  // Start polling for revision comment updates (real-time)
+  startRevisionPolling(sub._id);
 }
 
 window.addEventListener("click", e => {
-  if (e.target === modal) modal.style.display = "none";
+  if (e.target === modal) {
+    modal.style.display = "none";
+    stopRevisionPolling();
+  }
 });
 
 // Toggle edit mode
@@ -476,6 +484,7 @@ const setupEditToggle = () => {
 modal.addEventListener("click", (e) => {
   if (e.target.id === "modalCancel") {
     modal.style.display = "none";
+    stopRevisionPolling();
   }
 });
 
@@ -512,3 +521,80 @@ window.getDocumentPreviewHTML = function(docPath) {
     return `<div class="doc-not-viewable"><p>Preview not available for this file type.</p><a href="${accessPath}" download="${fileName}" class="download-link">Download ${fileName}</a></div>`;
   }
 };
+// ======================================================
+// Real-time Revision Comment Polling
+// ======================================================
+function startRevisionPolling(submissionId) {
+  // Clear any existing polling
+  stopRevisionPolling();
+  
+  // Poll every 3 seconds for new revision comments
+  revisionRefreshInterval = setInterval(async () => {
+    try {
+      const response = await fetch(`${API_URL}?id=${submissionId}`);
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const submission = result.data;
+        
+        // Check if revision comment section exists and update it
+        // Find all modal-section elements and look for the one with "Revision / Notes" heading
+        const allSections = document.querySelectorAll('.modal-content .modal-section');
+        let revisionSection = null;
+        
+        for (let section of allSections) {
+          const heading = section.querySelector('h3');
+          if (heading && heading.textContent.includes('Revision')) {
+            revisionSection = section;
+            break;
+          }
+        }
+        
+        if (revisionSection) {
+          // Find the detail-line in this section
+          const revisionLine = revisionSection.querySelector('.detail-line');
+          if (revisionLine) {
+            const newComment = submission.revisionComment || '<span class="no-docs">No revision comments</span>';
+            
+            // Only update if content has changed
+            if (revisionLine.innerHTML !== newComment) {
+              revisionLine.innerHTML = newComment;
+              
+              // Add a subtle highlight animation to indicate update
+              revisionSection.style.backgroundColor = '#fffacd';
+              setTimeout(() => {
+                revisionSection.style.backgroundColor = 'transparent';
+                revisionSection.style.transition = 'background-color 0.5s ease';
+              }, 100);
+            }
+          }
+        }
+        
+        // Also update the submission in memory
+        const submissionIndex = allSubmissions.findIndex(s => s._id === submissionId);
+        if (submissionIndex >= 0) {
+          allSubmissions[submissionIndex].revisionComment = submission.revisionComment;
+        }
+      }
+    } catch (error) {
+      console.error('Error polling revision updates:', error);
+    }
+  }, 3000);
+}
+
+function stopRevisionPolling() {
+  if (revisionRefreshInterval) {
+    clearInterval(revisionRefreshInterval);
+    revisionRefreshInterval = null;
+  }
+}
+
+// Stop polling when modal closes or window unloads
+window.addEventListener("click", e => {
+  if (e.target === modal) {
+    modal.style.display = "none";
+    stopRevisionPolling();
+  }
+});
+
+window.addEventListener("beforeunload", stopRevisionPolling);

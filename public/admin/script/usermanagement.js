@@ -125,7 +125,7 @@ async function fetchUsers() {
     try {
         const apiBase = API_CONFIG.usersEndpoint;
         console.log('Fetching users from:', apiBase);
-        const response = await fetch(apiBase);
+        const response = await fetch(apiBase, { credentials: 'include' });
         console.log('Response status:', response.status);
         const result = await response.json();
         console.log('Fetched data:', result);
@@ -339,6 +339,7 @@ async function handleSubmit(event) {
             // Edit existing user - PATCH request
             const response = await fetch(`${API_CONFIG.usersEndpoint}/${userId}`, {
                 method: 'PATCH',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -359,6 +360,7 @@ async function handleSubmit(event) {
             // Create new user - POST request
             const response = await fetch(API_CONFIG.usersEndpoint, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -389,6 +391,7 @@ async function confirmDelete() {
     try {
         const response = await fetch(`${API_CONFIG.usersEndpoint}/${userToDelete}`, {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             }

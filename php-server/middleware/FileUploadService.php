@@ -145,7 +145,6 @@ class FileUploadService
         ];
     }
 
-
     private function generateUniqueFilename($originalName, $uploadDir)
     {
         // Extract file extension and name
