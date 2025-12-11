@@ -759,3 +759,65 @@ input::-ms-clear, input::-ms-reveal { display: none; width: 0; height: 0; }
   }
 }
 
+/* User Modal: Add User for Organization */
+#userModal .createorg-modal-content {
+  width: 92%;
+  max-width: 520px;
+  padding: 20px 24px;
+  border-radius: 12px;
+}
+
+#userModal .form-group {
+  margin-bottom: 12px;
+}
+
+#userModal .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--deep-blue);
+  font-size: 14px;
+}
+
+#userModal .form-group input,
+#userModal .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: #fff;
+}
+
+#userModal .createorg-modal-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+#userModal .confirm-btn {
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+#userModal .cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  #userModal .createorg-modal-content {
+    padding: 16px 18px;
+  }
+}
+

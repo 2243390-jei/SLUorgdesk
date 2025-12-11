@@ -46,7 +46,7 @@ try {
             $role = strtolower($result['data']['role'] ?? '');
             $redirectMap = [
                 'osas' => 'osas/calendar.php',
-                'admin' => 'admin/dashboard.php',
+                'admin' => 'admin/dashboard.html',
                 'organization' => 'organization/submission.php'
             ];
             $result['redirect'] = $redirectMap[$role] ?? 'organization/submission.php';
