@@ -12,7 +12,7 @@ if (empty($_SESSION['logged_in'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Osas Calendar — Past Events</title>
   <link rel="stylesheet" href="styles/calendar.css">
-  <link rel="icon" type="image/png" href="../Images/Icon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
 </head>
 <body>
   <div class="app">
@@ -27,7 +27,7 @@ if (empty($_SESSION['logged_in'])) {
         <h1>OSAS Calendar</h1>
       </div>
       <div class="mobile-logo">
-        <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
+        <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
       </div>
     </div>
 
@@ -46,15 +46,15 @@ if (empty($_SESSION['logged_in'])) {
       <nav class="sidebar-menu" aria-label="Sidebar">
         <ul>
           <li class="nav-item active" onclick="location.href='../osas/calendar.php'">
-            <img src="../Images/osas/calendar.png" alt="Calendar" class="menu-icon">
+            <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/orgs.php'">
-            <img src="../Images/osas/group.png" alt="Organizations" class="menu-icon">
+            <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
           <li class="nav-item" onclick="location.href='../osas/analytics.php'">
-            <img src="../Images/osas/statistics.png" alt="Analytics" class="menu-icon">
+            <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
         </ul>
@@ -62,7 +62,7 @@ if (empty($_SESSION['logged_in'])) {
 
       <div class="sidebar-footer">
         <button id="logoutBtn" class="btn-logout" title="Logout" aria-label="Logout">
-          <img src="../Images/osas/logout.png" alt="" class="menu-icon">
+          <img src="../images/osas/logout.png" alt="" class="menu-icon">
           <span class="menu-label">LOGOUT</span>
         </button>
       </div>
@@ -77,7 +77,7 @@ if (empty($_SESSION['logged_in'])) {
         </div>
 
         <div class="header-logo">
-          <img src="../Images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
+          <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
         </div>
       </header>
 
@@ -94,13 +94,13 @@ if (empty($_SESSION['logged_in'])) {
 
             <div class="calendar-controls">
               <button id="prevBtn" class="icon-btn" aria-label="Previous month">
-                <img src="../Images/osas/back.png" alt="Previous">
+                <img src="../images/osas/back.png" alt="Previous">
               </button>
               <button id="todayBtn" class="btn-small">
-                <img src="../Images/osas/calendar.png" alt="Today"> Today
+                <img src="../images/osas/calendar.png" alt="Today"> Today
               </button>
               <button id="nextBtn" class="icon-btn" aria-label="Next month">
-                <img src="../Images/osas/next.png" alt="Next">
+                <img src="../images/osas/next.png" alt="Next">
               </button>
             </div>
           </div>
@@ -138,7 +138,7 @@ if (empty($_SESSION['logged_in'])) {
       <aside id="detailPanel" class="detail-panel">
         <div class="detail-header">
           <button id="detailBack" class="detail-back" aria-label="Go back">
-            <img src="../Images/osas/back.png" alt="Back">
+            <img src="../images/osas/back.png" alt="Back">
             <span class="back-text">Back</span>
           </button>
           <div class="detail-header-content">
@@ -146,7 +146,7 @@ if (empty($_SESSION['logged_in'])) {
             <div id="detailMeta" class="muted"></div>
           </div>
           <button id="detailClose" class="detail-close" aria-label="Close">
-            <img src="../Images/osas/cross.png" alt="Close">
+            <img src="../images/osas/cross.png" alt="Close">
           </button>
         </div>
         <div id="detailBody" class="detail-body"></div>
@@ -158,7 +158,7 @@ if (empty($_SESSION['logged_in'])) {
           <div class="modal-header">
             <h3>Confirm Logout</h3>
             <button id="logoutModalClose" class="modal-close" aria-label="Close">
-              <img src="../Images/osas/cross.png" alt="Close">
+              <img src="../images/osas/cross.png" alt="Close">
             </button>
           </div>
           <div class="modal-body">
