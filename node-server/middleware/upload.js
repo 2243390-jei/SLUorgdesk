@@ -32,8 +32,7 @@ router.post('/upload_logo', upload.single('orgLogo'), (req, res) => {
     return res.status(400).json({ success: false, error: 'No file uploaded' });
   }
 
-  // return path that frontend can use in <img src="..."> from admin page (public/admin)
-  // using "../images/orgs/filename" keeps compatibility with existing frontend.
+//Path
   const relativePath = `../images/orgs/${req.file.filename}`;
 
   res.json({

@@ -1,9 +1,6 @@
 <?php
-
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Load controllers and middleware
 require_once __DIR__ . '/../controllers/SubmissionController.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
