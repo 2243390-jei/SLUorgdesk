@@ -12,6 +12,6 @@ router.get('/health', (req, res) => {
 // API Routes
 router.use('/api/User', usersRoutes)
 router.use('/api/Organizations', organizationsRoutes)
-router.use('/api/stats', statsRoutes)
+router.use('/api/stats', require('./stats'))
 
 module.exports = router
