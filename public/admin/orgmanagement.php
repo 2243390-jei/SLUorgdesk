@@ -1,10 +1,3 @@
-<?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-  header('Location: ../../index.php');
-  exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
