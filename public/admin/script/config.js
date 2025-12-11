@@ -8,8 +8,9 @@ const API_CONFIG = (() => {
   return {
     apiBase: apiBase,
     statsEndpoint: `${apiBase}/api/stats`,
-    organizationsEndpoint: `${apiBase}/api/Organizations`,
-    usersEndpoint: `${apiBase}/api/User`
+    // Use lowercase plural endpoints to match the Node server routes
+    organizationsEndpoint: `${apiBase}/api/organizations`,
+    usersEndpoint: `${apiBase}/api/users`
   };
 })();
 
