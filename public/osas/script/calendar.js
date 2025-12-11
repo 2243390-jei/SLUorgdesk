@@ -32,13 +32,20 @@ let viewDate = new Date();
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 let orgToSchoolMap = {};
+let orgByAcronym = {};
+let orgById = {};
+let orgByName = {};
 
 // Initialize
-function init() {
+async function init() {
     document.getElementById('curYear').textContent = new Date().getFullYear();
+    // ensure organization -> school map is loaded before rendering so transformSubmissions
+    // can inject the correct school value into each event
+    await fetchOrganizations();
     setupEventListeners();
-    renderCalendar();
-    fetchData();
+    // now render calendar and events (fetchSubmissions / transformSubmissions will use orgToSchoolMap)
+    await renderCalendar();
+    await renderPastEvents();
 }
 
 // Setup Event Listeners
@@ -152,8 +159,8 @@ function fromISO(iso) {
 }
 
 // Fetch Data
+// keep a simple helper for on-demand refresh of past events
 async function fetchData() {
-    await fetchOrganizations();
     await renderPastEvents();
 }
 
@@ -165,15 +172,34 @@ async function fetchOrganizations() {
         const result = await response.json();
         const organizations = result.success ? result.data : [];
         
+        // reset maps
         orgToSchoolMap = {};
+        orgByAcronym = {};
+        orgById = {};
+        orgByName = {};
+        
         organizations.forEach(org => {
-            if (org._id) {
-                const id = org._id.$oid || org._id;
-                orgToSchoolMap[id] = org.school;
+            // normalize possible id shapes
+            const id = org._id?.$oid || org._id || (org.id && (org.id.$oid || org.id)) || null;
+            const acronym = (org.acronym || '').toString().trim();
+            const name = (org.name || '').toString().trim();
+            const school = org.school || org.college || org.faculty || '';
+
+            if (id) {
+                orgById[id] = org;
+                orgToSchoolMap[id] = school;
+            }
+            if (acronym) {
+                orgByAcronym[acronym.toUpperCase()] = org;
+                // map acronym key to school as well for quick lookup
+                orgToSchoolMap[acronym.toUpperCase()] = school;
+            }
+            if (name) {
+                orgByName[name.toLowerCase()] = org;
             }
         });
         
-        return orgToSchoolMap;
+        return { orgToSchoolMap, orgByAcronym, orgById, orgByName };
     } catch (error) {
         console.error("Error fetching organizations:", error);
         return {};
@@ -206,8 +232,18 @@ async function fetchSubmissions(options = {}) {
 function transformSubmissions(submissions) {
     return submissions.map(submission => {
         const eventDate = submission.event?.eventDate ? new Date(submission.event.eventDate) : new Date();
-        const orgId = submission.orgInfo?._id?.$oid || submission.orgInfo?._id;
-        
+        const orgId = submission.orgInfo?._id?.$oid || submission.orgInfo?._id || submission.orgInfo?.orgId || null;
+        const acronym = (submission.orgInfo?.acronym || submission.org || '').toString().trim();
+        const orgName = (submission.orgInfo?.name || '').toString().trim();
+
+        // try to find organization record by id, then acronym, then name
+        let orgRecord = null;
+        if (orgId && orgById[orgId]) orgRecord = orgById[orgId];
+        if (!orgRecord && acronym) orgRecord = orgByAcronym[acronym.toUpperCase()];
+        if (!orgRecord && orgName) orgRecord = orgByName[orgName.toLowerCase()];
+
+        const resolvedSchool = orgRecord?.school || submission.orgInfo?.school || orgToSchoolMap[orgId] || orgToSchoolMap[acronym?.toUpperCase()] || 'Unknown';
+
         // Format SDG properly
         let sdgDisplay = "Not specified";
         if (submission.event?.eventSDG) {
@@ -234,8 +270,7 @@ function transformSubmissions(submissions) {
             description: `${submission.orgInfo?.name || 'Organization'} - ${submission.event?.eventName || 'Event'}`,
             submissionData: submission,
             eventData: submission.event || {},
-            status: submission.status || "Unknown",
-            school: orgToSchoolMap[orgId] || submission.orgInfo?.school || 'Unknown',
+            school: resolvedSchool,
             acronym: submission.orgInfo?.acronym || 'ORG',
             completeName: submission.orgInfo?.name || 'Organization',
             SDGCategory: sdgDisplay
@@ -421,7 +456,7 @@ async function renderPastEvents(filter = '') {
             </div>
             <div class="event-details">
                 <div class="event-desc">${event.completeName}</div>
-                <div class="event-extra">${event.category} • ${event.status}</div>
+                <div class="event-extra">${event.category}
                 ${event.SDGCategory !== "Not specified" ? 
                     `<span class="sdg-badge">${event.SDGCategory}</span>` : ''}
             </div>
@@ -509,10 +544,6 @@ function openDetailPanel(event) {
         <div class="detail-section">
             <h4>Submission Details</h4>
             <div class="detail-grid">
-                <div class="detail-item">
-                    <div class="detail-label">STATUS</div>
-                    <div class="detail-value">${event.status}</div>
-                </div>
                 <div class="detail-item">
                     <div class="detail-label">SUBMISSION ID</div>
                     <div class="detail-value">${event.id ? event.id.substring(0, 8) + '...' : 'N/A'}</div>
