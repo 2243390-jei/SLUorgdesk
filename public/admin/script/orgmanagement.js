@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function fetchOrganizations() {
     try {
       const apiBase = API_CONFIG.organizationsEndpoint;
-      const response = await fetch(apiBase);
+      const response = await fetch(apiBase, { credentials: 'include' });
       const result = await response.json();
       organizations = result.success && result.data ? result.data : [];
       filteredData = [...organizations];
@@ -301,11 +301,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (orgToEdit) {
       await editOrganization(orgData);
+      closeEditModal();
     } else {
       await addOrganization(orgData);
+      // Do NOT close modal here - let addOrganization handle it
     }
-
-    closeEditModal();
   }
 
   // Add new organization - Call Node.js API
@@ -313,17 +313,39 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const resp = await fetch(API_CONFIG.organizationsEndpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orgData)
       });
       const json = await resp.json();
+      console.log('Add org response:', json);
+      
       if (!json.success) {
         console.error('Add org failed:', json);
         alert('Failed to add organization.');
         return;
       }
+      
+      // Store the newly created organization ID and name
+      // Response has 'id' directly, not 'data._id'
+      window.newlyCreatedOrgId = json.id;
+      window.newlyCreatedOrgName = orgData.name;
+      console.log('Stored org ID:', window.newlyCreatedOrgId, 'Org Name:', window.newlyCreatedOrgName);
+      
       // refresh list
       await fetchOrganizations();
+      
+      // Close the organization modal
+      closeEditModal();
+      
+      // Show user creation modal for the newly created organization
+      if (window.newlyCreatedOrgId) {
+        console.log('Opening user modal...');
+        // Use a small delay to ensure DOM is ready
+        setTimeout(() => {
+          openUserModal();
+        }, 100);
+      }
     } catch (error) {
       console.error("Error adding organization:", error);
       alert('Error adding organization.');
@@ -346,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const resp = await fetch(url, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -381,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Open "Add Organization" modal
   function openAddModal() {
     orgToEdit = null;
-    if (orgFormTitle) orgFormTitle.textContent = "Add Organization";
+    if (orgFormTitle) orgFormTitle.textContent = "Add Organization Details";
     if (createOrgForm) createOrgForm.reset();
     const logoPathField = document.getElementById("orgLogoPath");
     if (logoPathField) logoPathField.value = "";
@@ -448,6 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`${API_CONFIG.organizationsEndpoint}/${orgToDelete}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         }
@@ -457,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         // Refresh organizations list
         organizations = await new Promise((resolve, reject) => {
-          fetch(API_CONFIG.organizationsEndpoint)
+          fetch(API_CONFIG.organizationsEndpoint, { credentials: 'include' })
             .then(res => res.json())
             .then(data => resolve(data.success ? data.data : []))
             .catch(reject);
@@ -586,6 +610,102 @@ document.addEventListener("DOMContentLoaded", () => {
   window.openEditModal = openEditModal;
   window.openAddModal = openAddModal;
   window.closeEditModal = closeEditModal;
+
+  // User Modal Functions
+  function openUserModal() {
+    console.log('openUserModal called');
+    const userModal = document.getElementById('userModal');
+    const userForm = document.getElementById('userForm');
+    
+    console.log('userModal element:', userModal);
+    console.log('userForm element:', userForm);
+    
+    if (userForm) {
+      userForm.reset();
+    }
+    if (userModal) {
+      userModal.style.display = 'flex';
+      console.log('User modal display set to flex');
+    }
+  }
+
+  function closeUserModal() {
+    const userModal = document.getElementById('userModal');
+    const userForm = document.getElementById('userForm');
+    if (userForm) {
+      userForm.reset();
+    }
+    if (userModal) {
+      userModal.style.display = 'none';
+    }
+  }
+
+  async function handleUserSubmit(e) {
+    e.preventDefault();
+    
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const roleInput = document.getElementById('role');
+
+    if (!nameInput || !emailInput || !passwordInput || !roleInput) {
+      alert('Form fields are missing');
+      return;
+    }
+
+    const userData = {
+      name: nameInput.value.trim(),
+      email: emailInput.value.trim(),
+      password: passwordInput.value.trim(),
+      role: roleInput.value,
+      organization: window.newlyCreatedOrgId, // Reference to the newly created organization
+      isActive: true
+    };
+
+    if (!userData.name || !userData.email || !userData.password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const usersEndpoint = API_CONFIG.usersEndpoint || `${API_CONFIG.apiBase}/api/users`;
+      console.log('Creating user with data:', userData);
+      
+      const resp = await fetch(usersEndpoint, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      const json = await resp.json();
+      console.log('User creation response:', json);
+      
+      if (!json.success) {
+        console.error('Add user failed:', json);
+        alert('Failed to add user: ' + (json.message || json.error || 'Unknown error'));
+        return;
+      }
+
+      alert(`User "${userData.name}" created successfully for organization "${window.newlyCreatedOrgName}"!`);
+      closeUserModal();
+      window.newlyCreatedOrgId = null;
+      window.newlyCreatedOrgName = null;
+    } catch (error) {
+      console.error("Error adding user:", error);
+      alert('Error adding user: ' + (error.message || 'Unknown error'));
+    }
+  }
+
+  // Wire up user form handler
+  const userForm = document.getElementById('userForm');
+  if (userForm) {
+    userForm.addEventListener('submit', handleUserSubmit);
+  }
+
+  // Expose user modal functions globally
+  window.openUserModal = openUserModal;
+  window.closeUserModal = closeUserModal;
 
   // Add form submit handler
   if (createOrgForm) {

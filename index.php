@@ -37,9 +37,10 @@
     </div>
   </div>
 
+  <script src="public/admin/script/config.js" defer></script>
   <script src="public/organization/script/main.js" defer></script>
 
-  <script>
+  <!-- <script>
     /* ==============================
        DISABLE INSPECT & DEV TOOLS
        ============================== */
@@ -54,7 +55,7 @@
         e.preventDefault();
       }
     });
-  </script>
+  </script> -->
 
 </body>
 </html>

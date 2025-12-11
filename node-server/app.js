@@ -1,4 +1,5 @@
 const express = require('express')
+const sessionConfig = require('./config/session')
 const cors = require('cors')
 const path = require('path')
 const { connectDB } = require('./config/database')
@@ -37,8 +38,23 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
+// Session middleware
+app.use(sessionConfig)
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Normalize legacy/case-mismatched API paths from older front-end builds
+// This helps when clients still request endpoints like '/api/User' or '/api/Organizations'
+// — we rewrite them to the canonical lowercase plural routes so requests succeed.
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/User')) {
+    req.url = req.url.replace(/^\/api\/User/, '/api/users')
+  } else if (req.url.startsWith('/api/Organizations')) {
+    req.url = req.url.replace(/^\/api\/Organizations/, '/api/organizations')
+  }
+  next()
+})
 
 // mount upload router so frontend can POST /api/upload_logo
 const uploadRouter = require('./middleware/upload');
