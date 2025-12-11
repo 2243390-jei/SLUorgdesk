@@ -44,11 +44,11 @@ try {
             if (isset($_GET['id'])) {
                 $response = $controller->getById($_GET['id']);
             } elseif (isset($_GET['role'])) {
-                // Get users by role (OSAS only)
+                // Get users by role 
                 AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByRole($_GET['role']);
             } elseif (isset($_GET['email'])) {
-                // Get user by email (OSAS only)
+                // Get user by email 
                 AuthMiddleware::requireRole('OSAS');
                 $response = $controller->getByEmail($_GET['email']);
             }

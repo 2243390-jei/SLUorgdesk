@@ -49,7 +49,6 @@ try {
             $response = $controller->getById($_GET['id']);
         } elseif (isset($_GET['organizationId'])) {
             // Get submissions by organization
-            // Non-admin users can only see their own org submissions
             if ($user['role'] !== 'Admin' && $user['role'] !== 'OSAS' && $_GET['organizationId'] !== $user['organizationId']) {
                 $response = ['success' => false, 'error' => 'Unauthorized: Cannot view submissions from another organization'];
             } else {
@@ -59,8 +58,7 @@ try {
             // Get submissions by academic year and semester
             $response = $controller->getByYearSemester($_GET['academicYear'], $_GET['semester']);
         } else {
-            // Get all submissions (restricted by role)
-            // Non-admin users only see their org's submissions
+            // Get all submissions
             if ($user['role'] !== 'Admin' && $user['role'] !== 'OSAS') {
                 $response = $controller->getByOrganization($user['organizationId']);
             } else {
@@ -71,9 +69,8 @@ try {
         // Get request body
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // Check if this is a special action (like adding a revision)
         if (isset($data['action']) && $data['action'] === 'addRevision') {
-            // Only OSAS can add revisions (case-insensitive check)
+            // Only OSAS can add revisions 
             if (strtolower($user['role']) !== 'osas') {
                 $response = ['success' => false, 'error' => 'Unauthorized: Only OSAS can add revisions'];
             } else {
@@ -105,8 +102,7 @@ try {
             }
         }
     } elseif ($method === 'PUT') {
-        // Check if ID is provided
-        // Users can update their own organization's submissions, admin/OSAS can update any
+        // Users can update their own organization's submissions
         if (!isset($_GET['id'])) {
             $response = ['success' => false, 'error' => 'ID required'];
         } else {
@@ -115,7 +111,7 @@ try {
                 // Get submission to check organization ownership
                 $submissionData = $controller->getById($_GET['id']);
                 
-                // Extract organization ID from submission (check both possible fields)
+                // Extract organization ID from submission 
                 $submissionOrgId = null;
                 if (isset($submissionData['data']['organizationId'])) {
                     $submissionOrgId = $submissionData['data']['organizationId'];

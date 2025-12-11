@@ -65,7 +65,7 @@ try {
                         'message' => count($uploadResult['success']) . ' file(s) uploaded successfully'
                     ];
                 } else {
-                    // Handle partial success - some files uploaded, some failed
+                    // Handle partial success 
                     $response = [
                         'success' => count($uploadResult['success']) > 0,
                         'errors' => $uploadResult['errors'],
