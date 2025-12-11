@@ -78,7 +78,7 @@ const getUserByEmail = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body
+        const { name, email, password, role, organization, isActive } = req.body
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, error: 'Missing required fields' })
@@ -89,7 +89,8 @@ const createUser = async (req, res) => {
             email,
             password,
             role: role || 'Organization',
-            isActive: true
+            organization: organization || null,
+            isActive: isActive !== undefined ? isActive : true
         })
 
         const savedUser = await newUser.save()
