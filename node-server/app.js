@@ -5,7 +5,7 @@ const { connectDB } = require('./config/database')
 const routes = require('./routes')
 const { notFound, errorHandler } = require('./middleware/errorHandler')
 
-// connect to DB (uses env MONGO_URI if present)
+// connect to DB 
 connectDB().catch((err) => console.error('DB connect failed:', err))
 
 const app = express()

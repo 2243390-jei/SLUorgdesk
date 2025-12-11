@@ -46,7 +46,6 @@
     // Disable right-click context menu
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
     document.addEventListener('keydown', (e) => {
       if (e.key === 'F12' || 
           (e.ctrlKey && e.shiftKey && e.key === 'I') ||
