@@ -1,0 +1,4 @@
+# Prevent direct access to PHP files unless allowed
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^.*$ redirect.php [L]
