@@ -13,22 +13,23 @@ let chartRoles = new Chart(ctxRoles, {
 // ======== Active Users Chart (Top Widget 2) ========
 const ctxActive = document.getElementById('chartActive').getContext('2d');
 let chartActive = new Chart(ctxActive, {
-    type: 'bar',
-    data: { labels: [], datasets: [{ label: 'Recent Activities', data: [], backgroundColor: '#4ea8ff' }] },
+    type: 'line',
+    data: { labels: [], datasets: [{
+        label: 'Monthly Activities',
+        data: [],
+        fill: true,
+        tension: 0.3,
+        backgroundColor: 'rgba(78,168,255,0.12)',
+        borderColor: '#4ea8ff',
+        pointBackgroundColor: '#4ea8ff',
+        pointRadius: 4
+    }]},
     options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { 
-                ticks: { color: '#fff' }, 
-                grid: { color: 'rgba(255,255,255,0.1)' }
-            },
-            y: { 
-                ticks: { display: false },
-                grid: { color: 'rgba(255,255,255,0.1)' },
-                beginAtZero: true,
-                max: 10
-            }
+            x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { ticks: { color: '#fff', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } }
     }
@@ -97,26 +98,78 @@ async function loadDashboardStats(period = '7d') {
             console.warn('Roles data missing or invalid', roles);
         }
 
-        // Recent activities
-        if (recentActivities && Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
-            chartActive.data.labels = recentActivities.labels;
-            chartActive.data.datasets[0].data = recentActivities.data;
-
-            // Dynamically adjust canvas width based on number of labels.
-            const numItems = recentActivities.labels.length || 1;
-            const canvasEl = document.getElementById('chartActive');
-            if (canvasEl) {
-                // set width with 'important' to override CSS "!important" if present
-                const px = Math.max(480, numItems * 72);
-                canvasEl.style.setProperty('width', px + 'px', 'important');
-                // also ensure parent scroll container allows horizontal scroll
-                const parent = canvasEl.closest('.chart-scroll-container');
-                if (parent) parent.style.overflowX = 'auto';
+        // Recent activities - support both { labels,data } and array of activity objects
+        const formatDate = (val) => {
+            if (!val) return 'Unknown';
+            // If value is an ObjectId string (24 hex chars), derive timestamp
+            if (typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val)) {
+                try {
+                    const ts = parseInt(val.substring(0, 8), 16) * 1000;
+                    const d = new Date(ts);
+                    if (!isNaN(d)) return d.toLocaleDateString();
+                } catch (e) { /* fallback below */ }
             }
+            // Numbers (timestamp) or string dates
+            try {
+                const d = (typeof val === 'number') ? new Date(val) : new Date(String(val));
+                if (!isNaN(d)) return d.toLocaleDateString();
+            } catch (e) { /* ignore */ }
+            // final fallback: return the string (trim) or 'Unknown'
+            const s = String(val || '').trim();
+            return s ? s : 'Unknown';
+        };
 
-            chartActive.update();
+        if (recentActivities) {
+            // Case A: legacy object with labels/data already prepared by backend
+            if (Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
+                chartActive.data.labels = recentActivities.labels;
+                chartActive.data.datasets[0].data = recentActivities.data;
+                // width adjust
+                const numItems = recentActivities.labels.length || 1;
+                const canvasEl = document.getElementById('chartActive');
+                if (canvasEl) {
+                    const px = Math.max(480, numItems * 72);
+                    canvasEl.style.setProperty('width', px + 'px', 'important');
+                    const parent = canvasEl.closest('.chart-scroll-container');
+                    if (parent) parent.style.overflowX = 'auto';
+                }
+                chartActive.update();
+            }
+            // Case B: recentActivities is an array of objects from backend: [{ createdAt, ... }, ...]
+            else if (Array.isArray(recentActivities) && recentActivities.length && typeof recentActivities[0] === 'object') {
+                // Aggregate activities by month for current year
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                const counts = new Array(12).fill(0);
+                const now = new Date();
+                const currentYear = now.getFullYear();
+
+                recentActivities.forEach(a => {
+                    const raw = a.createdAt || a.date || a.timestamp || a.created_at || a._id || a.id || a.submittedAt;
+                    let d = null;
+                    if (raw && typeof raw === 'string' && /^[0-9a-fA-F]{24}$/.test(raw)) {
+                        // ObjectId -> timestamp
+                        try {
+                            const ts = parseInt(raw.substring(0,8), 16) * 1000;
+                            d = new Date(ts);
+                        } catch (e) { d = null; }
+                    } else {
+                        d = raw ? new Date(raw) : null;
+                    }
+                    if (d && !isNaN(d)) {
+                        const y = d.getFullYear();
+                        const m = d.getMonth(); // 0-11
+                        if (y === currentYear) counts[m] += 1;
+                    }
+                });
+
+                chartActive.data.labels = months;
+                chartActive.data.datasets[0].data = counts;
+                chartActive.update();
+            } else {
+                console.warn('Recent Activities data missing or invalid', recentActivities);
+            }
         } else {
-            console.warn('Recent Activities data missing or invalid', recentActivities);
+            console.warn('Recent Activities not present in payload');
         }
 
         // Organizations (robust parsing - accepts multiple shapes)
