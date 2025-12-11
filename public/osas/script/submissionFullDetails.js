@@ -78,13 +78,38 @@ async function loadSubmissionDetails() {
     }
 
     const docsList = document.getElementById("supportingDocumentsList");
-    if (Array.isArray(event.supportingDocuments) && event.supportingDocuments.length > 0) {
-      docsList.innerHTML = event.supportingDocuments
-        .map(doc => `<li><a href="${doc}" target="_blank">${doc.split('/').pop() || 'View Document'}</a></li>`)
-        .join("");
-    } else {
-      docsList.innerHTML = "<li>No additional documents</li>";
-    }
+docsList.innerHTML = "";
+
+const segments = window.location.pathname.split('/').filter(Boolean);
+const appRoot = segments[0] ? `/${segments[0]}` : ""; 
+const origin = window.location.origin;
+const basePrefix = origin + appRoot;
+
+function toFullUrl(raw) {
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith('/')) return basePrefix + raw;      
+  return basePrefix + '/' + raw;                       
+}
+
+if (Array.isArray(event.supportingDocuments) && event.supportingDocuments.length > 0) {
+  event.supportingDocuments.forEach(raw => {
+    const href = toFullUrl(raw);
+    const filename = decodeURIComponent((raw.split('/').pop()) || 'View Document');
+
+    const a = document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = filename;
+
+    const li = document.createElement('li');
+    li.appendChild(a);
+    docsList.appendChild(li);
+  });
+} else {
+  docsList.innerHTML = "<li>No additional documents</li>";
+}
+
 
     // Add responsive behavior after loading content
     enhanceMobileExperience();

@@ -10,7 +10,7 @@ class AuthController {
     }
 
     public function validateLogin(array $data) {
-        // Extract and sanitize email and password
+        // Extract email and password
         $email = isset($data['email']) ? strtolower(trim($data['email'])) : '';
         $password = isset($data['password']) ? $data['password'] : '';
 

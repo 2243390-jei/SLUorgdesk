@@ -1,9 +1,6 @@
 <?php
-
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Load controllers and middleware
 require_once __DIR__ . '/../controllers/SubmissionController.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -12,6 +9,11 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// No cache headers
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Handle CORS preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
