@@ -745,52 +745,51 @@ function showSubmissionDetailsModal(eventData) {
     ? eventData.eventSDG.map(sdg => `<span class="sdg-tag">${sdg}</span>`).join('')
     : '<span style="color: var(--muted);">None</span>';
   
+  // Portable URL resolver — works in subfolder or root
 const toFullUrl = (raw) => {
   if (!raw) return raw;
+
+  // If it's already a full URL
   if (/^https?:\/\//i.test(raw)) return raw;
 
   const origin = window.location.origin;
-  const pathname = window.location.pathname;
-  const pathSegments = pathname.split('/').filter(Boolean);
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
 
-  // Determine app root: assume the first path segment is the app folder
-  // only if it doesn't look like a filename (has .php/.html etc.) or a resource file.
+  // Detect app root folder dynamically
+  // Assume first path segment is folder unless it's a file
   let appRoot = '';
   if (pathSegments.length > 0) {
-    const first = pathSegments[0].toLowerCase();
-    const looksLikeFile = first.includes('.') && (first.endsWith('.php') || first.endsWith('.html') || first.endsWith('.htm') || first.endsWith('.aspx'));
-    const commonStaticDirs = ['js','css','images','img','assets','api','php-server']; // optional heuristics
-    if (!looksLikeFile && !commonStaticDirs.includes(first)) {
-      appRoot = '/' + pathSegments[0];
-    }
+    const first = pathSegments[0];
+    const looksLikeFile = first.includes('.') && (first.endsWith('.php') || first.endsWith('.html') || first.endsWith('.htm'));
+    if (!looksLikeFile) appRoot = '/' + first;
   }
 
-  // Normalizer to join parts without duplicate slashes
-  const joinParts = (...parts) => parts.map(p => p.replace(/(^\/+|\/+$)/g, '')).filter(Boolean).join('/');
+  // Normalize function to avoid duplicate slashes
+  const joinParts = (...parts) => parts.map(p => p.replace(/^\/+|\/+$/g, '')).filter(Boolean).join('/');
 
-  // If raw is root-absolute (starts with '/')
+  // Root-relative paths (start with '/')
   if (raw.startsWith('/')) {
-    // If appRoot is present and raw already includes it, use raw as-is (origin + raw)
-    if (appRoot && raw.startsWith(appRoot + '/')) {
-      return origin + raw;
-    }
-    // If appRoot is present but raw does not include it, prefer origin + appRoot + raw
-    if (appRoot) {
-      return origin + '/' + joinParts(appRoot, raw);
-    }
-    // No appRoot — raw is already root-relative
-    return origin + raw;
+    // If it already starts with appRoot, just prefix origin
+    if (appRoot && raw.startsWith(appRoot + '/')) return origin + raw;
+    // Otherwise, prepend appRoot
+    if (appRoot) return origin + '/' + joinParts(appRoot, raw);
+    return origin + raw; // no app root detected
   }
 
-  // raw is relative like "uploads/..." or "../uploads/..."
-  // Prefer to resolve against app root if we detected one, otherwise resolve from origin root.
-  if (appRoot) {
+  // Relative paths like uploads/... or ../uploads/...
+  if (raw.startsWith('uploads/') || raw.startsWith('../') || raw.startsWith('./')) {
     return origin + '/' + joinParts(appRoot, raw);
   }
 
-  return origin + '/' + raw.replace(/^\/+/, '');
+  // fallback to URL constructor
+  try {
+    return new URL(raw, window.location.href).href;
+  } catch (e) {
+    return origin + '/' + joinParts(appRoot, raw);
+  }
 };
 
+  
   // Build supporting documents DOM (portable links)
   let docsHTML = '<span style="color: var(--muted);">None</span>';
   if (Array.isArray(eventData.supportingDocuments) && eventData.supportingDocuments.length > 0) {
