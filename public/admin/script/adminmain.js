@@ -98,9 +98,76 @@ function bindAdminLogout() {
   });
 }
 
+// Mobile menu toggle functionality
+function initMobileMenu() {
+  // Only initialize on mobile devices
+  if (window.innerWidth > 768) return;
+
+  const sidebar = document.getElementById('sidebar');
+  const sidebarNav = document.getElementById('sidebar-nav');
+  const sidebarFooter = document.getElementById('sidebar-footer');
+  
+  if (!sidebar || !sidebarNav) return;
+  if (sidebar._mobileMenuInit) return;
+  sidebar._mobileMenuInit = true;
+
+  // Create and add mobile menu toggle button if it doesn't exist
+  let menuToggle = document.querySelector('.mobile-menu-toggle');
+  if (!menuToggle) {
+    menuToggle = document.createElement('button');
+    menuToggle.className = 'mobile-menu-toggle';
+    menuToggle.setAttribute('aria-label', 'Toggle Menu');
+    menuToggle.innerHTML = '☰';
+    sidebar.appendChild(menuToggle);
+  }
+
+  // Toggle menu visibility
+  menuToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    sidebarNav.classList.toggle('active');
+    menuToggle.classList.toggle('active');
+  });
+
+  // Close menu when a navigation link is clicked
+  const navLinks = sidebarNav.querySelectorAll('a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      sidebarNav.classList.remove('active');
+      menuToggle.classList.remove('active');
+    });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && sidebarNav.classList.contains('active')) {
+      sidebarNav.classList.remove('active');
+      menuToggle.classList.remove('active');
+    }
+  });
+}
+
+// Handle window resize for responsive behavior
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    const sidebarNav = document.getElementById('sidebar-nav');
+    if (sidebarNav) {
+      sidebarNav.classList.remove('active');
+    }
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    if (menuToggle) {
+      menuToggle.classList.remove('active');
+    }
+  }
+});
+
 // Auto-bind on page load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bindAdminLogout);
+  document.addEventListener('DOMContentLoaded', () => {
+    bindAdminLogout();
+    initMobileMenu();
+  });
 } else {
   bindAdminLogout();
+  initMobileMenu();
 }

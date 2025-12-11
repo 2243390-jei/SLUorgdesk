@@ -102,15 +102,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const imgSrc = org.localLogoPath || '../images/user.png';
       card.innerHTML = `
         <div class="card-header">
-          <img src="${imgSrc}" alt="${org.name || ''}" class="card-logo" />
+          <img src="${imgSrc}" alt="${org.name || ''}" class="card-logo" onerror="this.src='../images/user.png'" />
           <div>
             <div class="card-title">${org.name || 'N/A'}</div>
             <div class="card-email">${org.email || 'N/A'}</div>
           </div>
         </div>
         <div class="card-meta">
-          <span>${org.isWhitelisted ? 'Organization' : 'Pending'}</span>
-          <span>${org.school || 'N/A'}</span>
+          <span><strong>Role:</strong> ${org.isWhitelisted ? 'Organization' : 'Pending'}</span>
+          <span><strong>School:</strong> ${org.school || 'N/A'}</span>
         </div>
         <div class="card-actions">
           <button class="action-icon edit-btn" data-id="${org._id}" title="Edit" onclick="openEditModal('${org._id}')"><i class="fas fa-edit"></i></button>
@@ -147,17 +147,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!orgCardList) return;
 
+    const orgTable = document.querySelector('.org-table');
+    
     if (isMobile()) {
-      orgCardList.style.display = 'flex';
-      if (orgTableBody.parentElement && orgTableBody.parentElement.parentElement) {
-        orgTableBody.parentElement.parentElement.style.display = 'none';
-      }
+      // Mobile view: show cards, hide table
+      if (orgCardList) orgCardList.style.display = 'flex';
+      if (orgTable) orgTable.style.display = 'none';
       renderCards();
     } else {
-      orgCardList.style.display = 'none';
-      if (orgTableBody.parentElement && orgTableBody.parentElement.parentElement) {
-        orgTableBody.parentElement.parentElement.style.display = '';
-      }
+      // Desktop view: show table, hide cards
+      if (orgCardList) orgCardList.style.display = 'none';
+      if (orgTable) orgTable.style.display = 'table';
     }
 
     updatePagination(totalPages);

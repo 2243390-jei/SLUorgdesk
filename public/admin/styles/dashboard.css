@@ -61,3 +61,74 @@
     display: block;
     flex-grow: 1;
 }
+
+/* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 768px) {
+  #top-widgets {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .widget-box {
+    height: 220px;
+    padding: 16px;
+  }
+
+  .widget-box h3 {
+    font-size: 14px;
+  }
+
+  .widget-box canvas {
+    height: 140px !important;
+  }
+
+  #bottom-widget .large-box {
+    height: 280px;
+    padding: 16px;
+  }
+
+  #bottom-widget .large-box h3 {
+    font-size: 14px;
+  }
+
+  #bottom-widget .large-box canvas {
+    height: 180px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  /* iPhone 14 Pro Max specific */
+  #top-widgets {
+    gap: 12px;
+  }
+
+  .widget-box {
+    height: 200px;
+    padding: 12px;
+  }
+
+  .widget-box h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .widget-box canvas {
+    height: 120px !important;
+  }
+
+  #bottom-widget .large-box {
+    height: 240px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  #bottom-widget .large-box h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  #bottom-widget .large-box canvas {
+    height: 150px !important;
+  }
+}
