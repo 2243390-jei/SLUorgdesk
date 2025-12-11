@@ -234,6 +234,14 @@ body {
     letter-spacing: 1.5px;
 }
 
+/* Bottom Actions Container */
+.bottom-actions {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 /* Pagination Controls */
 .pagination-controls {
   display: flex;
