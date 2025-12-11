@@ -98,9 +98,15 @@ function setupEventListeners() {
         if (e.target === logoutModal) hideLogoutModal();
     });
     
-    // Close mobile menu when clicking on nav items
+    // Navigation between pages
     document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', closeMobileMenu);
+        item.addEventListener('click', (e) => {
+            const page = item.getAttribute('data-page');
+            if (page) {
+                navigateToPage(page);
+            }
+            closeMobileMenu();
+        });
     });
 }
 
@@ -592,6 +598,19 @@ function performLogout() {
         console.error('Logout error:', err);
     }
     window.location.href = '../../index.php';
+}
+
+// Navigation function
+function navigateToPage(page) {
+    const pages = {
+        'calendar': 'calendar.php',
+        'orgs': 'orgs.php',
+        'analytics': 'analytics.php'
+    };
+    
+    if (pages[page]) {
+        window.location.href = pages[page];
+    }
 }
 
 // Initialize on load
