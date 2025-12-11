@@ -363,6 +363,67 @@ if (closeSubmissionDetailsBtn) {
   });
 }
 
+// Submit Revision Button
+const submitRevisionBtn = document.getElementById('submitRevisionBtn');
+let currentEventData = null; // Store current event data for submission
+
+if (submitRevisionBtn) {
+  submitRevisionBtn.addEventListener('click', async () => {
+    const revisionComment = document.getElementById('revisionComment').value.trim();
+    
+    if (!revisionComment) {
+      alert('Please enter a comment or revision before submitting.');
+      return;
+    }
+    
+    if (!currentEventData) {
+      alert('Error: Submission data not found.');
+      return;
+    }
+    
+    if (!currentEventData.submissionId) {
+      alert('Error: Submission ID not found. Please close and try again.');
+      console.error('currentEventData:', currentEventData);
+      return;
+    }
+    
+    try {
+      const payload = {
+        action: 'addRevision',
+        submissionId: currentEventData.submissionId,
+        revisionComment: revisionComment
+      };
+      
+      console.log('Sending revision payload:', payload);
+      
+      const response = await fetch('../../php-server/routes/submissions.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      console.log('Revision response:', result);
+      
+      if (result.success) {
+        alert('Revision submitted successfully!');
+        document.getElementById('revisionComment').value = ''; // Clear the textarea
+        hideSubmissionDetailsModal();
+        hideSubmissionsModal();
+      } else {
+        const errorMsg = result.error || result.message || 'Failed to submit revision';
+        console.error('Revision submission error:', errorMsg);
+        alert('Error: ' + errorMsg);
+      }
+    } catch (error) {
+      console.error('Error submitting revision:', error);
+      alert('Error submitting revision. Please try again.');
+    }
+  });
+}
+
 // Close modals on background click
 if (submissionsModal) {
   submissionsModal.addEventListener('click', (e) => {
@@ -526,6 +587,12 @@ function renderSubmissionsTable(submissions) {
     const eventVenue = event.eventVenue || 'N/A';
     const sdgs = event.eventSDG && event.eventSDG.length > 0 ? event.eventSDG.join(', ') : 'None';
     
+    // Store the submission ID with the event data
+    const eventDataWithId = {
+      ...event,
+      submissionId: sub._id
+    };
+    
     html += `
       <tr>
         <td>${eventName}</td>
@@ -533,7 +600,7 @@ function renderSubmissionsTable(submissions) {
         <td>${eventDate}</td>
         <td>${eventVenue}</td>
         <td class="sdg-cell">${sdgs}</td>
-        <td><button class="view-details-link" data-event='${JSON.stringify(event).replace(/'/g, "&#39;")}'>View Details</button></td>
+        <td><button class="view-details-link" data-event='${JSON.stringify(eventDataWithId).replace(/'/g, "&#39;")}'>View Details</button></td>
       </tr>
     `;
   });
@@ -666,6 +733,15 @@ function showSubmissionDetailsModal(eventData) {
   const modalBody = document.getElementById('submissionDetailsBody');
   
   if (!modal || !modalBody) return;
+  
+  // Store event data for revision submission
+  currentEventData = eventData;
+  
+  // Clear previous revision comment
+  const revisionTextarea = document.getElementById('revisionComment');
+  if (revisionTextarea) {
+    revisionTextarea.value = '';
+  }
   
   // Update modal title
   document.getElementById('submissionDetailsModalTitle').textContent = eventData.eventName || 'Submission Details';
