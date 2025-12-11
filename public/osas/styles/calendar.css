@@ -1,8 +1,8 @@
 /* Fonts */
-@font-face { font-family: "Inter"; src: url("../../fonts/Inter_18pt-Regular.ttf"); font-weight: 400; }
-@font-face { font-family: "Inter"; src: url("../../fonts/Inter_18pt-Medium.ttf"); font-weight: 500; }
-@font-face { font-family: "Inter"; src: url("../../fonts/Inter_18pt-SemiBold.ttf"); font-weight: 600; }
-@font-face { font-family: "Inter"; src: url("../../fonts/Inter_24pt-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url="../../fonts/Inter_18pt-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url="../../fonts/Inter_18pt-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url="../../fonts/Inter_18pt-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url="../../fonts/Inter_24pt-Bold.ttf"); font-weight: 700; }
 
 /* Variables & Reset */
 :root {
@@ -23,7 +23,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif
 }
 
 body {
@@ -43,7 +43,7 @@ body {
   background: var(--sidebar);
   padding: 0 16px;
   align-items: center;
-  z-index: 1000;
+  z-index: 1250; /* bring header above overlay/detail on mobile so nav is clickable */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -55,7 +55,7 @@ body {
   position: relative;
   cursor: pointer;
   padding: 0;
-  z-index: 1001;
+  z-index: 1251; /* ensure hamburger sits above overlay */
 }
 
 .mobile-menu-toggle span {
@@ -277,6 +277,7 @@ body {
 .calendar-section {
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .calendar-header {
@@ -385,12 +386,19 @@ body {
 /* Calendar Grid - STATIC CELL SIZES */
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  justify-items: stretch;
+  align-items: stretch;
+  align-content: start;
   gap: 12px;
   background: var(--deep-blue);
   padding: 20px;
   border-radius: 16px;
   min-height: 580px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .week {
@@ -417,6 +425,7 @@ body {
   min-height: 100px;
   height: 100px;
   overflow: hidden;
+  min-width: 0; /* allow cells to shrink inside grid without creating extra width */
 }
 
 .day.inactive {
@@ -461,6 +470,7 @@ body {
   line-height: 1.2;
   font-weight: 500;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .more-badge {
@@ -1029,59 +1039,87 @@ body {
   }
 }
 
-@media (max-width: 480px) {
-  .calendar-controls {
-    gap: 4px;
+/* Mobile fixes: make calendar truly fill available width and show back button */
+@media (max-width: 768px) {
+  .calendar-section {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
-  
-  .btn-small {
-    padding: 10px 12px;
-    font-size: 12px;
-    height: 40px;
-  }
-  
-  .icon-btn {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .month-display {
+
+  .calendar-grid {
+    /* force stable 7 columns that never cause overflow */
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: 1fr;        /* keep rows uniform */
+    gap: 6px;
     padding: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    align-content: start;
+    align-items: stretch;
+    justify-items: stretch;
+    overflow: hidden;          /* prevent horizontal overflow/gap */
   }
-  
-  .month-name {
-    font-size: 18px;
+
+  .day {
+    min-width: 0;              /* allow cells to shrink inside grid */
+    width: 100%;
+    box-sizing: border-box;
   }
-  
-  .year-name {
-    font-size: 14px;
+
+  .event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
   }
-  
+
+  .event-badge {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Make sure the sliding detail view back button is visible on mobile */
+  .detail-back {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+
+  .detail-back .back-text {
+    display: inline-block;
+  }
+
+  /* avoid page-level horizontal scrolling caused by the calendar */
+  .content-body,
+  .main-content,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Tighten for very small screens too */
+@media (max-width: 480px) {
   .calendar-grid {
     gap: 4px;
     padding: 8px;
   }
-  
+
   .day {
     min-height: 75px;
     height: 75px;
-    padding: 6px;
-    font-size: 12px;
   }
-  
-  .event-badge {
-    font-size: 8px;
-    padding: 2px 3px;
-  }
-  
-  /* Back button adjustments for very small screens */
+
   .detail-back {
-    padding: 8px 12px 8px 8px;
-    font-size: 14px;
-  }
-  
-  .detail-back .back-text {
-    display: inline-block; /* Always show text */
+    padding: 6px 10px;
   }
 }
 
@@ -1110,4 +1148,77 @@ body {
 @keyframes slideIn {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Mobile detail panel fixes: ensure back button and overlay sit above mobile header */
+@media (max-width: 768px) {
+  /* mobile header height is 60px — place detail panel below the fixed mobile header */
+  .overlay {
+    z-index: 1200;
+    /* keep overlay under header by ensuring header z-index > 1200 (set above) */
+  }
+
+  .detail-panel {
+    top: 60px; /* push below the fixed mobile header */
+    height: calc(100vh - 60px);
+    width: 100%;
+    z-index: 1210; /* above the overlay and header */
+  }
+
+  /* tighten header so back and close remain visible */
+  .detail-header {
+    min-height: 56px;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .detail-header-content {
+    /* keep title centered but avoid pushing the back button off-screen */
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .detail-back {
+    display: flex !important;
+    z-index: 1220;
+  }
+}
+
+/* ...existing code... */
+.mobile-header {
+  /* keep header always on top and interactive */
+  z-index: 3000 !important;
+  pointer-events: auto;
+}
+
+/* ensure hamburger is above everything inside the header */
+.mobile-menu-toggle {
+  z-index: 3001 !important;
+  pointer-events: auto;
+}
+
+/* sidebar sits under header but above page content */
+.sidebar {
+  z-index: 1200;
+  top: 0;
+}
+
+/* overlay: do not block clicks when hidden; when shown it will accept clicks */
+.overlay {
+  z-index: 1000;
+  pointer-events: none;
+}
+.overlay.show {
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+/* detail panel should appear above overlay but under header */
+.detail-panel {
+  z-index: 2000;
 }

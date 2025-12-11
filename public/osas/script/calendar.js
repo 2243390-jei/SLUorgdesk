@@ -281,7 +281,8 @@ async function renderCalendar() {
     
     // Next month
     const totalCells = calendarGrid.children.length;
-    const remaining = 7 - ((totalCells - 7) % 7);
+    // avoid adding 7 extra cells when already aligned: use mod 7
+    const remaining = (7 - ((totalCells - 7) % 7)) % 7;
     for (let i = 1; i <= remaining; i++) {
         const date = new Date(year, month + 1, i);
         calendarGrid.appendChild(createDayCell(date, true));
