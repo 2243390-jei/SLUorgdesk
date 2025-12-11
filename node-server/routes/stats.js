@@ -116,8 +116,7 @@ router.get('/', async (req, res) => {
       };
     });
 
-    console.log(`GET /api/stats -> orgs:${orgLabels.length}, roles:${roleLabels.length}, recentActivities:${recentActivities.length}`);
-
+    // send response (debug logging removed)
     return res.json({
       success: true,
       data: {
