@@ -1,9 +1,6 @@
 <?php
-session_start();
-if (empty($_SESSION['logged_in'])) {
-    header('Location: ../../index.php');
-    exit;
-}
+require_once __DIR__ . '/../../php-server/middleware/AuthMiddleware.php';
+AuthMiddleware::requireRole('Organization');
 ?>
 <!DOCTYPE html>
 <html lang="en">
