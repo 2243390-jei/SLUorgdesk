@@ -11,6 +11,7 @@ AuthMiddleware::requireRole('OSAS');
   <link rel="stylesheet" href="styles/osasmain.css">
   <link rel="stylesheet" href="styles/calendar.css">
   <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
+  <script src="script/profile.js" defer></script>
 </head>
 <body data-page="calendar">
 
@@ -30,13 +31,13 @@ AuthMiddleware::requireRole('OSAS');
     </div>
 
     <!-- Sidebar -->
-    <aside class="sidebar" aria-label="Main navigation">
+     <aside class="sidebar" aria-label="Main navigation">
       <div class="sidebar-top">
         <div class="sidebar-profile">
-          <div class="avatar">O</div>
+          <img id="profile-icon" src="../images/user.png" alt="Profile Icon" width="32" height="32">
           <div class="profile-text">
-            <div class="admin-title">OSAS</div>
-            <div class="admin-sub" id="desktopPageTitle">Calendar Dashboard</div>
+            <div class="admin-name">OSAS</div>
+            <div class="admin-email">Loading...</div>
           </div>
         </div>
       </div>
