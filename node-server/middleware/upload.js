@@ -26,7 +26,7 @@ function fileFilter(req, file, cb) {
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
 
-// POST /api/upload_logo
+
 router.post('/upload_logo', upload.single('orgLogo'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, error: 'No file uploaded' });
