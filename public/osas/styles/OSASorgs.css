@@ -1517,5 +1517,11 @@ body {
   #submissionDetailsModal .document-links a {
     padding: 12px 14px;
     font-size: 13px;
+    
   }
+}
+@media (max-width: 768px) {
+    #header-logo {
+        display: none;
+    }
 }
