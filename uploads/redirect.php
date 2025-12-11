@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// Example: Only allow admin role to access
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+// Allow only OSAS to access this directory
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'OSAS') {
     // Redirect unauthorized users
-    header('Location: /login.php');
+    header('Location: ../index.php');
     exit();
 }
 

@@ -988,7 +988,6 @@ document.addEventListener("DOMContentLoaded", function () {
    *      Make time inputs open picker when clicked anywhere
    * ----------------------------------------------------------------- */
 
-
   [startTimeInput, endTimeInput].forEach(input => {
     if (input) {
       input.addEventListener("click", () => {

@@ -161,6 +161,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 180px;
 }
 
 .nav-item {
