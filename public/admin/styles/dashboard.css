@@ -23,9 +23,8 @@
 }
 
 .widget-box canvas {
-    /* allow JS to control width for the scrollable chart */
-    width: auto;
-    height: 200px;
+    width: 100% !important;
+    height: 200px !important; 
     display: block;
     flex-grow: 1;
 }
@@ -57,8 +56,8 @@
 }
 
 #bottom-widget .large-box canvas {
-    width: auto;
-    height: 250px;
+    width: 100% !important;
+    height: 250px !important; 
     display: block;
     flex-grow: 1;
 }

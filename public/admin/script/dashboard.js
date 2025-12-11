@@ -10,7 +10,7 @@ let chartRoles = new Chart(ctxRoles, {
     }
 });
 
-// ======== Active Users Chart (Top Widget 2) ========
+// ======== Monthly Activities Chart (Top Widget 2) ========
 const ctxActive = document.getElementById('chartActive').getContext('2d');
 let chartActive = new Chart(ctxActive, {
     type: 'line',
@@ -29,7 +29,7 @@ let chartActive = new Chart(ctxActive, {
         maintainAspectRatio: false,
         scales: {
             x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-            y: { ticks: { color: '#fff', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
+            y: { ticks: { color: '#fff', beginAtZero: true }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } }
     }
@@ -48,8 +48,7 @@ let chartSchools = new Chart(ctxSchools, {
             y: { 
                 ticks: { color: '#fff', stepSize: 1 },
                 grid: { color: 'rgba(255,255,255,0.1)' },
-                beginAtZero: true,
-                max: 10
+                beginAtZero: true
             }
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } }
@@ -62,6 +61,39 @@ function generatePalette(n) {
     const out = [];
     for (let i=0;i<n;i++) out.push(base[i % base.length]);
     return out;
+}
+
+// new: cache for organizations map
+const _orgNameMap = {};
+
+// new: fetch organizations list and build a lookup map (id, acronym, lower-name -> display name)
+async function fetchOrganizationsMap() {
+    if (Object.keys(_orgNameMap).length > 0) return _orgNameMap;
+
+    const endpoint = (typeof API_CONFIG !== 'undefined' && API_CONFIG.orgsEndpoint) ? API_CONFIG.orgsEndpoint : '/api/organizations';
+    try {
+        const res = await fetch(endpoint, { credentials: 'include' });
+        if (!res.ok) {
+            console.warn('Failed to load organizations map:', res.status, res.statusText);
+            return _orgNameMap;
+        }
+        const payload = await res.json();
+        const list = Array.isArray(payload) ? payload : (payload?.data || payload?.organizations || []);
+        if (!Array.isArray(list)) return _orgNameMap;
+
+        list.forEach(org => {
+            if (!org) return;
+            const id = org.id ?? org._id ?? org.org_id ?? org.orgId;
+            const name = org.name ?? org.orgName ?? org.title;
+            const acronym = org.acronym ?? org.short ?? org.code;
+            if (id) _orgNameMap[String(id)] = name || String(acronym || id);
+            if (acronym) _orgNameMap[String(acronym)] = name || String(acronym);
+            if (name) _orgNameMap[String(name).toLowerCase()] = name;
+        });
+    } catch (err) {
+        console.warn('Error fetching organizations map', err);
+    }
+    return _orgNameMap;
 }
 
 // Fetch stats from Node.js API endpoint and update charts
@@ -98,140 +130,63 @@ async function loadDashboardStats(period = '7d') {
             console.warn('Roles data missing or invalid', roles);
         }
 
-        // Recent activities - support both { labels,data } and array of activity objects
-        const formatDate = (val) => {
-            if (!val) return 'Unknown';
-            // If value is an ObjectId string (24 hex chars), derive timestamp
-            if (typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val)) {
-                try {
-                    const ts = parseInt(val.substring(0, 8), 16) * 1000;
-                    const d = new Date(ts);
-                    if (!isNaN(d)) return d.toLocaleDateString();
-                } catch (e) { /* fallback below */ }
-            }
-            // Numbers (timestamp) or string dates
-            try {
-                const d = (typeof val === 'number') ? new Date(val) : new Date(String(val));
-                if (!isNaN(d)) return d.toLocaleDateString();
-            } catch (e) { /* ignore */ }
-            // final fallback: return the string (trim) or 'Unknown'
-            const s = String(val || '').trim();
-            return s ? s : 'Unknown';
-        };
+        // Recent activities -> aggregate by month (Jan..Dec) for current year
+        if (Array.isArray(recentActivities)) {
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const counts = new Array(12).fill(0);
+            const now = new Date();
+            const currentYear = now.getFullYear();
 
-        if (recentActivities) {
-            // Case A: legacy object with labels/data already prepared by backend
-            if (Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
-                chartActive.data.labels = recentActivities.labels;
-                chartActive.data.datasets[0].data = recentActivities.data;
-                // width adjust
-                const numItems = recentActivities.labels.length || 1;
-                const canvasEl = document.getElementById('chartActive');
-                if (canvasEl) {
-                    const px = Math.max(480, numItems * 72);
-                    canvasEl.style.setProperty('width', px + 'px', 'important');
-                    const parent = canvasEl.closest('.chart-scroll-container');
-                    if (parent) parent.style.overflowX = 'auto';
+            recentActivities.forEach(a => {
+                const raw = a.createdAt || a.date || a.timestamp || a.created_at || a._id || a.id || a.submittedAt || a.time;
+                let d = null;
+                if (raw && typeof raw === 'string' && /^[0-9a-fA-F]{24}$/.test(raw)) {
+                    // ObjectId -> timestamp
+                    try {
+                        const ts = parseInt(raw.substring(0,8), 16) * 1000;
+                        d = new Date(ts);
+                    } catch (e) { d = null; }
+                } else {
+                    d = raw ? new Date(raw) : null;
                 }
-                chartActive.update();
-            }
-            // Case B: recentActivities is an array of objects from backend: [{ createdAt, ... }, ...]
-            else if (Array.isArray(recentActivities) && recentActivities.length && typeof recentActivities[0] === 'object') {
-                // Aggregate activities by month for current year
-                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                const counts = new Array(12).fill(0);
-                const now = new Date();
-                const currentYear = now.getFullYear();
-
-                recentActivities.forEach(a => {
-                    const raw = a.createdAt || a.date || a.timestamp || a.created_at || a._id || a.id || a.submittedAt;
-                    let d = null;
-                    if (raw && typeof raw === 'string' && /^[0-9a-fA-F]{24}$/.test(raw)) {
-                        // ObjectId -> timestamp
-                        try {
-                            const ts = parseInt(raw.substring(0,8), 16) * 1000;
-                            d = new Date(ts);
-                        } catch (e) { d = null; }
-                    } else {
-                        d = raw ? new Date(raw) : null;
-                    }
-                    if (d && !isNaN(d)) {
-                        const y = d.getFullYear();
-                        const m = d.getMonth(); // 0-11
-                        if (y === currentYear) counts[m] += 1;
-                    }
-                });
-
-                chartActive.data.labels = months;
-                chartActive.data.datasets[0].data = counts;
-                chartActive.update();
-            } else {
-                console.warn('Recent Activities data missing or invalid', recentActivities);
-            }
-        } else {
-            console.warn('Recent Activities not present in payload');
-        }
-
-        // Organizations (robust parsing - accepts multiple shapes)
-        (function handleOrganizations(organizations) {
-            const fallbackSchools = ['SEA','SAMCIS','SONAHBS','STELA','SOM','SOL','UNIVERSITY-WIDE'];
-            let orgLabels = [], orgData = [];
-
-            if (organizations) {
-                // Case A: { labels: [], data: [] }
-                if (Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
-                    orgLabels = organizations.labels.slice();
-                    orgData = organizations.data.slice();
+                if (d && !isNaN(d)) {
+                    const y = d.getFullYear();
+                    const m = d.getMonth(); // 0-11
+                    if (y === currentYear) counts[m] += 1;
                 }
-                // Case B: array of objects [{ label/name/school, value/... }, ...]
-                else if (Array.isArray(organizations) && organizations.length && typeof organizations[0] === 'object') {
-                    organizations.forEach(item => {
-                        let label = item.label || item.name || item.school || item.schoolName || item.acronym || '';
-                        if (label === null || typeof label === 'undefined') label = '';
-                        label = String(label).trim();
-                        if (!label) label = 'Unassigned';
-                        const value = (item.value ?? item.count ?? item.users ?? item.total ?? item.amount ?? 0);
-                        orgLabels.push(label);
-                        orgData.push(Number(value) || 0);
-                    });
-                }
-                // Case C: object map { "SAMCIS": 12, "SEA": 3, ... }
-                else if (typeof organizations === 'object' && !Array.isArray(organizations)) {
-                    for (const [k, v] of Object.entries(organizations)) {
-                        const label = (k && String(k).trim()) || 'Unassigned';
-                        orgLabels.push(label);
-                        orgData.push(Number(v) || 0);
-                    }
-                }
-                // Case D: simple numeric array [4,1,1,...] -> assume fallback school order
-                else if (Array.isArray(organizations) && organizations.length && organizations.every(n => typeof n === 'number')) {
-                    orgData = organizations.slice();
-                    orgLabels = fallbackSchools.slice(0, orgData.length);
-                }
-            }
-
-            // Normalize labels and replace empty/unknown tokens
-            orgLabels = orgLabels.map(l => {
-                if (!l || String(l).trim().length === 0) return 'Unassigned';
-                const s = String(l).trim();
-                if (['unknown','null','undefined',''].includes(s.toLowerCase())) return 'Unassigned';
-                return s;
             });
 
-            // If nothing found, fall back to a known school list (no "Unknown")
-            if (orgLabels.length === 0 || orgData.length === 0) {
-                console.warn('Organizations data missing or unexpected shape:', organizations);
-                const fallback = fallbackSchools;
-                chartSchools.data.labels = fallback;
-                chartSchools.data.datasets[0].data = new Array(fallback.length).fill(0);
-                chartSchools.data.datasets[0].backgroundColor = generatePalette(fallback.length);
-            } else {
-                chartSchools.data.labels = orgLabels.slice(0, 10);
-                chartSchools.data.datasets[0].data = orgData.slice(0, 10);
-                chartSchools.data.datasets[0].backgroundColor = generatePalette(Math.min(10, orgData.length));
-            }
+            chartActive.data.labels = months;
+            chartActive.data.datasets[0].data = counts;
+            chartActive.update();
+        } else if (recentActivities && Array.isArray(recentActivities.labels) && Array.isArray(recentActivities.data)) {
+            // legacy server-provided shape
+            chartActive.data.labels = recentActivities.labels;
+            chartActive.data.datasets[0].data = recentActivities.data;
+            chartActive.update();
+        } else {
+            console.warn('Recent Activities data missing or invalid', recentActivities);
+        }
+
+        // Organizations - map labels using org list so we show names instead of Unknown/IDs
+        if (organizations && Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
+            await fetchOrganizationsMap();
+            const mapped = organizations.labels.map(lbl => {
+                if (lbl === null || lbl === undefined) return 'Unknown';
+                const s = String(lbl);
+                return _orgNameMap[s] || _orgNameMap[s.toLowerCase()] || (s.trim() ? s : 'Unknown');
+            });
+
+            const topLabels = mapped.slice(0, 10);
+            const topData = organizations.data.slice(0, 10);
+
+            chartSchools.data.labels = topLabels;
+            chartSchools.data.datasets[0].data = topData;
+            chartSchools.data.datasets[0].backgroundColor = generatePalette(topLabels.length);
             chartSchools.update();
-        })(organizations);
+        } else {
+            console.warn('Organizations data missing or invalid', organizations);
+        }
 
     } catch (err) {
         console.error('Error loading dashboard stats', err);
