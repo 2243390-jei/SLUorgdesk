@@ -10,7 +10,7 @@ class SubmissionController {
     }
 
     public function getAll() {
-        // Get pagination params with defaults
+        // Get params with defaults
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
         // Fetch all submissions
