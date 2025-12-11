@@ -1,4 +1,4 @@
-const Organization = require('../models/Organization')
+const Organization = require('../models/Organization');
 
 const getAllOrganization = async (req, res) => {
     try {
@@ -99,22 +99,35 @@ const createOrganization = async (req, res) => {
 }
 
 const updateOrganization = async (req, res) => {
+    const id = req.params.id || req.body._id || req.body.id;
+    console.log('UPDATE ORGANIZATION REQUEST. id=', id, 'body=', req.body);
+
+    if (!id) {
+        return res.status(400).json({ success: false, error: 'Missing organization id' });
+    }
+
     try {
-        const { id } = req.params
-        const updateData = req.body
+        // Filter allowed fields to avoid accidental overwrites (optional)
+        const update = {};
+        const allowed = ['name','acronym','email','school','isWhitelisted','localLogoPath','logo'];
+        allowed.forEach(k => {
+          if (typeof req.body[k] !== 'undefined') update[k] = req.body[k];
+        });
 
-        updateData.updatedAt = new Date()
-
-        const result = await Organization.findByIdAndUpdate(id, updateData, { new: true })
-
-        if (!result) {
-            return res.status(404).json({ success: false, error: 'Organization not found' })
+        // If nothing to update, return error
+        if (Object.keys(update).length === 0) {
+          return res.status(400).json({ success: false, error: 'No updatable fields provided' });
         }
 
-        res.status(200).json({ success: true })
+        const updated = await Organization.findByIdAndUpdate(id, update, { new: true, runValidators: true });
+        if (!updated) {
+          return res.status(404).json({ success: false, error: 'Organization not found' });
+        }
+
+        res.json({ success: true, data: updated });
     } catch (err) {
-        console.error('Error update organization:', err)
-        res.status(500).json({ success: false, error: 'Failed to update organization', details: err.message })
+        console.error('Error updating organization:', err);
+        res.status(500).json({ success: false, error: err.message || 'Server error' });
     }
 }
 

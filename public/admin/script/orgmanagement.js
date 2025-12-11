@@ -334,28 +334,35 @@ document.addEventListener("DOMContentLoaded", () => {
   async function editOrganization(orgData) {
     if (!orgToEdit) return;
     try {
+      // include _id and multiple logo keys to match possible backend expectations
+      const payload = Object.assign({}, orgData, {
+        _id: orgToEdit,
+        id: orgToEdit,
+        logo: orgData.localLogoPath || orgData.logo || "",
+      });
+
       const url = `${API_CONFIG.organizationsEndpoint}/${orgToEdit}`;
-      console.log('Sending UPDATE to', url, 'payload:', orgData);
+      console.log('Sending UPDATE to', url, 'payload:', payload);
+
       const resp = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orgData)
+        body: JSON.stringify(payload)
       });
 
-      // Prefer robust error handling: try JSON, otherwise show text
-      let json;
       const text = await resp.text();
+      let json;
       try {
         json = text ? JSON.parse(text) : {};
       } catch (parseErr) {
         console.error('Edit org: response is not JSON:', text);
-        alert('Update failed: server returned invalid response.');
+        alert('Update failed: server returned invalid response. See console for details.');
         return;
       }
 
       if (!resp.ok || !json.success) {
         console.error('Edit org failed:', resp.status, json);
-        alert('Failed to update organization: ' + (json.error || json.message || 'Unknown error'));
+        alert('Failed to update organization: ' + (json.error || json.message || JSON.stringify(json)));
         return;
       }
 
@@ -363,7 +370,8 @@ document.addEventListener("DOMContentLoaded", () => {
       await fetchOrganizations();
       orgToEdit = null;
       closeEditModal();
-      alert('Organization updated successfully.');
+      // optional non-blocking notice
+      console.log('Organization updated:', json.data || json);
     } catch (error) {
       console.error("Error editing organization:", error);
       alert('Error editing organization: ' + (error.message || error));

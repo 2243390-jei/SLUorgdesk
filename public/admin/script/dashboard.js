@@ -119,15 +119,66 @@ async function loadDashboardStats(period = '7d') {
             console.warn('Recent Activities data missing or invalid', recentActivities);
         }
 
-        // Organizations
-        if (organizations && Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
-            chartSchools.data.labels = organizations.labels.slice(0, 10);
-            chartSchools.data.datasets[0].data = organizations.data.slice(0, 10);
-            chartSchools.data.datasets[0].backgroundColor = generatePalette(Math.min(10, organizations.data.length));
+        // Organizations (robust parsing - accepts multiple shapes)
+        (function handleOrganizations(organizations) {
+            const fallbackSchools = ['SEA','SAMCIS','SONAHBS','STELA','SOM','SOL','UNIVERSITY-WIDE'];
+            let orgLabels = [], orgData = [];
+
+            if (organizations) {
+                // Case A: { labels: [], data: [] }
+                if (Array.isArray(organizations.labels) && Array.isArray(organizations.data)) {
+                    orgLabels = organizations.labels.slice();
+                    orgData = organizations.data.slice();
+                }
+                // Case B: array of objects [{ label/name/school, value/... }, ...]
+                else if (Array.isArray(organizations) && organizations.length && typeof organizations[0] === 'object') {
+                    organizations.forEach(item => {
+                        let label = item.label || item.name || item.school || item.schoolName || item.acronym || '';
+                        if (label === null || typeof label === 'undefined') label = '';
+                        label = String(label).trim();
+                        if (!label) label = 'Unassigned';
+                        const value = (item.value ?? item.count ?? item.users ?? item.total ?? item.amount ?? 0);
+                        orgLabels.push(label);
+                        orgData.push(Number(value) || 0);
+                    });
+                }
+                // Case C: object map { "SAMCIS": 12, "SEA": 3, ... }
+                else if (typeof organizations === 'object' && !Array.isArray(organizations)) {
+                    for (const [k, v] of Object.entries(organizations)) {
+                        const label = (k && String(k).trim()) || 'Unassigned';
+                        orgLabels.push(label);
+                        orgData.push(Number(v) || 0);
+                    }
+                }
+                // Case D: simple numeric array [4,1,1,...] -> assume fallback school order
+                else if (Array.isArray(organizations) && organizations.length && organizations.every(n => typeof n === 'number')) {
+                    orgData = organizations.slice();
+                    orgLabels = fallbackSchools.slice(0, orgData.length);
+                }
+            }
+
+            // Normalize labels and replace empty/unknown tokens
+            orgLabels = orgLabels.map(l => {
+                if (!l || String(l).trim().length === 0) return 'Unassigned';
+                const s = String(l).trim();
+                if (['unknown','null','undefined',''].includes(s.toLowerCase())) return 'Unassigned';
+                return s;
+            });
+
+            // If nothing found, fall back to a known school list (no "Unknown")
+            if (orgLabels.length === 0 || orgData.length === 0) {
+                console.warn('Organizations data missing or unexpected shape:', organizations);
+                const fallback = fallbackSchools;
+                chartSchools.data.labels = fallback;
+                chartSchools.data.datasets[0].data = new Array(fallback.length).fill(0);
+                chartSchools.data.datasets[0].backgroundColor = generatePalette(fallback.length);
+            } else {
+                chartSchools.data.labels = orgLabels.slice(0, 10);
+                chartSchools.data.datasets[0].data = orgData.slice(0, 10);
+                chartSchools.data.datasets[0].backgroundColor = generatePalette(Math.min(10, orgData.length));
+            }
             chartSchools.update();
-        } else {
-            console.warn('Organizations data missing or invalid', organizations);
-        }
+        })(organizations);
 
     } catch (err) {
         console.error('Error loading dashboard stats', err);

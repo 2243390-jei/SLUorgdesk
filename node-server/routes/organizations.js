@@ -10,7 +10,11 @@ router.get('/filtered', organizationsController.getFilteredOrganizations)
 router.get('/', organizationsController.getAllOrganization)
 router.get('/:id', organizationsController.getOrganizationById)
 router.post('/', validateOrganization, organizationsController.createOrganization)
+
+// Accept both PATCH and PUT for updates so frontend PUT requests succeed
 router.patch('/:id', validateOrganization, organizationsController.updateOrganization)
+router.put('/:id', validateOrganization, organizationsController.updateOrganization)
+
 router.delete('/:id', organizationsController.deleteOrganization)
 
 module.exports = router

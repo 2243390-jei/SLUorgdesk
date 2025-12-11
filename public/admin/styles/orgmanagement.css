@@ -68,7 +68,7 @@
   pointer-events: none;
 }
 .search-wrap.has-value #searchClear { opacity: 1; pointer-events: auto; }
-#searchClear::after { /* removed duplicate visual '✕' to avoid double-X */ }
+
 /* Show our custom clear icon */
 #searchClear::after { content: '✕'; color: #6b7280; font-size: 13px; }
 

@@ -8,20 +8,21 @@ AuthMiddleware::requireRole('OSAS');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Osas Calendar — Analytics Dashboard</title>
+  <link rel="stylesheet" href="styles/osasmain.css">
   <link rel="stylesheet" href="styles/analytics.css">
   <link rel="icon" type="image/png" href="../images/Icon.png" sizes="32x32">
 </head>
-<body>
+<body data-page="analytics">
+
   <div class="app">
+
     <!-- Mobile Header -->
     <div class="mobile-header">
       <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
       <div class="mobile-greeting">
-        <h1>Analytics Dashboard</h1>
+        <h1 id="mobilePageTitle">Analytics Dashboard</h1>
       </div>
       <div class="mobile-logo">
         <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU Logo">
@@ -35,22 +36,22 @@ AuthMiddleware::requireRole('OSAS');
           <div class="avatar">O</div>
           <div class="profile-text">
             <div class="admin-title">OSAS</div>
-            <div class="admin-sub">Analytics Dashboard</div>
+            <div class="admin-sub" id="desktopPageTitle">Analytics Dashboard</div>
           </div>
         </div>
       </div>
 
-      <nav class="sidebar-menu" aria-label="Sidebar">
+      <nav class="sidebar-menu" aria-label="Sidebar navigation">
         <ul>
-          <li class="nav-item" onclick="location.href='../osas/calendar.php'">
+          <li class="nav-item" data-page="calendar">
             <img src="../images/osas/calendar.png" alt="Calendar" class="menu-icon">
             <span class="menu-label">CALENDAR</span>
           </li>
-          <li class="nav-item" onclick="location.href='../osas/orgs.php'">
+          <li class="nav-item" data-page="orgs">
             <img src="../images/osas/group.png" alt="Organizations" class="menu-icon">
             <span class="menu-label">ORG MANAGEMENT</span>
           </li>
-          <li class="nav-item active" onclick="location.href='../osas/analytics.php'">
+          <li class="nav-item active" data-page="analytics">
             <img src="../images/osas/statistics.png" alt="Analytics" class="menu-icon">
             <span class="menu-label">ANALYTICS</span>
           </li>
@@ -72,14 +73,13 @@ AuthMiddleware::requireRole('OSAS');
           <h1>Hello, OSAS</h1>
           <div class="muted">Organization analytics and insights</div>
         </div>
-        
         <div class="header-logo">
           <img src="../images/student_img/SLU_orgdesk_logo.png" alt="SLU OrgDesk Logo">
         </div>
       </header>
 
       <div class="dashboard-body">
-        <!-- Top Row: Top Organizations + Monthly Submissions -->
+        <!-- Top Row -->
         <div class="dashboard-row">
           <div class="orgs-section">
             <div class="section-header">
@@ -100,7 +100,7 @@ AuthMiddleware::requireRole('OSAS');
           </div>
         </div>
 
-        <!-- Middle Row: SDG Submissions -->
+        <!-- SDG Submissions -->
         <div class="dashboard-row">
           <div class="chart-full">
             <div class="chart-card">
@@ -118,7 +118,7 @@ AuthMiddleware::requireRole('OSAS');
           </div>
         </div>
 
-        <!-- Bottom Row: Submissions by School -->
+        <!-- Submissions by School -->
         <div class="dashboard-row">
           <div class="chart-full">
             <div class="chart-card">
