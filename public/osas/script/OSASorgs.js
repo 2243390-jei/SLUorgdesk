@@ -438,8 +438,19 @@ async function showSubmissionsModal(orgId, orgName) {
             <span class="arrow">›</span>
           </button>
           <div class="filter-sub hidden" data-type="sdg">
-            <button data-back class="filter-back-btn">‹ Back</button>
-            ${sdgs.map(sdg => `<button data-sdg="${sdg}">${sdg}</button>`).join('')}
+            <div class="sdg-scroll-container">
+              <div class="sdg-list-scrollable">
+                ${sdgs.sort((a, b) => {
+                  const aNum = parseInt(a.match(/\d+/)?.[0] || 0);
+                  const bNum = parseInt(b.match(/\d+/)?.[0] || 0);
+                  return aNum - bNum;
+                }).map(sdg => {
+                  const num = sdg.match(/\d+/)?.[0] || '';
+                  const title = sdg.replace(/^\d+\.\s*/, '').trim();
+                  return `<button data-sdg="${sdg}" class="sdg-filter-option" title="${sdg}"><span class="sdg-number">${num}</span><span class="sdg-title">${title}</span></button>`;
+                }).join('')}
+              </div>
+            </div>
           </div>
           
           <button class="filter-category" data-category="type">
@@ -447,8 +458,7 @@ async function showSubmissionsModal(orgId, orgName) {
             <span class="arrow">›</span>
           </button>
           <div class="filter-sub hidden" data-type="type">
-            <button data-back class="filter-back-btn">‹ Back</button>
-            ${eventTypes.map(type => `<button data-type="${type}">${type}</button>`).join('')}
+            ${eventTypes.map(type => `<button data-type="${type}" class="filter-option-btn">${type}</button>`).join('')}
           </div>
           
           <button class="filter-category" data-category="venue">
@@ -456,9 +466,10 @@ async function showSubmissionsModal(orgId, orgName) {
             <span class="arrow">›</span>
           </button>
           <div class="filter-sub hidden" data-type="venue">
-            <button data-back class="filter-back-btn">‹ Back</button>
-            ${venues.map(venue => `<button data-venue="${venue}">${venue}</button>`).join('')}
+            ${venues.map(venue => `<button data-venue="${venue}" class="filter-option-btn">${venue}</button>`).join('')}
           </div>
+          
+          <button id="resetFilterBtn" class="reset-filter-btn">Reset Filter</button>
         </div>
       
       <table class="submissions-table">
@@ -551,7 +562,6 @@ function initializeHierarchicalFilter() {
   const filterPanel = document.getElementById('filterPanel');
   const filterBtn = document.getElementById('filterToggleBtn');
   const categoryBtns = document.querySelectorAll('.filter-category');
-  const backBtns = document.querySelectorAll('.filter-back-btn');
   let currentFilter = null;
   
   // Close filter panel on outside click
@@ -564,7 +574,7 @@ function initializeHierarchicalFilter() {
     }
   });
   
-  // Category button clicks - show subcategories
+  // Category button clicks - toggle subcategories
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -572,32 +582,22 @@ function initializeHierarchicalFilter() {
       const subMenu = document.querySelector(`.filter-sub[data-type="${category}"]`);
       
       if (subMenu) {
-        // Hide all other submenus
+        const isHidden = subMenu.classList.contains('hidden');
+        // Hide all submenus
         document.querySelectorAll('.filter-sub').forEach(menu => {
-          if (menu !== subMenu) {
-            menu.classList.add('hidden');
-          }
+          menu.classList.add('hidden');
         });
-        // Toggle current submenu
-        subMenu.classList.toggle('hidden');
-      }
-    });
-  });
-  
-  // Back button clicks - return to main categories
-  backBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const subMenu = btn.closest('.filter-sub');
-      if (subMenu) {
-        subMenu.classList.add('hidden');
+        // Show current submenu if it was hidden
+        if (isHidden) {
+          subMenu.classList.remove('hidden');
+        }
       }
     });
   });
   
   // Filter option clicks
   document.querySelectorAll('[data-sdg], [data-type], [data-venue]').forEach(btn => {
-    if (btn.closest('.filter-sub')) {
+    if (btn.closest('.filter-sub') && !btn.classList.contains('filter-back-icon-btn')) {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const filterType = btn.getAttribute('data-sdg') ? 'sdg' : 
@@ -614,6 +614,21 @@ function initializeHierarchicalFilter() {
       });
     }
   });
+  
+  // Reset filter button
+  const resetBtn = document.getElementById('resetFilterBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentFilter = null;
+      renderSubmissionsTable(allSubmissions);
+      
+      // Close dropdown after reset
+      if (filterPanel) {
+        filterPanel.classList.add('hidden');
+      }
+    });
+  }
 }
 
 // Apply hierarchical filter
