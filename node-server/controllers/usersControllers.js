@@ -156,7 +156,7 @@ const deleteUser = async (req, res) => {
     }
 }
 
-// Helper function for login - returns full user object with password for authentication
+//  for login purposes
 const findUserByEmail = async (email) => {
     try {
         const user = await User.findOne({ email }).lean()

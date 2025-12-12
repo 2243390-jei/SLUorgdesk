@@ -1,16 +1,13 @@
-// Logout wiring — attach handler immediately or on DOMContentLoaded
-
-// Check if user session is valid - redirect to login if not
 async function verifySession() {
   try {
     const response = await fetch(`${API_CONFIG.apiBase}/api/users/me`, {
       method: 'GET',
-      credentials: 'include' // Include cookies for session
+      credentials: 'include'
     });
 
     
     if (!response.ok) {
-      // Session invalid or expired - redirect to index
+      // Session invalid or expired
       const errData = await response.json().catch(() => ({}));
       window.location.href = '../../index.php';
       return false;
@@ -18,14 +15,12 @@ async function verifySession() {
     const data = await response.json();
     return true;
   } catch (err) {
-    // On error, assume session is invalid - redirect to login
     window.location.href = '../../index.php';
     return false;
   }
 }
 
-// Only verify session on protected admin pages (not on login page)
-// Check if this is an admin page by checking if we're in the admin folder
+// if we're in the admin folder
 function isAdminPage() {
   return window.location.pathname.includes('/admin/');
 }

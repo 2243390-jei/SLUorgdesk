@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Organization = require('../models/Organization');
 const User = require('../models/User');
-const Submission = require('../models/Submission'); // recent activities
+const Submission = require('../models/Submission');
 
-// helper: normalize label
 function normalizeLabel(v) {
   if (v === null || typeof v === 'undefined') return 'Unassigned';
   const s = String(v).trim();
@@ -12,7 +11,7 @@ function normalizeLabel(v) {
   return s;
 }
 
-// helper: pick first existing field from candidates
+// pick first existing field from candidates
 function pick(obj, candidates = []) {
   for (const k of candidates) {
     if (!k) continue;

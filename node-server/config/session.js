@@ -6,7 +6,7 @@ module.exports = session({
   saveUninitialized: false,
   name: 'connect.sid',
   cookie: {
-    secure: false, // set to true if using HTTPS
+    secure: false, // true if using HTTPS
     httpOnly: true,
     sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24, // 24 hours

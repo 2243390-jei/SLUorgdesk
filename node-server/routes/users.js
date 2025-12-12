@@ -14,7 +14,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email and password required' })
     }
 
-    // Use your existing controller or database lookup
+    // Use findUserByEmail method to find user by email
     const user = await usersController.findUserByEmail(email)
 
     if (!user) {
@@ -64,23 +64,19 @@ router.get('/me', authMiddleware, (req, res) => {
   })
 })
 
-// Logout endpoint - destroys session
+// Logout endpoint
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).json({ success: false, error: 'Logout failed' })
     }
-    // Clear session cookie explicitly (like PHP does)
     res.clearCookie('connect.sid')
     res.json({ success: true, message: 'Logged out successfully' })
   })
 })
 
-// Specific routes MUST come before dynamic /:id routes
 router.get('/role/:role', usersController.getUserByRole)
 router.get('/email/:email', usersController.getUserByEmail)
-
-// Dynamic routes AFTER specific ones
 router.get('/', usersController.getAllUsers)
 router.get('/:id', usersController.getUserById)
 router.post('/', validateUser, usersController.createUser)
