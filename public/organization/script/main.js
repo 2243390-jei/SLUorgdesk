@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
               `;
               modal.querySelector('.profile-modal-content').innerHTML = content;
 
-           
+        
               const newLogout = modal.querySelector('#logoutBtn');
               const newCancel = modal.querySelector('#cancelBtn');
               if (newCancel) newCancel.addEventListener('click', () => modal.style.display = 'none');
