@@ -279,28 +279,16 @@ AuthMiddleware::requireRole('Organization');
 
         <div class="form-group">
           <label>Event Time</label>
-          <div class="event-time-container">
-            <div class="form-row">
-              <div class="form-group time-group">
-                <label>Start Time</label>
-                <div class="time-input-group">
-                  <input type="text" id="modalStartTime" class="time-input" placeholder="12:00" maxlength="5" required>
-                  <select id="modalStartPeriod" class="time-period">
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group time-group">
-                <label>End Time</label>
-                <div class="time-input-group">
-                  <input type="text" id="modalEndTime" class="time-input" placeholder="12:00" maxlength="5" required>
-                  <select id="modalEndPeriod" class="time-period">
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
+          <div class="form-row">
+            <div class="form-group time-group">
+              <label>Start Time <span class="required">*</span></label>
+              <input type="time" id="modalStartTime" required>
+              <span id="modalStartTimeError" class="error"></span>
+            </div>
+            <div class="form-group time-group">
+              <label>End Time <span class="required">*</span></label>
+              <input type="time" id="modalEndTime" required>
+              <span id="modalEndTimeError" class="error"></span>
             </div>
           </div>
         </div>

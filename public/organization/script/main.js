@@ -70,7 +70,7 @@ async function setupManualLogin() {
           console.log('Attempting Node.js login for admin user:', email);
           const nodeResp = await fetchWithTimeout(`${API_CONFIG.apiBase}/api/users/login`, {
             method: 'POST',
-            credentials: 'include',
+            credentials: 'include',  
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: email,
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
               `;
               modal.querySelector('.profile-modal-content').innerHTML = content;
 
-              // re-wire buttons inside the modal
+           
               const newLogout = modal.querySelector('#logoutBtn');
               const newCancel = modal.querySelector('#cancelBtn');
               if (newCancel) newCancel.addEventListener('click', () => modal.style.display = 'none');

@@ -1,4 +1,19 @@
 const User = require('../models/User')
+const bcrypt = require('bcrypt')
+
+/**
+ * Hash password using bcrypt
+ */
+const hashPassword = async (password) => {
+  return bcrypt.hash(password, 12)
+}
+
+/**
+ * Verify password against bcrypt hash
+ */
+const verifyPassword = async (password, hash) => {
+  return bcrypt.compare(password, hash)
+}
 
 const getAllUsers = async (req, res) => {
     try {
@@ -84,10 +99,13 @@ const createUser = async (req, res) => {
             return res.status(400).json({ success: false, error: 'Missing required fields' })
         }
 
+        // Hash password before storing
+        const hashedPassword = await hashPassword(password)
+
         const newUser = new User({
             name,
             email,
-            password,
+            password: hashedPassword,
             role: role || 'Organization',
             organization: organization || null,
             isActive: isActive !== undefined ? isActive : true
@@ -149,4 +167,4 @@ const findUserByEmail = async (email) => {
     }
 }
 
-module.exports = { getAllUsers, getUserById, getUserByRole, getUserByEmail, createUser, updateUser, deleteUser, findUserByEmail }
+module.exports = { getAllUsers, getUserById, getUserByRole, getUserByEmail, createUser, updateUser, deleteUser, findUserByEmail, hashPassword, verifyPassword }

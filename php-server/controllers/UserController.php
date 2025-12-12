@@ -37,7 +37,12 @@ class UserController {
 
         // Get user with password for verification
         $user = $this->user->getByEmail($email, true);
-        if (!$user || ($user['password'] ?? '') !== $password) {
+        if (!$user) {
+            return ['success' => false, 'error' => 'Invalid credentials'];
+        }
+        
+        // Verify password using bcrypt
+        if (!password_verify($password, $user['password'] ?? '')) {
             return ['success' => false, 'error' => 'Invalid credentials'];
         }
 

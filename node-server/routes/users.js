@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require('bcrypt')
 const usersController = require('../controllers/usersControllers')
 const { validateUser } = require('../middleware/validation')
 const authMiddleware = require('../middleware/AuthMiddleware')
@@ -21,7 +22,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Invalid credentials' })
     }
 
-    if (user.password !== password) {
+    // Verify password using bcrypt
+    const passwordMatch = await bcrypt.compare(password, user.password || '')
+    if (!passwordMatch) {
       console.warn(`Login attempt: Password mismatch for user: ${email}`)
       return res.status(401).json({ success: false, error: 'Invalid credentials' })
     }
