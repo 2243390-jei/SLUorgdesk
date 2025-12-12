@@ -336,6 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const newFiles = Array.from(e.dataTransfer.files).filter((f) =>
         /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
       );
+      files.length = 0; // Clear existing files
       files.push(...newFiles);
       render();
       sync();
@@ -346,6 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const newFiles = Array.from(input.files).filter((f) =>
         /\.(pdf|doc|docx|jpe?g|png)$/i.test(f.name)
       );
+      files.length = 0; // Clear existing files, don't append
       files.push(...newFiles);
       render();
       sync();
@@ -365,6 +367,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const previewList = document.getElementById("eventListPreview");
 
   let editingIndex = null;
+  const eventFilesMap = {}; // Track files for each event by unique event ID
+  let eventIdCounter = 0; // Counter for generating unique event IDs
 
   openBtn.onclick = () => {
     editingIndex = null;
@@ -453,6 +457,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("modalEventDate").value = "";
     document.getElementById("modalStartTime").value = "";
     document.getElementById("modalEndTime").value = "";
+    document.getElementById("modalStartTimeError").textContent = "";
+    document.getElementById("modalEndTimeError").textContent = "";
     document
       .querySelectorAll('#eventModal input[type="checkbox"]')
       .forEach((c) => (c.checked = false));
@@ -471,22 +477,42 @@ document.addEventListener("DOMContentLoaded", function () {
     const name = document.getElementById("modalEventName").value.trim();
     const type = document.getElementById("modalEventType").value.trim();
     const date = document.getElementById("modalEventDate").value;
-    const start = formatTime(
-      document.getElementById("modalStartTime"),
-      document.getElementById("modalStartPeriod")
-    );
-    const end = formatTime(
-      document.getElementById("modalEndTime"),
-      document.getElementById("modalEndPeriod")
-    );
+    const startTime24 = document.getElementById("modalStartTime").value;
+    const endTime24 = document.getElementById("modalEndTime").value;
     const venue = document.getElementById("modalEventVenue").value.trim();
     const attendees = document.getElementById("modalEventAttendees").value;
     const proof = document.getElementById("modalEventProof").value.trim();
     const sdgs = getSDGs();
     const desc = document.getElementById("modalEventDesc").value.trim();
 
-    if (!name || !date || !start || !end) {
+    if (!name || !date || !startTime24 || !endTime24) {
       alert("Event Name, Date, Start Time and End Time are required.");
+      return;
+    }
+
+    // Convert 24-hour time to 12-hour format with AM/PM
+    const start = convert24To12(startTime24);
+    const end = convert24To12(endTime24);
+
+    // Validate modal time fields (7:30 AM to 5:30 PM)
+    const [startHour, startMin] = startTime24.split(":").map(Number);
+    const [endHour, endMin] = endTime24.split(":").map(Number);
+    
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+    const minStartMinutes = 7 * 60 + 30; // 7:30 AM
+    const maxEndMinutes = 17 * 60 + 30; // 5:30 PM
+    
+    if (startMinutes < minStartMinutes) {
+      alert("Start time must be at or after 7:30 AM");
+      return;
+    }
+    if (endMinutes > maxEndMinutes) {
+      alert("End time must be at or before 5:30 PM");
+      return;
+    }
+    if (endMinutes <= startMinutes) {
+      alert("End time must be after start time");
       return;
     }
 
@@ -543,17 +569,39 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     hiddenContainer.appendChild(sdgContainer);
 
-    // Store file references (actual files will be uploaded separately)
+    // Generate unique event ID if this is a new event
+    let eventId;
+    if (editingIndex === null) {
+      eventId = `event_${eventIdCounter++}`;
+    } else {
+      // Get existing event ID from hidden container
+      eventId = hiddenContainer.getAttribute("data-event-id") || `event_${eventIdCounter++}`;
+    }
+    
+    hiddenContainer.setAttribute("data-event-id", eventId);
+
+    // Store file references and actual files
     const modalFileInput = document.getElementById("modalFileInput");
+    
+    // Clear hidden file inputs before re-adding (for editing case)
+    const oldHiddenFiles = hiddenContainer.querySelectorAll(".event-file-hidden");
+    oldHiddenFiles.forEach((input) => input.remove());
+    
     if (modalFileInput && modalFileInput.files.length) {
+      // Store actual file objects in map for this SPECIFIC event by unique ID
+      // Replace old files completely (don't append)
+      eventFilesMap[eventId] = Array.from(modalFileInput.files);
+      
+      // Also store file names as hidden inputs for reference
       Array.from(modalFileInput.files).forEach((file) => {
         const fileInput = document.createElement("input");
         fileInput.type = "hidden";
         fileInput.className = "event-file-hidden";
-        // We'll store placeholder; actual paths set after upload
         fileInput.value = file.name;
         hiddenContainer.appendChild(fileInput);
       });
+    } else {
+      eventFilesMap[eventId] = [];
     }
 
     if (editingIndex === null) {
@@ -591,6 +639,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (confirm("Delete this event?")) {
         previewList.removeChild(card);
         hiddenContainer.remove();
+        delete eventFilesMap[eventId]; // Clean up files for deleted event
         if (!previewList.children.length)
           previewList.innerHTML = "<p><em>No events added yet.</em></p>";
       }
@@ -622,12 +671,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("modalEventProof").value = data.proof;
     document.getElementById("modalEventDesc").value = data.desc;
 
-    const [startTime, startPeriod] = data.start.split(" ");
-    const [endTime, endPeriod] = data.end.split(" ");
-    document.getElementById("modalStartTime").value = startTime || "";
-    document.getElementById("modalStartPeriod").value = startPeriod || "AM";
-    document.getElementById("modalEndTime").value = endTime || "";
-    document.getElementById("modalEndPeriod").value = endPeriod || "AM";
+    // Convert 12-hour format back to 24-hour format for time inputs
+    const convert12To24 = (time12) => {
+      if (!time12) return "";
+      const [time, period] = time12.split(" ");
+      let [hours, minutes] = time.split(":").map(Number);
+      
+      if (period === "PM" && hours !== 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
+      
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    };
+
+    document.getElementById("modalStartTime").value = convert12To24(data.start);
+    document.getElementById("modalEndTime").value = convert12To24(data.end);
 
     document
       .querySelectorAll('#eventModal input[type="checkbox"]')
@@ -827,9 +884,7 @@ document.addEventListener("DOMContentLoaded", function () {
           ),
           eventProof: container.querySelector(".event-proof")?.value || "",
           eventSDG: sdgValues,
-          supportingDocuments: Array.from(
-            container.querySelectorAll(".event-file-hidden")
-          ).map((f) => f.value),
+          supportingDocuments: []
         };
         submissionData.events.push(eventData);
       });
@@ -857,15 +912,21 @@ document.addEventListener("DOMContentLoaded", function () {
       submitBtn.textContent = "Submitting...";
 
       try {
-        // Step 1: Create a separate submission for each event
-        const submissionIds = [];
+        // Step 1: Process each event - upload files FIRST, then create submission with correct paths
+        let eventIndex = 0;
         for (const event of submissionData.events) {
+          // Upload files for this event first to get the actual file paths
+          const uploadResult = await uploadSubmissionFilesForEventBeforeCreation(orgAcronym, eventIndex);
+          
+          // Set the supporting documents to ONLY the uploaded file paths (no raw filenames)
+          event.supportingDocuments = uploadResult.files || [];
+          
           const singleEventSubmission = {
             applicationInfo: submissionData.applicationInfo,
             orgInfo: submissionData.orgInfo,
             academicYear: submissionData.academicYear,
             semester: submissionData.semester,
-            events: [event],  // Single event per submission
+            events: [event],  // Single event per submission with correct file paths
             revisionComment: submissionData.revisionComment,
             confirmAccuracy: submissionData.confirmAccuracy
           };
@@ -881,17 +942,8 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!createResult.success) {
             throw new Error(createResult.error || "Failed to create submission");
           }
-
-          submissionIds.push(createResult.id);
-        }
-
-        // Step 2: Upload files if any exist (using the first submission ID as reference)
-        if (submissionIds.length > 0) {
-          const fileUploadResult = await uploadSubmissionFiles(submissionIds[0], orgAcronym);
           
-          if (!fileUploadResult.success && fileUploadResult.hasFiles) {
-            throw new Error("File upload failed: " + (fileUploadResult.error || "Unknown error"));
-          }
+          eventIndex++;
         }
 
         // Success!
@@ -912,51 +964,55 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* -----------------------------------------------------------------
-   *  9. FILE UPLOAD HELPER
+   *  9. FILE UPLOAD HELPER - BEFORE SUBMISSION CREATION
+   *      Upload files first, get paths, then create submission with correct paths
    * ----------------------------------------------------------------- */
-  async function uploadSubmissionFiles(submissionId, orgAcronym) {
+  async function uploadSubmissionFilesForEventBeforeCreation(orgAcronym, eventIndex) {
     try {
-      const inlineContainer = document.getElementById("inlineEventForm");
-      const inlineFileInput = inlineContainer.querySelector(".drop-zone-input");
-
-      // Collect all files from inline and modal forms
       const allFiles = new FormData();
-      allFiles.append("submissionId", submissionId);
       allFiles.append("orgAcronym", orgAcronym);
 
       let hasFiles = false;
-      const addedFiles = new Set(); // Track file names to prevent duplicates
-
-      // Add inline form files (from single event form at top)
-      if (inlineFileInput && inlineFileInput.files.length > 0) {
-        Array.from(inlineFileInput.files).forEach((file) => {
-          const fileKey = file.name + file.size; // Unique key
-          if (!addedFiles.has(fileKey)) {
+      let eventIdToClean = null;
+      
+      // Check if this is the inline event
+      const inlineContainer = document.getElementById("inlineEventForm");
+      const inlineEventExists = (
+        inlineContainer.querySelector('#eventName')?.value.trim() ||
+        inlineContainer.querySelector('#eventDate')?.value
+      );
+      
+      // If inline event exists and this is the first event, use inline files
+      if (inlineEventExists && eventIndex === 0) {
+        const inlineFileInput = inlineContainer.querySelector(".drop-zone-input");
+        if (inlineFileInput && inlineFileInput.files.length > 0) {
+          Array.from(inlineFileInput.files).forEach((file) => {
             allFiles.append("files[]", file);
-            addedFiles.add(fileKey);
             hasFiles = true;
+          });
+        }
+      } else {
+        // Get the event's unique ID from the hidden container
+        const hiddenContainers = document.querySelectorAll(".hidden-event-container");
+        const adjustedIndex = inlineEventExists ? eventIndex - 1 : eventIndex;
+        
+        if (hiddenContainers[adjustedIndex]) {
+          const eventId = hiddenContainers[adjustedIndex].getAttribute("data-event-id");
+          if (eventId && eventFilesMap[eventId]) {
+            eventIdToClean = eventId;
+            eventFilesMap[eventId].forEach((file) => {
+              allFiles.append("files[]", file);
+              hasFiles = true;
+            });
           }
-        });
-      }
-
-      // Add modal form files (from "Add Another Event" modal only)
-      const modalFileInput = document.getElementById("modalFileInput");
-      if (modalFileInput && modalFileInput.files.length > 0) {
-        Array.from(modalFileInput.files).forEach((file) => {
-          const fileKey = file.name + file.size; // Unique key
-          if (!addedFiles.has(fileKey)) {
-            allFiles.append("files[]", file);
-            addedFiles.add(fileKey);
-            hasFiles = true;
-          }
-        });
+        }
       }
 
       if (!hasFiles) {
-        return { success: true, hasFiles: false };
+        return { success: true, hasFiles: false, files: [] };
       }
 
-      // Upload files
+      // Upload files to get the actual paths
       const uploadResponse = await fetch("../../php-server/routes/upload.php", {
         method: "POST",
         body: allFiles,
@@ -969,16 +1025,23 @@ document.addEventListener("DOMContentLoaded", function () {
           success: false,
           hasFiles: true,
           error: uploadResult.message || "File upload failed",
+          files: []
         };
       }
 
-      return { success: true, hasFiles: true, files: uploadResult.paths };
+      // Clean up eventFilesMap after successful upload
+      if (eventIdToClean) {
+        delete eventFilesMap[eventIdToClean];
+      }
+
+      return { success: true, hasFiles: true, files: uploadResult.paths || [] };
     } catch (err) {
       console.error("File upload error:", err);
       return {
         success: false,
         hasFiles: true,
         error: err.message,
+        files: []
       };
     }
   }
