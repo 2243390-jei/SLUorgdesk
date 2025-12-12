@@ -40,7 +40,6 @@ async function initialize() {
       const errorMsg = responseData.error || "Unknown error";
       submissionList.innerHTML = `
         <div class="no-data">
-          <img src="../images/student_img/no-data.png" alt="No Data" style="width:120px;margin-bottom:1rem;">
           <p>${errorMsg}</p>
         </div>`;
       return;
@@ -56,7 +55,6 @@ async function initialize() {
     if (submissions.length === 0) {
       submissionList.innerHTML = `
         <div class="no-data">
-          <img src="../images/student_img/no-data.png" alt="No Data" style="width:120px;margin-bottom:1rem;">
           <p>No submissions found for your organization.</p>
         </div>`;
       return;
@@ -136,7 +134,6 @@ function renderCards(subs) {
   if (!subs.length) {
     submissionList.innerHTML = `
       <div class="no-data">
-        <img src="../images/student_img/no-data.png" alt="No Data" style="width:120px;margin-bottom:1rem;">
         <p>No submissions found</p>
       </div>`;
     return;
