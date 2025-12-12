@@ -36,7 +36,7 @@ try {
         
         // Route to filtered search if filters present
         if ($hasFilterParams) {
-            // Non-admin users can only see submissions from their own organization
+            // Organizations can only see submissions from their own organization
             if ($user['role'] !== 'Admin' && $user['role'] !== 'OSAS') {
                 $_GET['organizationId'] = $user['organizationId'];
             }
