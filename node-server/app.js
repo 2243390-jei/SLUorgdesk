@@ -25,6 +25,7 @@ const corsOrigins = [
   getServerHost()
 ].filter((origin, index, self) => self.indexOf(origin) === index && origin !== '*')
 
+// Allow API respond to frontend
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
@@ -44,9 +45,6 @@ app.use(sessionConfig)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// Normalize legacy/case-mismatched API paths from older front-end builds
-// This helps when clients still request endpoints like '/api/User' or '/api/Organizations'
-// — we rewrite them to the canonical lowercase plural routes so requests succeed.
 app.use((req, res, next) => {
   if (req.url.startsWith('/api/User')) {
     req.url = req.url.replace(/^\/api\/User/, '/api/users')
@@ -60,17 +58,16 @@ app.use((req, res, next) => {
 const uploadRouter = require('./middleware/upload');
 app.use('/api', uploadRouter);
 
-// API routes FIRST (higher priority)
+// API routes
 app.use('/', routes)
 
-// Static file serving AFTER API routes
 // Serve uploads folder
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
 
 // Serve static client files from root directory (lowest priority)
 app.use(express.static(path.join(__dirname, '..')))
 
-// 404 + error handlers (must be last)
+// 404 + error handlers
 app.use(notFound)
 app.use(errorHandler)
 

@@ -1,4 +1,3 @@
-//Validation
 const validateUser = (req, res, next) => {
   const { name, email, password, role } = req.body
 
@@ -30,7 +29,7 @@ const validateUser = (req, res, next) => {
     }
   }
 
-  // For PATCH requests, validate provided fields
+  // For PATCH requests
   if (req.method === 'PATCH') {
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({
@@ -49,9 +48,6 @@ const validateUser = (req, res, next) => {
   next()
 }
 
-/**
- * Validate organization creation/update
- */
 const validateOrganization = (req, res, next) => {
   const { name, acronym, school, email } = req.body
 

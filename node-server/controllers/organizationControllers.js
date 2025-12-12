@@ -108,14 +108,12 @@ const updateOrganization = async (req, res) => {
     }
 
     try {
-        // Filter allowed fields to avoid accidental overwrites (optional)
         const update = {};
         const allowed = ['name','acronym','email','school','isWhitelisted','localLogoPath','logo'];
         allowed.forEach(k => {
           if (typeof req.body[k] !== 'undefined') update[k] = req.body[k];
         });
 
-        // If nothing to update, return error
         if (Object.keys(update).length === 0) {
           return res.status(400).json({ success: false, error: 'No updatable fields provided' });
         }
@@ -142,7 +140,6 @@ const deleteOrganization = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Organization not found' })
         }
 
-        // Cascade delete users that reference this organization
         try {
             const deleteResult = await User.deleteMany({ organization: id })
             console.log(`Deleted ${deleteResult.deletedCount} user(s) referencing organization ${id}`)

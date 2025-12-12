@@ -120,7 +120,7 @@ async function initialize() {
     currentViewport = isMobile() ? 'mobile' : 'desktop';
 }
 
-// Fetch users from Node.js API
+// Fetch users
 async function fetchUsers() {
     try {
         const apiBase = API_CONFIG.usersEndpoint;
@@ -343,7 +343,7 @@ function closeDeleteModal() {
     userToDelete = null;
 }
 
-// Form submission handler - Call Node.js API
+// Form submission handler
 async function handleSubmit(event) {
     event.preventDefault();
     

@@ -70,7 +70,7 @@ async function setupManualLogin() {
           console.log('Attempting Node.js login for admin user:', email);
           const nodeResp = await fetchWithTimeout(`${API_CONFIG.apiBase}/api/users/login`, {
             method: 'POST',
-            credentials: 'include',  // IMPORTANT: Include cookies for session
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: email,

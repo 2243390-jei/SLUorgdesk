@@ -228,13 +228,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return { name, acronym, email, school, logoFile, existingLogoPath };
   }
 
-  // Upload logo file to Node upload endpoint, returns relative path (e.g. "../images/orgs/uuid.jpg")
   async function uploadLogoFile(file) {
-    // Prefer API_CONFIG if your config.js provides an upload/base URL:
-    // e.g. API_CONFIG.baseUrl = "http://192.168.1.117:5000"
     const base = (typeof API_CONFIG !== 'undefined' && (API_CONFIG.baseUrl || API_CONFIG.apiBase)) ? (API_CONFIG.baseUrl || API_CONFIG.apiBase) : null;
 
-    // Fallback: try localhost:5000 (adjust port to your node server port)
     const fallbackHost = 'http://localhost:5000';
 
     // Build candidate URLs and try them in order until one returns valid JSON
@@ -308,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Add new organization - Call Node.js API
+  // Add new organization
   async function addOrganization(orgData) {
     try {
       const resp = await fetch(API_CONFIG.organizationsEndpoint, {
@@ -354,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Edit organization - Call Node.js API
+  // Edit organization
   async function editOrganization(orgData) {
     if (!orgToEdit) return;
     try {
@@ -466,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
     orgToDelete = null;
   }
 
-  // Delete organization - Call Node.js API
+  // Delete organization
   async function confirmDelete() {
     if (!orgToDelete) return;
     
