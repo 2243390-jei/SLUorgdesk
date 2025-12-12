@@ -1,4 +1,5 @@
 const Organization = require('../models/Organization');
+const User = require('../models/User');
 
 const getAllOrganization = async (req, res) => {
     try {
@@ -139,6 +140,15 @@ const deleteOrganization = async (req, res) => {
 
         if (!result) {
             return res.status(404).json({ success: false, error: 'Organization not found' })
+        }
+
+        // Cascade delete users that reference this organization
+        try {
+            const deleteResult = await User.deleteMany({ organization: id })
+            console.log(`Deleted ${deleteResult.deletedCount} user(s) referencing organization ${id}`)
+        } catch (userDelErr) {
+            console.error('Error deleting users for organization:', userDelErr)
+           console.warn('Error deleting users for organization:', userDelErr)
         }
 
         res.status(200).json({ success: true })

@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   autoFillAcademicInfo();
   autofillOrgData();
 
-  // TODO: Kenneth: added time validation
+  // TODO: added time validation
   /* -----------------------------------------------------------------
    *  TIME VALIDATION - Start Time (7:30 AM min) and End Time (5:30 PM max)
    * ----------------------------------------------------------------- */
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         endTimeInput.setCustomValidity("End time must be at or before 5:30 PM");
-        console.log("Kenneth debugs: End time must be at or before 5:30 PM");
+        console.log(" End time must be at or before 5:30 PM");
         return false;
       }
 
@@ -751,7 +751,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const orgAcronym =
         document.querySelector('input[name="org_acronym"]').value || "unknown";
 
-      // TODO: Kenneth: changed the input[] into select[] sa position
+      // TODO:  changed the input[] into select[] sa position
       const submissionData = {
         applicationInfo: {
           applicantName:

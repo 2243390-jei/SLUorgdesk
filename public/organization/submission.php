@@ -57,44 +57,44 @@ AuthMiddleware::requireRole('Organization');
         <h3 class="form-section-title">Organization Information</h3>
 
         <div class="form-group">
-          <!-- TODO: Kenneth: added readonly -->
+          <!-- TODO: added readonly -->
           <label>Complete Name of Organization or Publication <span class="required">*</span></label>
           <input type="text" name="org_name" placeholder="Your answer" required readonly>
         </div>
 
         <div class="form-row">
 
-          <!-- TODO: Kenneth: added readonly -->
+          <!-- TODO: added readonly -->
           <div class="form-group">
-            <label>Acronym or Short Name of Organization</label>
+            <label>Acronym or Short Name of Organization <span class="required">*</span></label>
             <!-- Pwede niyo palitan yung readonly as disabled if ever ayaw ni maam -->
-            <input type="text" name="org_acronym" placeholder="Your answer" readonly>
+            <input type="text" name="org_acronym" placeholder="Your answer" required readonly>
           </div>
 
-          <!-- TODO: Kenneth: added readonly -->
+          <!-- TODO: added readonly -->
           <div class="form-group">
-            <label>Official SLU Institutional Email of Organization</label>
-            <input type="email" name="org_email" placeholder="Your answer" readonly>
+            <label>Official SLU Institutional Email of Organization <span class="required">*</span></label>
+            <input type="email" name="org_email" placeholder="Your answer" required readonly>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Name of Applicant Representing The Organization</label>
-            <input type="text" name="applicant_name" placeholder="Your answer">
+            <label>Name of Applicant Representing The Organization <span class="required">*</span></label>
+            <input type="text" name="applicant_name" placeholder="Your answer" required>
           </div>
           <div class="form-group">
-            <label>SLU Institutional Email of Applicant</label>
-            <input type="email" name="applicant_email" placeholder="Your answer">
+            <label>SLU Institutional Email of Applicant <span class="required">*</span></label>
+            <input type="email" name="applicant_email" placeholder="Your answer" required>
           </div>
         </div>
 
-        <!-- TODO: Kenneth: Iniba ko yung input element to select element for drop box
+        <!-- TODO: Iniba ko yung input element to select element for drop box
          Pa check rin if tama yung position -->
         <div class="form-group">
-          <label>Position of Applicant in the Student Group</label>
+          <label>Position of Applicant in the Student Group <span class="required">*</span></label>
           <!-- <input type="text" name="applicant_position" placeholder="Your answer"> -->
-          <select name="applicant_position">
+          <select name="applicant_position" required>
             <option value="" disabled selected>Select your position</option>
             <option value="President">President</option>
             <option value="Vice President">Vice President</option>
@@ -130,12 +130,12 @@ AuthMiddleware::requireRole('Organization');
 
         <div class="event-form-container" id="inlineEventForm">
           <div class="form-group">
-            <label>Event Name</label>
-            <input type="text" id="eventName" placeholder="Your answer">
+            <label>Event Name <span class="required">*</span></label>
+            <input type="text" id="eventName" placeholder="Your answer" required>
           </div>
 
           <div class="form-group">
-            <label>Event Type</label>
+            <label>Event Type <span class="required">*</span></label>
             <input list="eventTypeOptions" id="eventType" placeholder="Your answer" required>
             <datalist id="eventTypeOptions">
               <option value="Workshop"></option>
@@ -150,7 +150,7 @@ AuthMiddleware::requireRole('Organization');
           </div>
 
 
-          <!-- TODO: Kenneth: added a span element para sa error  -->
+          <!-- TODO: added a span element para sa error  -->
           <div class="form-row">
             <div class="form-group time-group">
               <label for="startTime">Start Time <span class="required">*</span></label>
@@ -159,7 +159,7 @@ AuthMiddleware::requireRole('Organization');
               <span id="startTimeError" class="error"></span>
             </div>
 
-            <!-- TODO: Kenneth: added a span element para sa error  -->
+            <!-- TODO:  added a span element para sa error  -->
             <div class="form-group time-group">
               <label for="endTime">End Time <span class="required">*</span></label>
               <input type="time" id="endTime" name="end_time" required>
@@ -169,22 +169,22 @@ AuthMiddleware::requireRole('Organization');
           </div>
 
           <div class="form-group">
-            <label>Venue</label>
-            <input type="text" id="eventVenue" placeholder="Your answer">
+            <label>Venue <span class="required">*</span></label>
+            <input type="text" id="eventVenue" placeholder="Your answer" required>
           </div>
 
           <div class="form-group">
-            <label>Total Number of Attendees</label>
-            <input type="number" id="eventAttendees" placeholder="Your answer" min="0">
+            <label>Total Number of Attendees <span class="required">*</span></label>
+            <input type="number" id="eventAttendees" placeholder="Your answer" min="0" required>
           </div>
 
           <div class="form-group">
-            <label>Link of Proof (e.g., Google Drive, Photos)</label>
-            <input type="url" id="eventProof" placeholder="https://example.com">
+            <label>Link of Proof (e.g., Google Drive, Photos) <span class="required">*</span></label>
+            <input type="url" id="eventProof" placeholder="https://example.com" required>
           </div>
 
           <div class="form-group">
-            <label>Select Applicable SDGs</label>
+            <label>Select Applicable SDGs <span class="required">*</span></label>
             <div class="event-sdg-options">
               <label><input type="checkbox" value="1"> 1. No Poverty</label>
               <label><input type="checkbox" value="2"> 2. Zero Hunger</label>
@@ -207,17 +207,17 @@ AuthMiddleware::requireRole('Organization');
           </div>
 
           <div class="form-group">
-            <label>Event Description</label>
-            <textarea id="eventDesc" rows="3" placeholder="Briefly describe the event..."></textarea>
+            <label>Event Description <span class="required">*</span></label>
+            <textarea id="eventDesc" rows="3" placeholder="Briefly describe the event..." required></textarea>
           </div>
 
           <div class="form-group">
-            <label>Supporting Document</label>
+            <label>Supporting Document <span class="required">*</span></label>
             <div class="drop-zone">
               <p>Browse File</p>
               <span>Drag & Drop files here</span>
               <input type="file" name="supporting_doc[]" class="drop-zone-input"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple required>
             </div>
           </div>
 
@@ -263,13 +263,13 @@ AuthMiddleware::requireRole('Organization');
 
       <div class="event-form">
         <div class="form-group">
-          <label>Event Name</label>
-          <input type="text" id="modalEventName" placeholder="Your answer">
+          <label>Event Name <span class="required">*</span></label>
+          <input type="text" id="modalEventName" placeholder="Your answer" required>
         </div>
 
         <div class="form-group">
-          <label>Event Type</label>
-          <input type="text" id="modalEventType" placeholder="Your answer">
+          <label>Event Type <span class="required">*</span></label>
+          <input type="text" id="modalEventType" placeholder="Your answer" required>
         </div>
 
         <div class="form-group">
@@ -306,22 +306,22 @@ AuthMiddleware::requireRole('Organization');
         </div>
 
         <div class="form-group">
-          <label>Venue</label>
-          <input type="text" id="modalEventVenue" placeholder="Your answer">
+          <label>Venue <span class="required">*</span></label>
+          <input type="text" id="modalEventVenue" placeholder="Your answer" required>
         </div>
 
         <div class="form-group">
-          <label>Total Number of Attendees</label>
-          <input type="number" id="modalEventAttendees" placeholder="Your answer" min="0">
+          <label>Total Number of Attendees <span class="required">*</span></label>
+          <input type="number" id="modalEventAttendees" placeholder="Your answer" min="0" required>
         </div>
 
         <div class="form-group">
-          <label>Link of Proof</label>
-          <input type="url" id="modalEventProof" placeholder="https://example.com">
+          <label>Link of Proof <span class="required">*</span></label>
+          <input type="url" id="modalEventProof" placeholder="https://example.com" required>
         </div>
 
         <div class="form-group">
-          <label>Select SDGs</label>
+          <label>Select SDGs <span class="required">*</span></label>
           <div class="event-sdg-options">
             <label><input type="checkbox" value="1"> 1. No Poverty</label>
             <label><input type="checkbox" value="2"> 2. Zero Hunger</label>
@@ -344,17 +344,17 @@ AuthMiddleware::requireRole('Organization');
         </div>
 
         <div class="form-group">
-          <label>Event Description</label>
-          <textarea id="modalEventDesc" rows="3" placeholder="Briefly describe the event..."></textarea>
+          <label>Event Description <span class="required">*</span></label>
+          <textarea id="modalEventDesc" rows="3" placeholder="Briefly describe the event..." required></textarea>
         </div>
 
         <div class="form-group">
-          <label>Supporting Document</label>
+          <label>Supporting Document <span class="required">*</span></label>
           <div class="drop-zone">
             <p>Browse File</p>
             <span>Drag & Drop files here</span>
             <input type="file" id="modalFileInput" name="modal_supporting_doc[]" class="drop-zone-input"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple required>
           </div>
         </div>
 
