@@ -1,0 +1,51 @@
+# =============================================================================
+# SLU OrgDesk
+# There was previously no .gitignore, which is why node-server/node_modules
+# (2,379 files) and node-server/.env ended up committed.
+# =============================================================================
+
+# --- Dependencies (installed by `npm ci`, never commit) ---
+node_modules/
+**/node_modules/
+
+# --- Environment files and secrets ---
+# node-server/.env holds live MongoDB Atlas credentials.
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+
+# Certificates and OAuth client secrets
+**/client_secret*.json
+**/*.pem
+**/*.key
+
+# --- Build and deploy output ---
+*.log
+build-*.log
+compose-*.log
+dockerinfo.txt
+
+# --- Editor / OS noise ---
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# --- Local container overrides ---
+docker-compose.override.yml
+
+# --- Data exports ---
+# data/*.json holds user records including plaintext passwords. It must never be
+# committed. Keep the export somewhere safe until you have confirmed the import,
+# then delete it: the passwords are bcrypt hashes in the database now.
+data/
+
+# --- Uploaded documents ---
+# Runtime user data. The application writes here at runtime, and the database
+# references no local paths, so these are leftovers. The two guard files are code
+# and must stay under version control.
+uploads/*
+!uploads/.htaccess
+!uploads/redirect.php
