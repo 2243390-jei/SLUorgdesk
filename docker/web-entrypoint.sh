@@ -75,6 +75,21 @@ for dir in "${DOC_ROOT}/uploads" "${DOC_ROOT}/public/images/orgs"; do
     || echo "[entrypoint] warning: could not chown ${dir} (object-storage mount?)"
 done
 
+# A volume mounted over uploads/ replaces the directory contents, which hides the
+# access-control guard that ships in the image. Put it back from the pristine copy
+# baked outside the mount point.
+if [ -d /opt/orgdesk/uploads-guard ]; then
+  for guard in .htaccess redirect.php; do
+    if [ ! -e "${DOC_ROOT}/uploads/${guard}" ]; then
+      if cp "/opt/orgdesk/uploads-guard/${guard}" "${DOC_ROOT}/uploads/${guard}" 2>/dev/null; then
+        echo "[entrypoint] restored uploads/${guard} (masked by the volume mount)"
+      else
+        echo "[entrypoint] warning: could not restore uploads/${guard}"
+      fi
+    fi
+  done
+fi
+
 if [ "${APACHE_RUN_AS_ROOT:-0}" = "1" ]; then
   echo "[entrypoint] running Apache workers as root (APACHE_RUN_AS_ROOT=1)"
   printf 'User root\nGroup root\n' > /etc/apache2/conf-available/zz-run-as-root.conf

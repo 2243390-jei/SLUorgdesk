@@ -8,7 +8,8 @@
 # context.
 #
 # Explicitly NOT ignored (both Dockerfiles copy these):
-#   index.php, public/, php-server/, node-server/, uploads/.htaccess, docker/
+#   index.php, public/, php-server/, node-server/,
+#   uploads/.htaccess, uploads/redirect.php, docker/
 # =============================================================================
 
 # Version control and CI noise
@@ -35,9 +36,18 @@ node_modules
 data/
 
 # Local runtime data - lives in Cloud Storage, mounted as a volume
-uploads/**
+# uploads/ mixes application code with user data. redirect.php and .htaccess are
+# the access-control guard for submitted documents and MUST stay in the build
+# context, otherwise the deployed image serves uploads with no guard at all.
+#
+# `uploads/*` rather than `uploads/**`: excluding the children leaves the uploads/
+# directory entry in place, whereas `uploads/**` caused Cloud Build to drop the
+# directory and fail with "COPY failed: stat uploads/: file does not exist".
+# Keep this list in sync with .dockerignore.
+uploads/*
 !uploads/.htaccess
-public/images/orgs/**
+!uploads/redirect.php
+public/images/orgs/*
 
 # Editor / OS noise
 .vscode

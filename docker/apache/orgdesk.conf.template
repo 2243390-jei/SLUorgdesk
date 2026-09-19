@@ -68,6 +68,12 @@
     ProxyTimeout 300
     ProxyBadHeader Ignore
 
+    # Required to proxy to an HTTPS upstream. Cloud Run serves the API service on
+    # https://..., so without this the proxy fails with
+    # "AH01144: No protocol handler was valid ... (scheme 'https')".
+    # Harmless for the plain-http upstream used by docker-compose.
+    SSLProxyEngine On
+
     ProxyPass        /api/  ${NODE_API_URL}/api/  timeout=300
     ProxyPassReverse /api/  ${NODE_API_URL}/api/
 

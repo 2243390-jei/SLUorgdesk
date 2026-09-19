@@ -37,10 +37,15 @@ deploy/
 # uploads/ mixes application code with user data: redirect.php and .htaccess are
 # the access-control guard for submitted documents, so they must stay in the
 # image even though the rest of the directory is runtime data.
-uploads/**
+#
+# `uploads/*` (not `uploads/**`) excludes the children while leaving the uploads/
+# directory entry itself in the build context. With `uploads/**` Cloud Build's
+# archiver drops the directory entirely once only exception-matched files remain,
+# which makes `COPY uploads/ ...` fail.
+uploads/*
 !uploads/.htaccess
 !uploads/redirect.php
-public/images/orgs/**
+public/images/orgs/*
 
 # ---- Editor / OS noise ----
 .vscode

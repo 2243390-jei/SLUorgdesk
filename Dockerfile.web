@@ -75,11 +75,15 @@ RUN set -eux; \
 # Apache modules:
 #   rewrite   - uploads/.htaccess rewrite to redirect.php
 #   proxy*    - /api/* -> Node service (same-origin cookies, no CORS)
-#   headers   - Cache-Control / X-Forwarded-* / X-Internal-Auth
+#   ssl       - required to proxy to an HTTPS upstream. Cloud Run serves the API
+#               on https://..., and without mod_ssl the proxy fails with
+#               "AH01144: No protocol handler was valid ... (scheme 'https')".
+#               Harmless when the upstream is plain http, as in Compose.
+#   headers   - Cache-Control, X-Forwarded-*, X-Internal-Auth
 #   expires   - static asset caching
-#   setenvif  - "SetEnvIf X-Forwarded-Proto ^https HTTPS=on"
+#   setenvif  - SetEnvIf X-Forwarded-Proto ^https HTTPS=on
 RUN set -eux; \
-    a2enmod rewrite proxy proxy_http headers expires setenvif; \
+    a2enmod rewrite proxy proxy_http headers expires setenvif ssl; \
     { \
       echo 'ServerTokens Prod'; \
       echo 'ServerSignature Off'; \
@@ -112,7 +116,23 @@ WORKDIR /var/www/html
 COPY index.php   /var/www/html/index.php
 COPY public/     /var/www/html/public/
 COPY php-server/ /var/www/html/php-server/
-COPY uploads/    /var/www/html/uploads/
+
+# uploads/ holds runtime data, so it is excluded from the build context except for
+# these two files, which are the access-control guard for submitted documents.
+# The files are named explicitly rather than using `COPY uploads/ ...` so the
+# build does not depend on the uploads/ directory entry surviving the ignore
+# rules - Cloud Build's archiver omits it when every remaining child is matched
+# only by an exception.
+COPY uploads/.htaccess uploads/redirect.php /var/www/html/uploads/
+
+# Keep a pristine copy of the guard files OUTSIDE the uploads/ mount point. At
+# runtime a volume is mounted over /var/www/html/uploads (a GCS bucket on Cloud
+# Run, a named volume in Compose), and a mount replaces the directory contents -
+# which would hide the access control for submitted documents. The entrypoint
+# restores them from here.
+RUN set -eux; \
+    mkdir -p /opt/orgdesk/uploads-guard; \
+    cp /var/www/html/uploads/.htaccess /var/www/html/uploads/redirect.php /opt/orgdesk/uploads-guard/
 
 RUN set -eux; \
     mkdir -p /var/www/html/uploads /var/www/html/public/images/orgs; \

@@ -59,6 +59,24 @@ if [ -z "${PROJECT_ID}" ] || [ "${PROJECT_ID}" = "(unset)" ]; then
   die "No GCP project selected. Run: gcloud config set project <PROJECT_ID>"
 fi
 
+# `gcloud config get-value project` returns whatever is configured, even if that
+# project has been deleted or the account cannot see it. Creating resources then
+# fails deep inside an API call with a confusing RESOURCES_NOT_FOUND, so verify
+# reachability up front and list what is actually available.
+if ! gcloud projects describe "${PROJECT_ID}" >/dev/null 2>&1; then
+  warn "Project '${PROJECT_ID}' is not accessible - it may have been deleted, renamed, or you may lack permission."
+  echo
+  echo "Projects available to this account:"
+  gcloud projects list --format='table(projectId,projectNumber,name)' 2>/dev/null || true
+  echo
+  die "Re-run with a valid project, e.g. PROJECT_ID=<project-id> bash deploy/deploy.sh"
+fi
+
+# Cloud Run, Cloud Build and Secret Manager all require billing.
+if ! gcloud billing projects describe "${PROJECT_ID}" --format='value(billingEnabled)' 2>/dev/null | grep -qi 'true'; then
+  warn "Billing does not appear to be enabled on '${PROJECT_ID}'. The deploy will fail without it."
+fi
+
 # Reuse the local .env for the Atlas URI if it is not already exported.
 if [ -z "${MONGO_URI:-}" ] && [ -f "${PROJECT_ROOT}/.env" ]; then
   MONGO_URI="$(grep -E '^MONGO_URI=' "${PROJECT_ROOT}/.env" | head -n1 | cut -d= -f2- || true)"
@@ -188,12 +206,25 @@ log "Granted storage.objectAdmin on both buckets"
 # -----------------------------------------------------------------------------
 # 5. Build and push both images (Cloud Build - no local Docker required)
 # -----------------------------------------------------------------------------
-log "Building images with Cloud Build"
-gcloud builds submit "${PROJECT_ROOT}" \
-  --project "${PROJECT_ID}" \
-  --config "${SCRIPT_DIR}/cloudbuild.yaml" \
-  --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO},_TAG=${TAG}" \
-  --quiet
+# Set SKIP_BUILD=1 to re-deploy the images already sitting in Artifact Registry
+# without running Cloud Build again. Useful when only service configuration
+# changed (env vars, secrets, volume mounts), which is the common case while
+# bringing a service up for the first time.
+if [ "${SKIP_BUILD:-0}" = "1" ]; then
+  log "SKIP_BUILD=1 - reusing ${WEB_IMAGE} and ${API_IMAGE}"
+else
+  log "Building images with Cloud Build"
+
+  # Note: do NOT reach for MSYS_NO_PATHCONV here. MSYS translates the POSIX source
+  # path into a Windows path for gcloud, which is a native binary; disabling that
+  # translation also breaks gcloud's own launcher, which needs it to locate its
+  # bundled Python interpreter.
+  gcloud builds submit "${PROJECT_ROOT}" \
+    --project "${PROJECT_ID}" \
+    --config "${SCRIPT_DIR}/cloudbuild.yaml" \
+    --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO},_TAG=${TAG}" \
+    --quiet
+fi
 
 # -----------------------------------------------------------------------------
 # 6. Deploy the API service first, so the web service can be pointed at its URL
