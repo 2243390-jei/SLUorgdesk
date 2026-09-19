@@ -3,6 +3,7 @@ const router = express.Router();
 const Organization = require('../models/Organization');
 const User = require('../models/User');
 const Submission = require('../models/Submission');
+const authMiddleware = require('../middleware/AuthMiddleware');
 
 function normalizeLabel(v) {
   if (v === null || typeof v === 'undefined') return 'Unassigned';
@@ -32,7 +33,9 @@ function pick(obj, candidates = []) {
   return null;
 }
 
-router.get('/', async (req, res) => {
+// Dashboard aggregate counts; only the admin and OSAS dashboards read this, and
+// both are behind a login, so it must not be world-readable.
+router.get('/', authMiddleware, async (req, res) => {
   try {
     // Organizations grouped by school (unchanged)
     const orgAgg = await Organization.aggregate([

@@ -1,0 +1,77 @@
+# =============================================================================
+# SLU OrgDesk - API image (Node.js / Express)
+#
+# Provides:
+#   /api/users        login, session, CRUD        (node-server/routes/users.js)
+#   /api/organizations, /api/stats
+#   /api/upload_logo  multipart org logo upload   (node-server/middleware/upload.js)
+#   /uploads/**       static serving of submitted files
+#   /health           health probe                (node-server/routes/index.js)
+#
+# Important: the app resolves writable paths relative to its own directory:
+#   app.js                 -> path.join(__dirname, '..', 'uploads')
+#   middleware/upload.js   -> path.join(__dirname, '..', '..', 'public', 'images', 'orgs')
+# so /app/uploads and /app/public/images/orgs must exist and be shared with the
+# web container (both services write to them).
+#
+# Build:
+#   docker build -f Dockerfile.node -t orgdesk-api .
+# =============================================================================
+
+ARG NODE_VERSION=20
+
+# -----------------------------------------------------------------------------
+# Stage 1 - dependencies
+# Build tools are present so bcrypt can fall back to compiling from source if
+# the prebuilt binary download is unavailable during the build.
+# -----------------------------------------------------------------------------
+FROM node:${NODE_VERSION}-bookworm-slim AS deps
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends python3 make g++ ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/node-server
+COPY node-server/package.json node-server/package-lock.json ./
+# `npm ci` fails if the lockfile is out of sync with package.json - that is
+# intentional: the image must be built from a reproducible dependency tree.
+RUN npm ci --omit=dev --no-audit --no-fund
+
+# -----------------------------------------------------------------------------
+# Stage 2 - runtime
+# -----------------------------------------------------------------------------
+FROM node:${NODE_VERSION}-bookworm-slim AS runtime
+
+# gosu -> drop root after fixing ownership of the shared volumes
+# curl -> container healthcheck
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends gosu curl ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production \
+    APP_DIR=/app/node-server
+
+# Project-root layout the Express app expects: /app/node-server + /app/uploads
+# + /app/public/images/orgs. This mirrors the local WAMP directory structure.
+WORKDIR /app
+COPY node-server/ /app/node-server/
+COPY --from=deps /app/node-server/node_modules /app/node-server/node_modules
+
+COPY docker/node-entrypoint.sh /usr/local/bin/node-entrypoint.sh
+RUN set -eux; \
+    sed -i 's/\r$//' /usr/local/bin/node-entrypoint.sh; \
+    chmod +x /usr/local/bin/node-entrypoint.sh; \
+    mkdir -p /app/uploads /app/public/images/orgs; \
+    chown -R node:node /app/uploads /app/public/images/orgs /app/node-server
+
+# Local default is 5000 (matches the original setup); Cloud Run injects PORT=8080.
+EXPOSE 5000 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT:-5000}/health" >/dev/null || exit 1
+
+# Starts as root only to fix volume ownership, then drops to `node`.
+ENTRYPOINT ["/usr/local/bin/node-entrypoint.sh"]
+CMD ["node", "server.js"]

@@ -1,0 +1,39 @@
+# =============================================================================
+# Line-ending policy
+#
+# Windows checkouts convert text files to CRLF, which breaks shell scripts:
+#   bash deploy/deploy.sh      -> ": not found" / "syntax error near unexpected token"
+#   docker/web-entrypoint.sh   -> same, inside the container
+#
+# Dockerfile.web and Dockerfile.node strip a trailing CR from the entrypoints
+# defensively, but deploy/deploy.sh runs directly from the repository, so the
+# endings must be correct on disk. These rules force LF for the files where it
+# matters and leave everything else alone.
+# =============================================================================
+
+# Shell scripts must be LF, or they cannot be executed by sh/bash.
+*.sh              text eol=lf
+
+# Container build files and runtime config.
+Dockerfile        text eol=lf
+Dockerfile.*      text eol=lf
+*.conf.template   text eol=lf
+*.ini             text eol=lf
+
+# Binary assets must never be line-ending converted.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.doc   binary
+*.docx  binary
+*.xls   binary
+*.xlsx  binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.eot   binary

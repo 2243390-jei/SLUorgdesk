@@ -1,5 +1,8 @@
 const http = require('http')
 
+// Load .env before anything reads process.env.
+require('./config/env')
+
 // Parse command-line arguments for host configuration FIRST (before loading app)
 let HOST = '0.0.0.0'
 const args = process.argv.slice(2)

@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/../database/dbAccess.php';
+require_once __DIR__ . '/../database/dbAccess.php';
 
 class Organization {
     private $collection = 'Organizations';

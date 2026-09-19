@@ -1,0 +1,48 @@
+# =============================================================================
+# Cloud Build source-upload filter.
+#
+# `gcloud builds submit` uploads this directory as the Docker build context.
+# Without this file gcloud synthesises one from .gitignore, which risks either
+# uploading node_modules / .git or - worse - excluding paths the Dockerfiles
+# COPY. This list mirrors .dockerignore so local and remote builds see the same
+# context.
+#
+# Explicitly NOT ignored (both Dockerfiles copy these):
+#   index.php, public/, php-server/, node-server/, uploads/.htaccess, docker/
+# =============================================================================
+
+# Version control and CI noise
+.git
+.gitignore
+.github
+
+# Node dependencies - reinstalled inside the image with `npm ci`
+node_modules
+**/node_modules
+
+# Secrets: injected at runtime from Secret Manager, never uploaded or baked in
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+**/client_secret*.json
+**/*.pem
+**/*.key
+
+# Data exports - user records, including plaintext passwords. Never upload these
+# to Cloud Build; import them from a machine that can reach the database.
+data/
+
+# Local runtime data - lives in Cloud Storage, mounted as a volume
+uploads/**
+!uploads/.htaccess
+public/images/orgs/**
+
+# Editor / OS noise
+.vscode
+.idea
+Thumbs.db
+Desktop.ini
+*.log
+README.txt

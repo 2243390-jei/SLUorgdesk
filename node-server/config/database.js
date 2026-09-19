@@ -1,11 +1,20 @@
-require('dotenv').config()
+require('./env')
 const mongoose = require('mongoose')
 
 const connectDB = async (uri) => {
-  const mongoUri = uri || process.env.MONGO_URI || "mongodb+srv://root:root123360@software-engineering.vw1nyls.mongodb.net/Web-Tech?retryWrites=true&w=majority&appName=Software-Engineering"
+  // No hardcoded fallback: the credentials live in the environment (Secret
+  // Manager on Cloud Run) or in node-server/.env for local development.
+  const mongoUri = uri || process.env.MONGO_URI
+
+  if (!mongoUri) {
+    throw new Error(
+      'MONGO_URI is not configured. Set it in the environment or in node-server/.env'
+    )
+  }
+
   try {
     await mongoose.connect(mongoUri)
-    console.log('MongoDB connected')
+    console.log(`MongoDB connected (db: ${mongoose.connection.name})`)
   } catch (err) {
     console.error('MongoDB connection error:', err)
     throw err

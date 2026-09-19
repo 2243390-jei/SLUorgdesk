@@ -1,0 +1,97 @@
+# =============================================================================
+# SLU OrgDesk - Apache virtual host (template)
+# Rendered at container start by /usr/local/bin/web-entrypoint.sh via envsubst.
+# Placeholders: ${HTTP_PORT} ${DOC_ROOT} ${NODE_API_URL} ${INTERNAL_AUTH_TOKEN}
+# =============================================================================
+<VirtualHost *:${HTTP_PORT}>
+    ServerName orgdesk
+    ServerAdmin admin@localhost
+
+    # The project root is the document root on purpose: the frontend addresses
+    # PHP route scripts with relative URLs such as `php-server/routes/users.php`
+    # and `../../php-server/routes/users.php`, which the browser resolves
+    # against the document base URI.
+    DocumentRoot ${DOC_ROOT}
+
+    <Directory ${DOC_ROOT}>
+        Options -Indexes +FollowSymLinks
+        # `uploads/.htaccess` performs the access-control rewrite to
+        # uploads/redirect.php, so overrides must be permitted.
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Uploaded artefacts are written at runtime by both the PHP service
+    # (FileUploadService) and the Node service (multer). Keep both writable
+    # directories explicitly enabled.
+    <Directory ${DOC_ROOT}/uploads>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <Directory ${DOC_ROOT}/public/images/orgs>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    DirectoryIndex index.php index.html
+
+    # -------------------------------------------------------------------------
+    # TLS awareness
+    # Cloud Run terminates TLS at the load balancer and forwards
+    # `X-Forwarded-Proto: https`. Propagate that to PHP (so $_SERVER['HTTPS'] is
+    # set and Secure session cookies are emitted) and to the Node upstream
+    # (so `trust proxy` lets express-session mark its cookie Secure too).
+    # On plain-HTTP local Docker this block simply does not apply.
+    #
+    # Note: `SetEnv` here is mod_setenvif syntax, which PHP reads via
+    # $_SERVER['HTTPS']. The <If> block is at virtual-host level deliberately -
+    # that context is unambiguously supported.
+    # -------------------------------------------------------------------------
+    SetEnvIf X-Forwarded-Proto "^https" HTTPS=on
+
+    <If "%{HTTP:X-Forwarded-Proto} =~ /^https$/i">
+        RequestHeader set X-Forwarded-Proto "https"
+        RequestHeader set X-Forwarded-Ssl   "on"
+    </If>
+
+    # -------------------------------------------------------------------------
+    # Reverse proxy: Node/Express API mounted behind the same origin.
+    # Serving /api/* from this host keeps both the PHP session cookie
+    # (PHPSESSID) and the Express session cookie (connect.sid) first-party,
+    # which avoids SameSite=None / third-party-cookie restrictions and
+    # removes the hardcoded :5000 dependency in the frontend config.
+    # -------------------------------------------------------------------------
+    ProxyPreserveHost On
+    ProxyTimeout 300
+    ProxyBadHeader Ignore
+
+    ProxyPass        /api/  ${NODE_API_URL}/api/  timeout=300
+    ProxyPassReverse /api/  ${NODE_API_URL}/api/
+
+    # Shared secret. The Node service only inspects it for /api/* and
+    # /uploads/*; PHP ignores it entirely.
+    RequestHeader set X-Internal-Auth "${INTERNAL_AUTH_TOKEN}"
+
+    # -------------------------------------------------------------------------
+    # Static asset caching
+    # -------------------------------------------------------------------------
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresByType image/png               "access plus 7 days"
+        ExpiresByType image/jpeg              "access plus 7 days"
+        ExpiresByType image/svg+xml           "access plus 7 days"
+        ExpiresByType text/css                "access plus 1 days"
+        ExpiresByType application/javascript  "access plus 1 days"
+    </IfModule>
+
+    # Never let a CDN or browser cache API responses or PHP pages.
+    <LocationMatch "^/(api/|php-server/)">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    </LocationMatch>
+
+    ErrorLog  /proc/self/fd/2
+    CustomLog /proc/self/fd/1 combined
+</VirtualHost>

@@ -75,12 +75,17 @@ router.post('/logout', (req, res) => {
   })
 })
 
-router.get('/role/:role', usersController.getUserByRole)
-router.get('/email/:email', usersController.getUserByEmail)
-router.get('/', usersController.getAllUsers)
-router.get('/:id', usersController.getUserById)
-router.post('/', validateUser, usersController.createUser)
-router.patch('/:id', validateUser, usersController.updateUser)
-router.delete('/:id', usersController.deleteUser)
+// Everything below reads or mutates user records, so it requires an authenticated
+// session. Without this guard anyone who can reach the app could list every user,
+// create an account - including an admin, since `role` is taken from the request
+// body - or delete existing users. `validateUser` checks the payload shape, not
+// the identity of the caller.
+router.get('/role/:role', authMiddleware, usersController.getUserByRole)
+router.get('/email/:email', authMiddleware, usersController.getUserByEmail)
+router.get('/', authMiddleware, usersController.getAllUsers)
+router.get('/:id', authMiddleware, usersController.getUserById)
+router.post('/', authMiddleware, validateUser, usersController.createUser)
+router.patch('/:id', authMiddleware, validateUser, usersController.updateUser)
+router.delete('/:id', authMiddleware, usersController.deleteUser)
 
 module.exports = router

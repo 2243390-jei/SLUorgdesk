@@ -1,0 +1,51 @@
+# ---- Version control ----
+.git
+.gitignore
+
+# ---- Node ----
+node-server/node_modules
+node-server/npm-debug.log*
+node-server/.npm
+
+# ---- Node ----
+node-server/node_modules/**
+**/node_modules/**
+
+# ---- Environment / secrets (injected at runtime, never baked into images) ----
+# Listed at every depth: a bare `.env` pattern does not reliably match
+# nested paths, and node-server/.env currently holds live Atlas credentials.
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+**/client_secret*.json
+**/*.pem
+**/*.key
+
+# Data exports - user records, including plaintext passwords. Import with
+# `docker compose cp`, which bypasses the build context entirely.
+data/
+
+# ---- Docker / deploy artifacts (not needed inside the images) ----
+Dockerfile.*
+docker-compose*.yml
+.dockerignore
+deploy/
+
+# ---- Local runtime data: uploaded at runtime, mounted as a volume ----
+# uploads/ mixes application code with user data: redirect.php and .htaccess are
+# the access-control guard for submitted documents, so they must stay in the
+# image even though the rest of the directory is runtime data.
+uploads/**
+!uploads/.htaccess
+!uploads/redirect.php
+public/images/orgs/**
+
+# ---- Editor / OS noise ----
+.vscode
+.idea
+Thumbs.db
+Desktop.ini
+*.log
+README.txt

@@ -1,0 +1,111 @@
+# =============================================================================
+# SLU OrgDesk - local container topology
+#
+#   Browser ──► web  (Apache + mod_php, :8080)
+#                 ├─ /                       index.php
+#                 ├─ /public/** , /php-server/routes/*.php
+#                 ├─ /uploads/**             (shared volume, .htaccess guarded)
+#                 └─ /api/**  ──proxy──► api (Express, :5000)  (shared volumes)
+#
+# Two containers, one origin. Proxying /api/* through Apache keeps both the
+# PHP session cookie (PHPSESSID) and the Express session cookie (connect.sid)
+# first-party, so no SameSite=None / third-party-cookie caveats apply.
+#
+# MongoDB is MongoDB Atlas (external) - there is no database container.
+#
+# Usage:
+#   cp .env.example .env      # then fill in MONGO_URI and SESSION_SECRET
+#   docker compose up --build
+#   open http://localhost:8080
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Web tier: PHP frontend + PHP JSON API + reverse proxy to the Node API
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        PHP_VERSION: "8.3"
+    image: orgdesk-web:local
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Apache binds this port; the entrypoint rewrites ports.conf accordingly.
+      PORT: "8080"
+      # Upstream for the /api/* reverse proxy (Docker's internal DNS).
+      NODE_API_URL: "http://api:5000"
+      # Shared secret echoed to the Node API; empty disables the check.
+      INTERNAL_AUTH_TOKEN: "${INTERNAL_AUTH_TOKEN:-}"
+      # Plain HTTP locally, so the PHP session cookie must NOT be Secure.
+      PHP_SESSION_COOKIE_SECURE: "0"
+      # The PHP half queries Atlas directly (UserController, OrganizationController,
+      # SubmissionController), so this service needs the connection string too -
+      # it is not enough for only the API service to have it.
+      MONGO_URI: "${MONGO_URI:?set MONGO_URI in .env (see .env.example)}"
+      MONGO_DB: "${MONGO_DB:-Web-Tech}"
+    volumes:
+      # Submitted files: written by php-server/middleware/FileUploadService.php
+      - uploads:/var/www/html/uploads
+      # Organization logos: written by the Node multer middleware
+      - org_logos:/var/www/html/public/images/orgs
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/php-server/routes/users.php?session=me >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 25s
+      retries: 3
+    networks:
+      - orgdesk
+
+  # ---------------------------------------------------------------------------
+  # API tier: Express (users, organizations, stats, upload_logo)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+      args:
+        NODE_VERSION: "20"
+    image: orgdesk-api:local
+    restart: unless-stopped
+    # Published for direct debugging only; the frontend should always go through
+    # the web container so that cookies stay first-party.
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: "${NODE_ENV:-production}"
+      PORT: "5000"
+      MONGO_URI: "${MONGO_URI:?set MONGO_URI in .env (see .env.example)}"
+      MONGO_DB: "${MONGO_DB:-Web-Tech}"
+      SESSION_SECRET: "${SESSION_SECRET:?set SESSION_SECRET in .env (see .env.example)}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:8080,http://localhost:5000}"
+      INTERNAL_AUTH_TOKEN: "${INTERNAL_AUTH_TOKEN:-}"
+    volumes:
+      - uploads:/app/uploads
+      - org_logos:/app/public/images/orgs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:5000/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    networks:
+      - orgdesk
+
+volumes:
+  # Shared between web and api: PHP writes submissions, Node serves/reads them.
+  uploads:
+  # Shared between web and api: Node writes logos, Apache serves them.
+  org_logos:
+
+networks:
+  orgdesk:
+    driver: bridge

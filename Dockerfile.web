@@ -1,0 +1,128 @@
+# =============================================================================
+# SLU OrgDesk - WEB image (Apache + mod_php frontend and PHP API)
+#
+# Serves:
+#   /                       -> index.php
+#   /public/**              -> static frontend assets
+#   /php-server/routes/*.php-> PHP JSON API (login, users, orgs, submissions)
+#   /uploads/**             -> uploads/.htaccess -> redirect.php (access control)
+#   /api/**                 -> reverse-proxied to the Node API service
+#
+# Build:
+#   docker build -f Dockerfile.web -t orgdesk-web .
+# =============================================================================
+
+ARG PHP_VERSION=8.3
+
+# -----------------------------------------------------------------------------
+# Stage 1 - build the mongodb PECL extension.
+#
+# Built on the *same* base image as the runtime stage, so the resulting .so
+# matches the runtime PHP ABI and every shared library it needs (libssl,
+# libcrypto) is already present in the runtime filesystem. Nothing has to be
+# re-guessed at runtime stage, and no distro-package-name drift can break it.
+#
+# libsasl2 is deliberately NOT installed: it is only needed for Kerberos/LDAP
+# authentication. MongoDB Atlas uses SCRAM-SHA-256, which is built in.
+# -----------------------------------------------------------------------------
+FROM php:${PHP_VERSION}-apache AS ext-builder
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        $PHPIZE_DEPS \
+        libssl-dev \
+        libcurl4-openssl-dev \
+        pkg-config; \
+    rm -rf /var/lib/apt/lists/*
+
+# Empty = latest stable PECL release.
+# Pin for reproducible builds once verified, e.g. --build-arg MONGODB_EXT_VERSION=2.1.0
+ARG MONGODB_EXT_VERSION=
+RUN set -eux; \
+    if [ -n "${MONGODB_EXT_VERSION}" ]; then \
+        pecl install "mongodb-${MONGODB_EXT_VERSION}"; \
+    else \
+        pecl install mongodb; \
+    fi; \
+    find /usr/local/lib/php/extensions -type f -name 'mongodb.so' -exec cp {} /tmp/mongodb.so \;; \
+    test -f /tmp/mongodb.so
+
+# -----------------------------------------------------------------------------
+# Stage 2 - runtime
+# -----------------------------------------------------------------------------
+FROM php:${PHP_VERSION}-apache AS runtime
+
+# gettext-base -> envsubst, used by the entrypoint to render the virtual host.
+# curl         -> container healthcheck and in-container debugging.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        gettext-base \
+        curl; \
+    rm -rf /var/lib/apt/lists/*
+
+# The mongodb driver is a hard requirement: php-server/database/dbAccess.php
+# aborts with "MongoDB PHP driver not installed." when it is absent.
+# Loaded by absolute path so resolution never depends on extension_dir.
+COPY --from=ext-builder /tmp/mongodb.so /opt/php-ext/mongodb.so
+RUN set -eux; \
+    echo 'extension=/opt/php-ext/mongodb.so' > /usr/local/etc/php/conf.d/zz-mongodb.ini; \
+    php -m | grep -ix 'mongodb'; \
+    php -r 'exit((int) !extension_loaded("mongodb"));'
+
+# Apache modules:
+#   rewrite   - uploads/.htaccess rewrite to redirect.php
+#   proxy*    - /api/* -> Node service (same-origin cookies, no CORS)
+#   headers   - Cache-Control / X-Forwarded-* / X-Internal-Auth
+#   expires   - static asset caching
+#   setenvif  - "SetEnvIf X-Forwarded-Proto ^https HTTPS=on"
+RUN set -eux; \
+    a2enmod rewrite proxy proxy_http headers expires setenvif; \
+    { \
+      echo 'ServerTokens Prod'; \
+      echo 'ServerSignature Off'; \
+      echo 'ServerName localhost'; \
+      echo 'TraceEnable Off'; \
+      echo 'KeepAlive On'; \
+      echo 'KeepAliveTimeout 5'; \
+      echo '# 50 MB per file plus multipart overhead (FileUploadService ceiling)'; \
+      echo 'LimitRequestBody 262144000'; \
+    } > /etc/apache2/conf-available/zz-orgdesk-hardening.conf; \
+    a2enconf zz-orgdesk-hardening
+
+COPY docker/php/php-custom.ini /usr/local/etc/php/conf.d/zz-orgdesk.ini
+
+# Virtual host template - rendered at start-up once $PORT is known.
+COPY docker/apache/orgdesk.conf.template /etc/apache2/sites-templates/orgdesk.conf.template
+
+# sed strips CRLF so the script still runs if the repo is checked out on Windows.
+COPY docker/web-entrypoint.sh /usr/local/bin/web-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/web-entrypoint.sh \
+    && chmod +x /usr/local/bin/web-entrypoint.sh
+
+# -----------------------------------------------------------------------------
+# Application payload.
+# Copied selectively - the Node sources are intentionally absent from this image.
+# The document root MUST be the project root: the frontend resolves
+# `php-server/routes/*.php` against the document base URI.
+# -----------------------------------------------------------------------------
+WORKDIR /var/www/html
+COPY index.php   /var/www/html/index.php
+COPY public/     /var/www/html/public/
+COPY php-server/ /var/www/html/php-server/
+COPY uploads/    /var/www/html/uploads/
+
+RUN set -eux; \
+    mkdir -p /var/www/html/uploads /var/www/html/public/images/orgs; \
+    chown -R www-data:www-data /var/www/html/uploads /var/www/html/public/images/orgs
+
+# 80 is the plain-Docker default; Cloud Run injects PORT=8080 at runtime.
+EXPOSE 80 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT:-80}/php-server/routes/users.php?session=me" >/dev/null || exit 1
+
+ENTRYPOINT ["/usr/local/bin/web-entrypoint.sh"]
+CMD ["apache2-foreground"]
